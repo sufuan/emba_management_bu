@@ -47,11 +47,15 @@ class ApplicantController extends Controller
             'phone' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'subject_choice' => 'required|string',
-            'experience_json' => 'nullable|array',
-            'education_json' => 'nullable|array',
+            'experience_json' => 'nullable|string',
+            'education_json' => 'nullable|string',
             'passport_photo' => 'required|image|mimes:jpg,jpeg,png|max:200|dimensions:width=300,height=300',
             'signature' => 'required|image|mimes:jpg,jpeg,png|max:200|dimensions:width=300,height=80',
         ]);
+
+        // Parse JSON strings to arrays
+        $validated['education_json'] = json_decode($validated['education_json'] ?? '[]', true) ?: [];
+        $validated['experience_json'] = json_decode($validated['experience_json'] ?? '[]', true) ?: [];
 
         $applicant = $this->applicantService->createApplicant(
             $validated,

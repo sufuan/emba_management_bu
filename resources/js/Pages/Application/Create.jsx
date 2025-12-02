@@ -76,14 +76,59 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
 
     const handleFileChange = (e, field) => {
         const file = e.target.files[0];
-        if (file) {
-            setData(field, file);
-            const reader = new FileReader();
-            reader.onload = (ev) => field === 'passport_photo' ? setPhotoPreview(ev.target.result) : setSignaturePreview(ev.target.result);
-            reader.readAsDataURL(file);
-            // Clear error when file is selected
-            setStepErrors(prev => ({ ...prev, [field]: null }));
+        if (!file) return;
+
+        // Get constraints based on field
+        const constraints = field === 'passport_photo'
+            ? { width: 300, height: 300, maxSize: 200 * 1024, label: 'Passport Photo (300×300px)' }
+            : { width: 300, height: 80, maxSize: 200 * 1024, label: 'Signature (300×80px)' };
+
+        // Validate file size first
+        if (file.size > constraints.maxSize) {
+            setStepErrors(prev => ({
+                ...prev,
+                [field]: `File size must be less than 200KB. Current: ${Math.round(file.size / 1024)}KB`
+            }));
+            e.target.value = '';
+            return;
         }
+
+        // Validate file type
+        if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
+            setStepErrors(prev => ({
+                ...prev,
+                [field]: 'Only JPG, JPEG, or PNG images are allowed'
+            }));
+            e.target.value = '';
+            return;
+        }
+
+        // Validate image dimensions
+        const img = new Image();
+        const reader = new FileReader();
+
+        reader.onload = (ev) => {
+            img.onload = () => {
+                if (img.width !== constraints.width || img.height !== constraints.height) {
+                    setStepErrors(prev => ({
+                        ...prev,
+                        [field]: `Image must be exactly ${constraints.width}×${constraints.height}px. Your image: ${img.width}×${img.height}px`
+                    }));
+                    e.target.value = '';
+                    setData(field, null);
+                    if (field === 'passport_photo') setPhotoPreview(null);
+                    else setSignaturePreview(null);
+                } else {
+                    // Valid image - set data and preview
+                    setData(field, file);
+                    if (field === 'passport_photo') setPhotoPreview(ev.target.result);
+                    else setSignaturePreview(ev.target.result);
+                    setStepErrors(prev => ({ ...prev, [field]: null }));
+                }
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
     };
 
     const addEducation = () => setData('education_json', [...data.education_json, { degree: '', institution: '', year: '', result: '' }]);
@@ -106,7 +151,27 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validateStep(4)) {
-            post('/apply', { forceFormData: true });
+            // Use router.post with FormData for file uploads
+            const formData = new FormData();
+            formData.append('full_name', data.full_name);
+            formData.append('fathers_name', data.fathers_name);
+            formData.append('mothers_name', data.mothers_name);
+            formData.append('dob', data.dob);
+            formData.append('nid', data.nid);
+            formData.append('phone', data.phone);
+            formData.append('email', data.email);
+            formData.append('subject_choice', data.subject_choice);
+            formData.append('education_json', JSON.stringify(data.education_json));
+            formData.append('experience_json', JSON.stringify(data.experience_json));
+            if (data.passport_photo) formData.append('passport_photo', data.passport_photo);
+            if (data.signature) formData.append('signature', data.signature);
+
+            router.post('/apply', formData, {
+                forceFormData: true,
+                onError: (errors) => {
+                    console.log('Submission errors:', errors);
+                },
+            });
         }
     };
 
