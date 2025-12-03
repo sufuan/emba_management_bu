@@ -1,105 +1,116 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8" />
     <title>Admit Card - {{ $applicant->admission_roll }}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; color: #333; }
-        .card { border: 3px solid #1e40af; max-width: 600px; margin: 20px auto; }
-        .header { background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 20px; text-align: center; }
-        .header h1 { font-size: 18px; margin-bottom: 5px; }
-        .header h2 { font-size: 14px; font-weight: normal; }
-        .admit-badge { background: #fbbf24; color: #1e40af; padding: 5px 20px; display: inline-block; font-weight: bold; margin-top: 10px; font-size: 16px; }
-        .content { padding: 20px; }
-        .photo-roll { display: table; width: 100%; margin-bottom: 20px; }
-        .photo-box { display: table-cell; width: 120px; vertical-align: top; }
-        .photo-box img { width: 100px; height: 120px; border: 2px solid #1e40af; object-fit: cover; }
-        .roll-box { display: table-cell; vertical-align: middle; text-align: center; }
-        .roll-number { font-size: 24px; font-weight: bold; color: #1e40af; }
-        .roll-label { font-size: 12px; color: #666; }
-        .info-section { margin-bottom: 15px; }
-        .info-row { display: table; width: 100%; margin-bottom: 8px; }
-        .info-label { display: table-cell; width: 40%; font-weight: bold; color: #555; }
-        .info-value { display: table-cell; width: 60%; }
-        .divider { border-top: 1px dashed #ccc; margin: 15px 0; }
-        .exam-info { background: #f3f4f6; padding: 15px; margin-top: 15px; }
-        .exam-info h3 { color: #1e40af; margin-bottom: 10px; font-size: 14px; }
-        .signature-section { display: table; width: 100%; margin-top: 20px; }
-        .signature-section > div { display: table-cell; width: 50%; text-align: center; }
-        .signature-box { border-top: 1px solid #333; margin-top: 40px; padding-top: 5px; display: inline-block; min-width: 150px; }
-        .candidate-signature img { height: 40px; margin-bottom: 5px; }
-        .footer { background: #f3f4f6; padding: 10px; text-align: center; font-size: 10px; color: #666; }
-        .instructions { margin-top: 20px; padding: 15px; border: 1px solid #fbbf24; background: #fffbeb; }
-        .instructions h4 { color: #d97706; margin-bottom: 10px; }
-        .instructions ul { margin-left: 20px; }
-        .instructions li { margin-bottom: 5px; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; margin:40px 60px; }
+        .dotted-top { border-top:1px dotted #333; margin-top:5px; margin-bottom:10px; }
+        .header { text-align:center; }
+        .header .title { font-size:18px; font-weight:bold; }
+        .header .subtitle { margin-top:6px; }
+        .layout { width:100%; margin-top:10px; }
+        .left-box { width:28%; vertical-align:top; }
+        .center-box { width:44%; padding-left:10px; padding-right:10px; vertical-align:top; text-align:center; }
+        .right-box { width:28%; vertical-align:top; text-align:right; }
+        .office-table { border:1px solid #000; border-collapse:collapse; width:100%; }
+        .office-table td { border:1px solid #000; padding:6px; }
+        .photo-frame { width:120px; height:150px; border:1px solid #000; position:relative; overflow:hidden; }
+        .info-line { margin-top:14px; }
+        .fields { margin-top:18px; }
+        .fields td { padding:6px 8px; vertical-align:top; }
+        .field-label { display:block; margin-top:10px; text-align:right; vertical-align:top; padding-right:10px; }
+        .name-value { display:block; margin-top:10px; text-align:left; vertical-align:top; padding-left:10px; }
+        .signature-box { margin-top:50px; text-align:right; }
+        .sig-line { display:block; margin-bottom:6px; }
+        .small-note { font-size:10px; text-align:center; margin-top:6px; }
+        .underline { border-bottom:1px solid #000; display:inline-block; min-width:200px; }
+        .two-cols { width:100%; margin-top:8px; }
+        .two-cols td { vertical-align:top; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="header">
-            <h1>EXECUTIVE MBA PROGRAM</h1>
-            <h2>{{ $session->session_name }} ({{ $session->year_start }}-{{ $session->year_end }})</h2>
-            <div class="admit-badge">ADMIT CARD</div>
-        </div>
 
-        <div class="content">
-            <div class="photo-roll">
-                <div class="photo-box">
-                    @if($applicant->photo_path)
-                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" alt="Photo">
-                    @else
-                        <div style="width: 100px; height: 120px; border: 2px solid #1e40af; text-align: center; padding-top: 45px; color: #999;">Photo</div>
+    <div class="header">
+        <table style="width:100%;">
+            <tr>
+                <td style="text-align:center;">
+                    @if(file_exists(public_path('logo/university_logo.png')))
+                        <img src="{{ public_path('logo/university_logo.png') }}" style="width:80px; height:80px; object-fit:contain;" />
                     @endif
-                </div>
-                <div class="roll-box">
-                    <div class="roll-label">ADMISSION ROLL</div>
-                    <div class="roll-number">{{ $applicant->admission_roll }}</div>
-                </div>
-            </div>
+                    <div style="font-size:20px; font-weight:bold; margin-top:5px;">UNIVERSITY OF BARISHAL</div>
+                </td>
+            </tr>
+        </table>
 
-            <div class="info-section">
-                <div class="info-row"><span class="info-label">Candidate Name:</span><span class="info-value">{{ $applicant->full_name }}</span></div>
-                <div class="info-row"><span class="info-label">Father's Name:</span><span class="info-value">{{ $applicant->fathers_name }}</span></div>
-                <div class="info-row"><span class="info-label">Mother's Name:</span><span class="info-value">{{ $applicant->mothers_name }}</span></div>
-                <div class="info-row"><span class="info-label">Subject Choice:</span><span class="info-value">{{ $applicant->subject_choice }}</span></div>
-                <div class="info-row"><span class="info-label">Form No:</span><span class="info-value">{{ $applicant->form_no }}</span></div>
-            </div>
-
-            <div class="exam-info">
-                <h3>Examination Information</h3>
-                <div class="info-row"><span class="info-label">Exam Date:</span><span class="info-value">To Be Announced</span></div>
-                <div class="info-row"><span class="info-label">Exam Time:</span><span class="info-value">To Be Announced</span></div>
-                <div class="info-row"><span class="info-label">Venue:</span><span class="info-value">To Be Announced</span></div>
-            </div>
-
-            <div class="signature-section">
-                <div class="candidate-signature">
-                    @if($applicant->signature_path)
-                        <img src="{{ public_path('storage/' . $applicant->signature_path) }}" alt="Signature">
-                    @endif
-                    <div class="signature-box">Candidate's Signature</div>
-                </div>
-                <div>
-                    <div class="signature-box">Controller of Examination</div>
-                </div>
-            </div>
-
-            <div class="instructions">
-                <h4>Important Instructions:</h4>
-                <ul>
-                    <li>Bring this admit card along with a valid photo ID to the examination hall.</li>
-                    <li>Arrive at the venue at least 30 minutes before the exam time.</li>
-                    <li>Electronic devices including mobile phones are strictly prohibited.</li>
-                    <li>Use only blue or black ballpoint pen for writing.</li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>This is a computer-generated admit card. | Generated on {{ now()->format('d M, Y h:i A') }}</p>
-        </div>
+        <div style="margin-top:10px; font-size:18px; font-weight:bold">ADMIT CARD</div>
     </div>
+
+    <table class="layout" style="margin-left:auto; margin-right:auto;">
+        <tr>
+            <td class="left-box">
+                <table class="office-table">
+                    <tr><td colspan="2"><strong>For Office Use Only</strong></td></tr>
+                    <tr><td style="width:40%">Form No.</td><td>{{ $applicant->form_no ?? '' }}</td></tr>
+                    <tr><td>Admission Test Roll No.</td><td>{{ $applicant->admission_roll ?? '' }}</td></tr>
+                </table>
+            </td>
+
+            <td class="center-box">
+                Faculty of Business Studies<br>
+                Application Form for Executive MBA Admission<br>
+                Session: {{ $session->session_name ?? '' }}
+            </td>
+
+            <td class="right-box">
+                <div class="photo-frame">
+                    @if($applicant->photo_path)
+                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;" />
+                    @else
+                        <div style="font-size:10px; padding-top:60px; text-align:center;">Passport Size Photo</div>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <table class="two-cols" style="margin-left:auto; margin-right:auto;">
+        <tr>
+            <td style="width:10%"></td>
+            <td style="width:90%">
+                <div class="fields">
+                    <table width="100%">
+                        <tr>
+                            <td style="width:18%; text-align:right; vertical-align:top;"><strong class="field-label">Full Name in Block Letters (in English):</strong></td>
+                            <td style="width:82%; text-align:left; vertical-align:top;"><span class="underline name-value">{{ strtoupper($applicant->full_name ?? '') }}</span></td>
+                        </tr>
+                        <tr style="height:10px"></tr>
+                        <tr>
+                            <td style="width:18%; text-align:right; vertical-align:top;"><strong class="field-label">Father's Name:</strong></td>
+                            <td style="width:82%; text-align:left; vertical-align:top; padding-top:5px;">
+                                <span class="underline name-value">{{ $applicant->fathers_name ?? '' }}</span>
+                            </td>
+                        </tr>
+                        <tr style="height:10px"></tr>
+                        <tr>
+                            <td style="width:18%; text-align:right; vertical-align:top;"><strong class="field-label">Mother's Name:</strong></td>
+                            <td style="width:82%; text-align:left; vertical-align:top; padding-top:5px;">
+                                <span class="underline name-value">{{ $applicant->mothers_name ?? '' }}</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="signature-box">
+                    @if($applicant->signature_path)
+                        <img src="{{ public_path('storage/' . $applicant->signature_path) }}" style="width:120px; height:35px; object-fit:contain;" /><br>
+                    @endif
+                    <div style="font-size:11px; border-top:1px dotted #000; display:inline-block; padding-top:4px; margin-top:40px;">Signature of the Applicant<br><span style="font-size:10px;">(Please See Overleaf)</span></div>
+                </div>
+
+            </td>
+        </tr>
+    </table>
+
 </body>
 </html>

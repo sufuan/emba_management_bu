@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
-import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 
 const steps = [
     { id: 1, name: 'Personal Info', icon: User },
@@ -16,12 +16,26 @@ const steps = [
     { id: 4, name: 'Documents', icon: Upload },
 ];
 
+// Education row definitions
+const educationRows = [
+    { key: 'ssc', label: 'SSC / Equivalent', required: true },
+    { key: 'hsc', label: 'HSC / Equivalent', required: true },
+    { key: 'bachelor', label: '4 Years Bachelor', required: true },
+    { key: 'master', label: 'Master (if any)', required: false },
+];
+
 export default function Create({ session, subjectChoices, uploadConfig }) {
     const [currentStep, setCurrentStep] = useState(1);
     const [stepErrors, setStepErrors] = useState({});
     const { data, setData, post, processing, errors } = useForm({
         full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: '',
-        subject_choice: '', education_json: [{ degree: '', institution: '', year: '', result: '' }],
+        subject_choice: '',
+        education_json: {
+            ssc: { year: '', board: '', subject: '', result: '' },
+            hsc: { year: '', board: '', subject: '', result: '' },
+            bachelor: { year: '', university: '', department: '', result: '' },
+            master: { year: '', university: '', department: '', result: '' },
+        },
         experience_json: [{ position: '', company: '', duration: '' }],
         passport_photo: null, signature: null,
     });
@@ -47,19 +61,14 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
         }
 
         if (step === 2) {
-            const hasValidEducation = data.education_json.some(edu =>
-                edu.degree.trim() && edu.institution.trim() && edu.year.trim() && edu.result.trim()
-            );
-            if (!hasValidEducation) {
-                newErrors.education = 'At least one complete education entry is required';
-            }
-            data.education_json.forEach((edu, i) => {
-                if (edu.degree || edu.institution || edu.year || edu.result) {
-                    if (!edu.degree.trim()) newErrors[`edu_${i}_degree`] = 'Degree is required';
-                    if (!edu.institution.trim()) newErrors[`edu_${i}_institution`] = 'Institution is required';
-                    if (!edu.year.trim()) newErrors[`edu_${i}_year`] = 'Year is required';
-                    if (!edu.result.trim()) newErrors[`edu_${i}_result`] = 'Result is required';
-                }
+            // Validate required education rows (SSC, HSC, Bachelor)
+            ['ssc', 'hsc', 'bachelor'].forEach(key => {
+                const edu = data.education_json[key];
+                const label = key === 'ssc' ? 'SSC' : key === 'hsc' ? 'HSC' : 'Bachelor';
+                if (!edu.year.trim()) newErrors[`${key}_year`] = `${label} year is required`;
+                if (!edu.board?.trim() && !edu.university?.trim()) newErrors[`${key}_board`] = `${label} board/university is required`;
+                if (!edu.subject?.trim() && !edu.department?.trim()) newErrors[`${key}_subject`] = `${label} subject/department is required`;
+                if (!edu.result.trim()) newErrors[`${key}_result`] = `${label} result is required`;
             });
         }
 
@@ -131,21 +140,29 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
         reader.readAsDataURL(file);
     };
 
-    const addEducation = () => setData('education_json', [...data.education_json, { degree: '', institution: '', year: '', result: '' }]);
     const addExperience = () => setData('experience_json', [...data.experience_json, { position: '', company: '', duration: '' }]);
 
-    const updateEducation = (index, field, value) => {
-        const updated = [...data.education_json];
-        updated[index][field] = value;
+    const updateEducation = (rowKey, field, value) => {
+        const updated = { ...data.education_json };
+        updated[rowKey] = { ...updated[rowKey], [field]: value };
         setData('education_json', updated);
         // Clear specific error
-        setStepErrors(prev => ({ ...prev, [`edu_${index}_${field}`]: null, education: null }));
+        setStepErrors(prev => ({ ...prev, [`${rowKey}_${field}`]: null }));
     };
 
     const updateExperience = (index, field, value) => {
         const updated = [...data.experience_json];
         updated[index][field] = value;
         setData('experience_json', updated);
+    };
+
+    // Check if an education row is complete (for live validation indicator)
+    const isRowComplete = (key) => {
+        const edu = data.education_json[key];
+        if (key === 'master') return true; // Optional
+        const hasBoard = edu.board?.trim() || edu.university?.trim();
+        const hasSubject = edu.subject?.trim() || edu.department?.trim();
+        return edu.year?.trim() && hasBoard && hasSubject && edu.result?.trim();
     };
 
     const handleSubmit = (e) => {
@@ -272,40 +289,137 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
 
                                 {/* Step 2: Education */}
                                 {currentStep === 2 && (
-                                    <div className="space-y-4">
-                                        {stepErrors.education && (
-                                            <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
-                                                <AlertCircle className="h-4 w-4" />
-                                                <span>{stepErrors.education}</span>
+                                    <div className="space-y-6">
+                                        {/* Header with gradient */}
+                                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6 text-white">
+                                            <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl"></div>
+                                            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+                                            <div className="relative">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Sparkles className="h-5 w-5" />
+                                                    <span className="text-sm font-medium uppercase tracking-wider">Education Information</span>
+                                                </div>
+                                                <p className="text-blue-100 text-sm">Fill out your SSC, HSC, and 4-year Bachelor information. <span className="font-semibold text-white">Master's degree is optional.</span></p>
+                                            </div>
+                                        </div>
+
+                                        {/* Education Table */}
+                                        <div className="overflow-hidden rounded-xl border border-slate-200 shadow-lg bg-white">
+                                            <div className="overflow-x-auto">
+                                                <table className="w-full">
+                                                    <thead>
+                                                        <tr className="bg-gradient-to-r from-slate-800 to-slate-700 text-white">
+                                                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider w-[160px]">Examination</th>
+                                                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Year of Passing</th>
+                                                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Board / University</th>
+                                                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Subject / Dept.</th>
+                                                            <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Division / CGPA</th>
+                                                            <th className="px-2 py-4 w-[50px]"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-slate-100">
+                                                        {educationRows.map((row, idx) => {
+                                                            const edu = data.education_json[row.key];
+                                                            const isComplete = isRowComplete(row.key);
+                                                            const isMaster = row.key === 'master';
+                                                            const boardField = isMaster || row.key === 'bachelor' ? 'university' : 'board';
+                                                            const subjectField = isMaster || row.key === 'bachelor' ? 'department' : 'subject';
+
+                                                            return (
+                                                                <tr key={row.key} className={`transition-all duration-200 ${isMaster ? 'bg-blue-50/50' : idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-blue-50`}>
+                                                                    <td className="px-4 py-4">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="font-semibold text-slate-700">{row.label}</span>
+                                                                            {!row.required && (
+                                                                                <Badge variant="secondary" className="text-[10px] bg-blue-100 text-blue-700">Optional</Badge>
+                                                                            )}
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="px-2 py-2">
+                                                                        <Input
+                                                                            type="number"
+                                                                            min="1900"
+                                                                            max="2099"
+                                                                            value={edu.year}
+                                                                            onChange={e => updateEducation(row.key, 'year', e.target.value)}
+                                                                            placeholder="e.g. 2020"
+                                                                            className={`h-9 text-sm ${stepErrors[`${row.key}_year`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-2 py-2">
+                                                                        <Input
+                                                                            value={edu[boardField] || ''}
+                                                                            onChange={e => updateEducation(row.key, boardField, e.target.value)}
+                                                                            placeholder={isMaster || row.key === 'bachelor' ? "University name" : "e.g. Dhaka"}
+                                                                            className={`h-9 text-sm ${stepErrors[`${row.key}_board`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-2 py-2">
+                                                                        <Input
+                                                                            value={edu[subjectField] || ''}
+                                                                            onChange={e => updateEducation(row.key, subjectField, e.target.value)}
+                                                                            placeholder={isMaster || row.key === 'bachelor' ? "Department" : "e.g. Science"}
+                                                                            className={`h-9 text-sm ${stepErrors[`${row.key}_subject`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-2 py-2">
+                                                                        <Input
+                                                                            value={edu.result}
+                                                                            onChange={e => updateEducation(row.key, 'result', e.target.value)}
+                                                                            placeholder="e.g. 4.50"
+                                                                            className={`h-9 text-sm ${stepErrors[`${row.key}_result`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
+                                                                        />
+                                                                    </td>
+                                                                    <td className="px-2 py-2 text-center">
+                                                                        {isComplete ? (
+                                                                            <div className="w-7 h-7 rounded-full bg-gradient-to-r from-green-400 to-emerald-500 flex items-center justify-center shadow-lg shadow-green-500/30">
+                                                                                <CheckCircle2 className="h-4 w-4 text-white" />
+                                                                            </div>
+                                                                        ) : row.required ? (
+                                                                            <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center">
+                                                                                <div className="w-2 h-2 rounded-full bg-slate-400"></div>
+                                                                            </div>
+                                                                        ) : null}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        {/* Validation summary */}
+                                        {Object.keys(stepErrors).filter(k => k.startsWith('ssc_') || k.startsWith('hsc_') || k.startsWith('bachelor_')).length > 0 && (
+                                            <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+                                                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                                                <div>
+                                                    <p className="font-semibold text-sm">Please complete all required fields</p>
+                                                    <p className="text-xs text-red-600 mt-1">SSC, HSC, and Bachelor information are required. Look for highlighted fields above.</p>
+                                                </div>
                                             </div>
                                         )}
-                                        {data.education_json.map((edu, i) => (
-                                            <Card key={i} className="p-4 bg-slate-50">
-                                                <div className="grid md:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <Label>Degree *</Label>
-                                                        <Input value={edu.degree} onChange={e => updateEducation(i, 'degree', e.target.value)} placeholder="e.g., BBA, MBA" className={stepErrors[`edu_${i}_degree`] ? 'border-red-500' : ''} />
-                                                        {stepErrors[`edu_${i}_degree`] && <p className="text-sm text-red-500 mt-1">{stepErrors[`edu_${i}_degree`]}</p>}
-                                                    </div>
-                                                    <div>
-                                                        <Label>Institution *</Label>
-                                                        <Input value={edu.institution} onChange={e => updateEducation(i, 'institution', e.target.value)} className={stepErrors[`edu_${i}_institution`] ? 'border-red-500' : ''} />
-                                                        {stepErrors[`edu_${i}_institution`] && <p className="text-sm text-red-500 mt-1">{stepErrors[`edu_${i}_institution`]}</p>}
-                                                    </div>
-                                                    <div>
-                                                        <Label>Year *</Label>
-                                                        <Input value={edu.year} onChange={e => updateEducation(i, 'year', e.target.value)} placeholder="2020" className={stepErrors[`edu_${i}_year`] ? 'border-red-500' : ''} />
-                                                        {stepErrors[`edu_${i}_year`] && <p className="text-sm text-red-500 mt-1">{stepErrors[`edu_${i}_year`]}</p>}
-                                                    </div>
-                                                    <div>
-                                                        <Label>Result/CGPA *</Label>
-                                                        <Input value={edu.result} onChange={e => updateEducation(i, 'result', e.target.value)} className={stepErrors[`edu_${i}_result`] ? 'border-red-500' : ''} />
-                                                        {stepErrors[`edu_${i}_result`] && <p className="text-sm text-red-500 mt-1">{stepErrors[`edu_${i}_result`]}</p>}
-                                                    </div>
+
+                                        {/* Progress indicator */}
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex -space-x-1">
+                                                    {['ssc', 'hsc', 'bachelor'].map(key => (
+                                                        <div key={key} className={`w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold ${isRowComplete(key) ? 'bg-green-500 text-white' : 'bg-slate-300 text-slate-600'}`}>
+                                                            {key === 'ssc' ? 'S' : key === 'hsc' ? 'H' : 'B'}
+                                                        </div>
+                                                    ))}
                                                 </div>
-                                            </Card>
-                                        ))}
-                                        <Button type="button" variant="outline" onClick={addEducation}>+ Add More Education</Button>
+                                                <span className="text-sm text-slate-600">
+                                                    {['ssc', 'hsc', 'bachelor'].filter(isRowComplete).length}/3 required sections complete
+                                                </span>
+                                            </div>
+                                            {['ssc', 'hsc', 'bachelor'].every(isRowComplete) && (
+                                                <Badge className="bg-green-100 text-green-700 border-green-200">
+                                                    <CheckCircle2 className="h-3 w-3 mr-1" /> Ready to proceed
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 

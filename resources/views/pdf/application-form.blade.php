@@ -27,7 +27,7 @@
         <div style="font-size:12px;">Please read the application guidelines provided at the end<br>before you complete the application form</div>
     </div>
 
-    <div style="position:absolute; top:40px; right:40px; width:120px; height:150px; border:1px solid #000; text-align:center;">
+    <div style="position:absolute; top:140px; right:40px; width:120px; height:150px; border:1px solid #000; text-align:center;">
         @if($applicant->photo_path)
             <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
         @else
@@ -55,32 +55,59 @@
     <table>
         <thead>
             <tr>
-                <th>Name of Degree/Examination</th>
-                <th>Institution/University</th>
+                <th>Examination</th>
                 <th>Year of Passing</th>
-                <th>Result/CGPA</th>
+                <th>Board / University</th>
+                <th>Subject / Dept.</th>
+                <th>Division / CGPA</th>
             </tr>
         </thead>
         <tbody>
-            @if($applicant->education_json && count($applicant->education_json) > 0)
-                @foreach ($applicant->education_json as $edu)
-                    <tr>
-                        <td>{{ $edu['degree'] ?? '' }}</td>
-                        <td>{{ $edu['institution'] ?? '' }}</td>
-                        <td>{{ $edu['year'] ?? '' }}</td>
-                        <td>{{ $edu['result'] ?? '' }}</td>
-                    </tr>
-                @endforeach
-            @else
+            @php
+                $eduData = $applicant->education_json;
+                $rows = [
+                    ['key' => 'ssc', 'label' => 'SSC / Equivalent'],
+                    ['key' => 'hsc', 'label' => 'HSC / Equivalent'],
+                    ['key' => 'bachelor', 'label' => '4 Years Bachelor'],
+                    ['key' => 'master', 'label' => 'Master (if any)'],
+                ];
+            @endphp
+            @foreach($rows as $row)
+                @php
+                    $edu = $eduData[$row['key']] ?? [];
+                    $board = $edu['board'] ?? $edu['university'] ?? '';
+                    $subject = $edu['subject'] ?? $edu['department'] ?? '';
+                    $year = $edu['year'] ?? '';
+                    $result = $edu['result'] ?? '';
+                    // Skip master row if empty
+                    $isEmpty = empty($year) && empty($board) && empty($subject) && empty($result);
+                @endphp
+                @if($row['key'] !== 'master' || !$isEmpty)
                 <tr>
-                    <td colspan="4" style="text-align:center;">No education records</td>
+                    <td>{{ $row['label'] }}</td>
+                    <td>{{ $year }}</td>
+                    <td>{{ $board }}</td>
+                    <td>{{ $subject }}</td>
+                    <td>{{ $result }}</td>
                 </tr>
-            @endif
+                @endif
+            @endforeach
         </tbody>
     </table>
 
     <p><strong>8. Job Experience (if any)</strong></p>
-    @if($applicant->experience_json && count($applicant->experience_json) > 0)
+    @php
+        $hasExperience = false;
+        if($applicant->experience_json && is_array($applicant->experience_json)) {
+            foreach($applicant->experience_json as $exp) {
+                if(!empty($exp['position']) || !empty($exp['company']) || !empty($exp['duration'])) {
+                    $hasExperience = true;
+                    break;
+                }
+            }
+        }
+    @endphp
+    @if($hasExperience)
         <table>
             <thead>
                 <tr>

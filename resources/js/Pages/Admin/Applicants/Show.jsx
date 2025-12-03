@@ -61,18 +61,42 @@ export default function Show({ applicant }) {
                         <Card className="border-0 shadow-lg">
                             <CardHeader><CardTitle>Education Background</CardTitle></CardHeader>
                             <CardContent>
-                                {applicant.education_json?.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {applicant.education_json.map((edu, i) => (
-                                            <div key={i} className="p-4 bg-slate-50 rounded-lg">
-                                                <div className="grid md:grid-cols-4 gap-4">
-                                                    <div><p className="text-xs text-muted-foreground">Degree</p><p className="font-medium">{edu.degree}</p></div>
-                                                    <div><p className="text-xs text-muted-foreground">Institution</p><p className="font-medium">{edu.institution}</p></div>
-                                                    <div><p className="text-xs text-muted-foreground">Year</p><p className="font-medium">{edu.year}</p></div>
-                                                    <div><p className="text-xs text-muted-foreground">Result</p><p className="font-medium">{edu.result}</p></div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                {applicant.education_json && typeof applicant.education_json === 'object' ? (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="bg-slate-100">
+                                                    <th className="px-4 py-2 text-left font-semibold">Examination</th>
+                                                    <th className="px-4 py-2 text-left font-semibold">Year</th>
+                                                    <th className="px-4 py-2 text-left font-semibold">Board/University</th>
+                                                    <th className="px-4 py-2 text-left font-semibold">Subject/Dept.</th>
+                                                    <th className="px-4 py-2 text-left font-semibold">Result/CGPA</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y">
+                                                {[
+                                                    { key: 'ssc', label: 'SSC / Equivalent' },
+                                                    { key: 'hsc', label: 'HSC / Equivalent' },
+                                                    { key: 'bachelor', label: '4 Years Bachelor' },
+                                                    { key: 'master', label: 'Master (if any)' },
+                                                ].map(row => {
+                                                    const edu = applicant.education_json[row.key] || {};
+                                                    const board = edu.board || edu.university || '';
+                                                    const subject = edu.subject || edu.department || '';
+                                                    const isEmpty = !edu.year && !board && !subject && !edu.result;
+                                                    if (row.key === 'master' && isEmpty) return null;
+                                                    return (
+                                                        <tr key={row.key} className="hover:bg-slate-50">
+                                                            <td className="px-4 py-3 font-medium">{row.label}</td>
+                                                            <td className="px-4 py-3">{edu.year || '-'}</td>
+                                                            <td className="px-4 py-3">{board || '-'}</td>
+                                                            <td className="px-4 py-3">{subject || '-'}</td>
+                                                            <td className="px-4 py-3">{edu.result || '-'}</td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 ) : <p className="text-muted-foreground">No education data</p>}
                             </CardContent>

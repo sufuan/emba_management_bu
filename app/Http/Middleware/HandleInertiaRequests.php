@@ -34,6 +34,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'applyNowEnabled' => config('admission.apply_now_enabled'),
         ];
     }
 }
