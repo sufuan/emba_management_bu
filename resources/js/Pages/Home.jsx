@@ -48,7 +48,7 @@ export default function Home({ applyNowEnabled, activeSession }) {
                             <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
                                 Transform Your
                                 <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"> Career </span>
-                                with EMBA
+                                with mba
                             </h1>
                             <p className="text-lg text-slate-300 max-w-xl">
                                 Join our prestigious Executive MBA program and unlock your leadership potential.
@@ -97,7 +97,7 @@ export default function Home({ applyNowEnabled, activeSession }) {
                     <div className="text-center max-w-2xl mx-auto mb-16">
                         <Badge variant="outline" className="mb-4">Why Choose Us</Badge>
                         <h2 className="text-3xl lg:text-4xl font-bold mb-4">Program Highlights</h2>
-                        <p className="text-muted-foreground">Our EMBA program is designed to fit your lifestyle while delivering world-class education</p>
+                        <p className="text-muted-foreground">Our mba program is designed to fit your lifestyle while delivering world-class education</p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {features.map((feature, i) => (

@@ -22,7 +22,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>EMBA Applicants List</h1>
+        <h1>mba Applicants List</h1>
         <p>Generated on {{ now()->format('d M, Y h:i A') }} | Total: {{ $applicants->count() }} applicants</p>
     </div>
 
@@ -56,7 +56,7 @@
     </table>
 
     <div class="footer">
-        <p>EMBA Admission System</p>
+        <p>mba Admission System</p>
     </div>
 </body>
 </html>

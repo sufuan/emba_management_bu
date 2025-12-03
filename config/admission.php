@@ -30,10 +30,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | The prefix used when generating form numbers for applicants.
-    | Format: {prefix}{year}{serial} e.g., EMBA-2025-0001
+    | Format: {prefix}{year}{serial} e.g., mba-2025-0001
     |
     */
-    'form_no_prefix' => env('ADMISSION_FORM_NO_PREFIX', 'EMBA'),
+    'form_no_prefix' => env('ADMISSION_FORM_NO_PREFIX', 'mba'),
 
     /*
     |--------------------------------------------------------------------------
@@ -63,7 +63,7 @@ return [
     | Subject Choices
     |--------------------------------------------------------------------------
     |
-    | Available subject choices for EMBA program.
+    | Available subject choices for mba program.
     |
     */
     'subject_choices' => [

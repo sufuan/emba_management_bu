@@ -62,7 +62,7 @@ class ApplicantService
      */
     public function generateFormNumber(Session $session): string
     {
-        $prefix = config('admission.form_no_prefix', 'EMBA');
+        $prefix = config('admission.form_no_prefix', 'mba');
         $lastApplicant = Applicant::where('session_id', $session->id)
             ->orderBy('id', 'desc')
             ->first();
@@ -79,7 +79,7 @@ class ApplicantService
 
     /**
      * Generate admission roll number.
-     * Format: EMBA {YEAR} {SERIAL}
+     * Format: mba {YEAR} {SERIAL}
      */
     public function generateAdmissionRoll(Session $session): string
     {
@@ -94,7 +94,7 @@ class ApplicantService
             $serial = isset($matches[1]) ? (int) $matches[1] + 1 : 1;
         }
 
-        return sprintf('EMBA %d %04d', $session->year_start, $serial);
+        return sprintf('mba %d %04d', $session->year_start, $serial);
     }
 
     /**

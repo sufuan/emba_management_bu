@@ -28,7 +28,7 @@ function Sidebar({ currentPath }) {
                         <GraduationCap className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                        <span className="font-bold text-lg">EMBA Admin</span>
+                        <span className="font-bold text-lg">mba Admin</span>
                         <span className="text-xs block text-muted-foreground">Management Portal</span>
                     </div>
                 </Link>
