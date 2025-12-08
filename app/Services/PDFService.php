@@ -6,9 +6,21 @@ use App\Models\Applicant;
 use App\Models\PdfLog;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 
 class PDFService
 {
+    /**
+     * Generate Barcode as base64 PNG for PDF embedding.
+     */
+    protected function generateBarcodeBase64(string $code): string
+    {
+        $generator = new BarcodeGeneratorPNG();
+        $barcode = $generator->getBarcode($code, $generator::TYPE_CODE_128, 2, 40);
+        
+        return 'data:image/png;base64,' . base64_encode($barcode);
+    }
+
     /**
      * Generate Application Form PDF.
      */
@@ -16,9 +28,13 @@ class PDFService
     {
         $applicant->load(['session', 'uploads']);
 
+        // Generate barcode
+        $barcodeBase64 = $this->generateBarcodeBase64($applicant->form_no);
+
         $pdf = Pdf::loadView('pdf.application-form', [
             'applicant' => $applicant,
             'session' => $applicant->session,
+            'barcodeBase64' => $barcodeBase64,
         ]);
 
         $pdf->setPaper('A4', 'portrait');
@@ -84,9 +100,13 @@ class PDFService
     {
         $applicant->load(['session', 'uploads']);
 
+        // Generate barcode
+        $barcodeBase64 = $this->generateBarcodeBase64($applicant->form_no);
+
         $pdf = Pdf::loadView('pdf.application-form', [
             'applicant' => $applicant,
             'session' => $applicant->session,
+            'barcodeBase64' => $barcodeBase64,
         ]);
 
         $filename = sprintf('application_%s.pdf', $applicant->form_no);
@@ -118,9 +138,13 @@ class PDFService
     {
         $applicant->load(['session', 'uploads']);
 
+        // Generate barcode
+        $barcodeBase64 = $this->generateBarcodeBase64($applicant->form_no);
+
         $pdf = Pdf::loadView('pdf.application-form', [
             'applicant' => $applicant,
             'session' => $applicant->session,
+            'barcodeBase64' => $barcodeBase64,
         ]);
 
         return $pdf->stream('application_preview.pdf');

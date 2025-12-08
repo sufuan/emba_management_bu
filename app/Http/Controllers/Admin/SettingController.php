@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Session;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
@@ -22,6 +23,7 @@ class SettingController extends Controller
             'activeSessionId' => config('admission.active_session_id'),
             'sessions' => $sessions,
             'uploadConfig' => config('admission.uploads'),
+            'paymentSettings' => Setting::getPaymentSettings(),
         ]);
     }
 
@@ -62,6 +64,27 @@ class SettingController extends Controller
         Artisan::call('config:clear');
 
         return back()->with('success', 'Active session updated successfully.');
+    }
+
+    /**
+     * Update payment settings.
+     */
+    public function updatePaymentSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'payment_fee' => 'required|numeric|min:0',
+            'payment_bkash_number' => 'nullable|string|max:20',
+            'payment_nagad_number' => 'nullable|string|max:20',
+            'payment_rocket_number' => 'nullable|string|max:20',
+            'payment_bank_name' => 'nullable|string|max:255',
+            'payment_bank_account' => 'nullable|string|max:50',
+        ]);
+
+        foreach ($validated as $key => $value) {
+            Setting::setValue($key, $value);
+        }
+
+        return back()->with('success', 'Payment settings updated successfully.');
     }
 
     /**

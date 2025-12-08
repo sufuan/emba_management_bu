@@ -37,6 +37,9 @@ Route::post('/track/search', [ApplicantController::class, 'search'])->name('appl
 Route::get('/application/{applicant}/status', [ApplicantController::class, 'status'])->name('application.status');
 Route::get('/application/{applicant}/preview', [ApplicantController::class, 'preview'])->name('application.preview');
 
+// QR Code Verification (public)
+Route::get('/verify/{formNo}', [ApplicantController::class, 'verify'])->name('application.verify');
+
 // PDF Downloads (public)
 Route::get('/application/{applicant}/pdf/download', [PDFController::class, 'downloadApplication'])->name('pdf.application.download');
 Route::get('/application/{applicant}/pdf/preview', [PDFController::class, 'previewApplication'])->name('pdf.application.preview');
@@ -58,6 +61,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::delete('/applicants/{applicant}', [AdminApplicantController::class, 'destroy'])->name('applicants.destroy');
     Route::post('/applicants/bulk-status', [AdminApplicantController::class, 'bulkUpdateStatus'])->name('applicants.bulk-status');
     Route::get('/applicants-export', [AdminApplicantController::class, 'exportPdf'])->name('applicants.export');
+    Route::get('/applicants-export-excel', [AdminApplicantController::class, 'exportExcel'])->name('applicants.export-excel');
 
     // Sessions Management
     Route::get('/sessions', [AdminSessionController::class, 'index'])->name('sessions.index');
@@ -72,6 +76,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/toggle-apply', [AdminSettingController::class, 'toggleApplyNow'])->name('settings.toggle-apply');
     Route::post('/settings/active-session', [AdminSettingController::class, 'updateActiveSession'])->name('settings.active-session');
+    Route::post('/settings/payment', [AdminSettingController::class, 'updatePaymentSettings'])->name('settings.payment');
 
     // Sessions - add PATCH route for activate
     Route::patch('/sessions/{session}/activate', [AdminSessionController::class, 'setActive'])->name('sessions.activate-patch');

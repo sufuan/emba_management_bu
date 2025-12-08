@@ -47,7 +47,7 @@ export default function Track() {
                                         <Input
                                             value={data.search}
                                             onChange={e => setData('search', e.target.value)}
-                                            placeholder="e.g., mba-2025-0001 or +880..."
+                                            placeholder="e.g., EMBA-2025-0001 or +880..."
                                             className="pl-10"
                                         />
                                     </div>

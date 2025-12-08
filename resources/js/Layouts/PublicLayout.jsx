@@ -21,7 +21,7 @@ export default function PublicLayout({ children }) {
                 <div className="container mx-auto px-4 flex justify-between items-center text-sm">
                     <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> +880 1234-567890</span>
-                        <span className="hidden sm:flex items-center gap-1"><Mail className="h-3 w-3" /> admission@mba.edu</span>
+                        <span className="hidden sm:flex items-center gap-1"><Mail className="h-3 w-3" /> admission@EMBA.edu</span>
                     </div>
                     <div className="flex items-center gap-2">
                         {auth?.user && (
@@ -41,8 +41,8 @@ export default function PublicLayout({ children }) {
                                 <GraduationCap className="h-6 w-6 text-white" />
                             </div>
                             <div className="hidden sm:block">
-                                <span className="font-bold text-xl text-primary">mba</span>
-                                <span className="text-xs block text-muted-foreground">Executive MBA Program</span>
+                                <span className="font-bold text-xl text-primary">EMBA</span>
+                                <span className="text-xs block text-muted-foreground">Executive EMBA Program</span>
                             </div>
                         </Link>
 
@@ -117,10 +117,10 @@ export default function PublicLayout({ children }) {
                                 <div className="bg-primary rounded-lg p-2">
                                     <GraduationCap className="h-6 w-6 text-white" />
                                 </div>
-                                <span className="font-bold text-xl text-white">mba Program</span>
+                                <span className="font-bold text-xl text-white">EMBA Program</span>
                             </div>
                             <p className="text-sm text-slate-400 mb-4">
-                                Elevate your career with our Executive MBA program designed for working professionals
+                                Elevate your career with our Executive EMBA program designed for working professionals
                                 who aspire to leadership positions.
                             </p>
                         </div>
@@ -139,12 +139,12 @@ export default function PublicLayout({ children }) {
                             <ul className="space-y-2 text-sm">
                                 <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> University Campus, Dhaka</li>
                                 <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +880 1234-567890</li>
-                                <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> admission@mba.edu</li>
+                                <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> admission@EMBA.edu</li>
                             </ul>
                         </div>
                     </div>
                     <div className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-500">
-                        <p>© {new Date().getFullYear()} mba Admission Portal. All rights reserved.</p>
+                        <p>© {new Date().getFullYear()} EMBA Admission Portal. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

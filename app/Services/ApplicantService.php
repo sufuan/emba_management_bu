@@ -14,9 +14,9 @@ class ApplicantService
     /**
      * Create a new applicant with all related data.
      */
-    public function createApplicant(array $data, ?UploadedFile $photo = null, ?UploadedFile $signature = null): Applicant
+    public function createApplicant(array $data, ?UploadedFile $photo = null): Applicant
     {
-        return DB::transaction(function () use ($data, $photo, $signature) {
+        return DB::transaction(function () use ($data, $photo) {
             $sessionId = $data['session_id'] ?? config('admission.active_session_id');
             $session = Session::findOrFail($sessionId);
 
@@ -34,9 +34,15 @@ class ApplicantService
                 'nid' => $data['nid'], // Will be auto-encrypted by model cast
                 'phone' => $data['phone'],
                 'email' => $data['email'],
-                'subject_choice' => $data['subject_choice'],
+                'present_address' => $data['present_address'] ?? null,
+                'permanent_address' => $data['permanent_address'] ?? null,
+                'subject_choice' => 'Management', // Fixed to Management as per requirement
                 'experience_json' => $data['experience_json'] ?? null,
                 'education_json' => $data['education_json'] ?? null,
+                'payment_transaction_id' => $data['payment_transaction_id'] ?? null,
+                'payment_method' => $data['payment_method'] ?? null,
+                'payment_amount' => $data['payment_amount'] ?? null,
+                'payment_date' => $data['payment_date'] ?? now(),
                 'form_no' => $formNo,
                 'admission_roll' => $admissionRoll,
                 'status' => 'submitted',
@@ -46,10 +52,6 @@ class ApplicantService
             // Handle file uploads
             if ($photo) {
                 $this->handleUpload($applicant, $photo, 'passport_photo');
-            }
-
-            if ($signature) {
-                $this->handleUpload($applicant, $signature, 'signature');
             }
 
             return $applicant->fresh(['uploads', 'session']);
@@ -62,7 +64,7 @@ class ApplicantService
      */
     public function generateFormNumber(Session $session): string
     {
-        $prefix = config('admission.form_no_prefix', 'mba');
+        $prefix = config('admission.form_no_prefix', 'EMBA');
         $lastApplicant = Applicant::where('session_id', $session->id)
             ->orderBy('id', 'desc')
             ->first();
@@ -79,7 +81,7 @@ class ApplicantService
 
     /**
      * Generate admission roll number.
-     * Format: mba {YEAR} {SERIAL}
+     * Format: EMBA {YEAR} {SERIAL}
      */
     public function generateAdmissionRoll(Session $session): string
     {
@@ -94,7 +96,7 @@ class ApplicantService
             $serial = isset($matches[1]) ? (int) $matches[1] + 1 : 1;
         }
 
-        return sprintf('mba %d %04d', $session->year_start, $serial);
+        return sprintf('EMBA %d %04d', $session->year_start, $serial);
     }
 
     /**

@@ -38,9 +38,14 @@ export default function Index({ applicants, filters, sessions }) {
                         <h1 className="text-3xl font-bold">Applicants</h1>
                         <p className="text-muted-foreground">Manage and verify all applications</p>
                     </div>
-                    <a href="/admin/applicants/export">
-                        <Button variant="outline" className="gap-2"><Download className="h-4 w-4" /> Export PDF</Button>
-                    </a>
+                    <div className="flex gap-2">
+                        <a href={`/admin/applicants-export?${new URLSearchParams({ session_id: session !== 'all' ? session : '', status: status !== 'all' ? status : '', search: search || '' }).toString()}`}>
+                            <Button variant="outline" className="gap-2"><Download className="h-4 w-4" /> Export PDF</Button>
+                        </a>
+                        <a href={`/admin/applicants-export-excel?${new URLSearchParams({ session_id: session !== 'all' ? session : '', status: status !== 'all' ? status : '', search: search || '' }).toString()}`}>
+                            <Button variant="outline" className="gap-2"><Download className="h-4 w-4" /> Export Excel</Button>
+                        </a>
+                    </div>
                 </div>
 
                 {/* Filters */}
@@ -82,7 +87,6 @@ export default function Index({ applicants, filters, sessions }) {
                                         <th className="text-left py-4 px-4 font-medium">Form No</th>
                                         <th className="text-left py-4 px-4 font-medium">Applicant</th>
                                         <th className="text-left py-4 px-4 font-medium">Contact</th>
-                                        <th className="text-left py-4 px-4 font-medium">Subject</th>
                                         <th className="text-left py-4 px-4 font-medium">Status</th>
                                         <th className="text-left py-4 px-4 font-medium">Date</th>
                                         <th className="text-right py-4 px-4 font-medium">Actions</th>
@@ -99,7 +103,6 @@ export default function Index({ applicants, filters, sessions }) {
                                                 </div>
                                             </td>
                                             <td className="py-4 px-4"><p className="text-sm">{a.phone}</p><p className="text-xs text-muted-foreground">{a.email}</p></td>
-                                            <td className="py-4 px-4">{a.subject_choice}</td>
                                             <td className="py-4 px-4"><Badge className={statusColors[a.status]}>{a.status}</Badge></td>
                                             <td className="py-4 px-4 text-muted-foreground text-sm">{new Date(a.submitted_at).toLocaleDateString()}</td>
                                             <td className="py-4 px-4 text-right">

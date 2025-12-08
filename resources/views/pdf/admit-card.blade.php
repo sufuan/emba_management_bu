@@ -58,7 +58,7 @@
 
             <td class="center-box">
                 Faculty of Business Studies<br>
-                Application Form for Executive MBA Admission<br>
+                Application Form for Executive EMBA Admission<br>
                 Session: {{ $session->session_name ?? '' }}
             </td>
 

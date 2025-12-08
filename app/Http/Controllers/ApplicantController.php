@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Models\Session;
+use App\Models\Setting;
 use App\Services\ApplicantService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -30,6 +31,7 @@ class ApplicantController extends Controller
             'session' => $activeSession,
             'subjectChoices' => config('admission.subject_choices'),
             'uploadConfig' => config('admission.uploads'),
+            'paymentSettings' => Setting::getPaymentSettings(),
         ]);
     }
 
@@ -43,24 +45,27 @@ class ApplicantController extends Controller
             'fathers_name' => 'required|string|max:255',
             'mothers_name' => 'required|string|max:255',
             'dob' => 'required|date|before:today',
-            'nid' => 'required|string|max:20',
+            'nid' => 'required|string|regex:/^[0-9]+$/|min:10|max:17',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|max:255',
-            'subject_choice' => 'required|string',
+            'present_address' => 'required|string|max:500',
+            'permanent_address' => 'required|string|max:500',
             'experience_json' => 'nullable|string',
             'education_json' => 'nullable|string',
+            'payment_transaction_id' => 'required|string|max:100',
+            'payment_method' => 'required|string|max:50',
+            'payment_amount' => 'required|numeric|min:0',
             'passport_photo' => 'required|image|mimes:jpg,jpeg,png|max:200|dimensions:width=300,height=300',
-            'signature' => 'required|image|mimes:jpg,jpeg,png|max:200|dimensions:width=300,height=80',
         ]);
 
         // Parse JSON strings to arrays
         $validated['education_json'] = json_decode($validated['education_json'] ?? '[]', true) ?: [];
         $validated['experience_json'] = json_decode($validated['experience_json'] ?? '[]', true) ?: [];
+        $validated['payment_date'] = now();
 
         $applicant = $this->applicantService->createApplicant(
             $validated,
-            $request->file('passport_photo'),
-            $request->file('signature')
+            $request->file('passport_photo')
         );
 
         return redirect()->route('application.preview', $applicant->id)
@@ -117,6 +122,21 @@ class ApplicantController extends Controller
 
         return Inertia::render('Application/Status', [
             'applicant' => $applicant,
+        ]);
+    }
+
+    /**
+     * Verify application by form number (QR code).
+     */
+    public function verify(string $formNo)
+    {
+        $applicant = Applicant::with('session')
+            ->where('form_no', $formNo)
+            ->first();
+
+        return Inertia::render('Application/Verify', [
+            'applicant' => $applicant,
+            'formNo' => $formNo,
         ]);
     }
 }

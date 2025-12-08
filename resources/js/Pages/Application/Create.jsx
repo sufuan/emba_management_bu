@@ -7,13 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
-import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles } from 'lucide-react';
+import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles, CreditCard } from 'lucide-react';
 
 const steps = [
     { id: 1, name: 'Personal Info', icon: User },
     { id: 2, name: 'Education', icon: GraduationCap },
     { id: 3, name: 'Experience', icon: Briefcase },
     { id: 4, name: 'Documents', icon: Upload },
+    { id: 5, name: 'Payment', icon: CreditCard },
 ];
 
 // Education row definitions
@@ -24,12 +25,12 @@ const educationRows = [
     { key: 'master', label: 'Master (if any)', required: false },
 ];
 
-export default function Create({ session, subjectChoices, uploadConfig }) {
+export default function Create({ session, subjectChoices, uploadConfig, paymentSettings }) {
     const [currentStep, setCurrentStep] = useState(1);
     const [stepErrors, setStepErrors] = useState({});
     const { data, setData, post, processing, errors } = useForm({
         full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: '',
-        subject_choice: '',
+        present_address: '', permanent_address: '',
         education_json: {
             ssc: { year: '', board: '', subject: '', result: '' },
             hsc: { year: '', board: '', subject: '', result: '' },
@@ -37,11 +38,11 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
             master: { year: '', university: '', department: '', result: '' },
         },
         experience_json: [{ position: '', company: '', duration: '' }],
-        passport_photo: null, signature: null,
+        passport_photo: null,
+        payment_transaction_id: '', payment_method: '', payment_amount: paymentSettings?.payment_fee || 500,
     });
 
     const [photoPreview, setPhotoPreview] = useState(null);
-    const [signaturePreview, setSignaturePreview] = useState(null);
 
     // Validation for each step
     const validateStep = (step) => {
@@ -53,11 +54,15 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
             if (!data.mothers_name.trim()) newErrors.mothers_name = "Mother's name is required";
             if (!data.dob) newErrors.dob = 'Date of birth is required';
             if (!data.nid.trim()) newErrors.nid = 'NID number is required';
+            else if (!/^[0-9]+$/.test(data.nid.trim())) newErrors.nid = 'NID must contain only numbers';
+            else if (data.nid.trim().length < 10 || data.nid.trim().length > 17) newErrors.nid = 'NID must be 10-17 digits';
             if (!data.phone.trim()) newErrors.phone = 'Phone number is required';
             else if (!/^(\+?880)?[0-9]{10,11}$/.test(data.phone.replace(/\s/g, ''))) newErrors.phone = 'Invalid phone number';
             if (!data.email.trim()) newErrors.email = 'Email is required';
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = 'Invalid email address';
-            if (!data.subject_choice) newErrors.subject_choice = 'Subject choice is required';
+            if (!data.present_address.trim()) newErrors.present_address = 'Present address is required';
+            if (!data.permanent_address.trim()) newErrors.permanent_address = 'Permanent address is required';
+            // Subject is always Management - no validation needed
         }
 
         if (step === 2) {
@@ -76,7 +81,12 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
 
         if (step === 4) {
             if (!data.passport_photo) newErrors.passport_photo = 'Passport photo is required';
-            if (!data.signature) newErrors.signature = 'Signature is required';
+        }
+
+        if (step === 5) {
+            if (!data.payment_transaction_id.trim()) newErrors.payment_transaction_id = 'Transaction ID is required';
+            if (!data.payment_method) newErrors.payment_method = 'Payment method is required';
+            if (!data.payment_amount || parseFloat(data.payment_amount) <= 0) newErrors.payment_amount = 'Valid payment amount is required';
         }
 
         setStepErrors(newErrors);
@@ -87,10 +97,8 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
         const file = e.target.files[0];
         if (!file) return;
 
-        // Get constraints based on field
-        const constraints = field === 'passport_photo'
-            ? { width: 300, height: 300, maxSize: 200 * 1024, label: 'Passport Photo (300×300px)' }
-            : { width: 300, height: 80, maxSize: 200 * 1024, label: 'Signature (300×80px)' };
+        // Constraints for passport photo
+        const constraints = { width: 300, height: 300, maxSize: 200 * 1024, label: 'Passport Photo (300×300px)' };
 
         // Validate file size first
         if (file.size > constraints.maxSize) {
@@ -125,13 +133,11 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
                     }));
                     e.target.value = '';
                     setData(field, null);
-                    if (field === 'passport_photo') setPhotoPreview(null);
-                    else setSignaturePreview(null);
+                    setPhotoPreview(null);
                 } else {
                     // Valid image - set data and preview
                     setData(field, file);
-                    if (field === 'passport_photo') setPhotoPreview(ev.target.result);
-                    else setSignaturePreview(ev.target.result);
+                    setPhotoPreview(ev.target.result);
                     setStepErrors(prev => ({ ...prev, [field]: null }));
                 }
             };
@@ -167,7 +173,7 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (validateStep(4)) {
+        if (validateStep(5)) {
             // Use router.post with FormData for file uploads
             const formData = new FormData();
             formData.append('full_name', data.full_name);
@@ -177,11 +183,14 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
             formData.append('nid', data.nid);
             formData.append('phone', data.phone);
             formData.append('email', data.email);
-            formData.append('subject_choice', data.subject_choice);
+            formData.append('present_address', data.present_address);
+            formData.append('permanent_address', data.permanent_address);
             formData.append('education_json', JSON.stringify(data.education_json));
             formData.append('experience_json', JSON.stringify(data.experience_json));
+            formData.append('payment_transaction_id', data.payment_transaction_id);
+            formData.append('payment_method', data.payment_method);
+            formData.append('payment_amount', data.payment_amount);
             if (data.passport_photo) formData.append('passport_photo', data.passport_photo);
-            if (data.signature) formData.append('signature', data.signature);
 
             router.post('/apply', formData, {
                 forceFormData: true,
@@ -194,7 +203,7 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
 
     const nextStep = () => {
         if (validateStep(currentStep)) {
-            setCurrentStep(Math.min(currentStep + 1, 4));
+            setCurrentStep(Math.min(currentStep + 1, 5));
         }
     };
     const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 1));
@@ -262,27 +271,50 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
                                             {stepErrors.dob && <p className="text-sm text-red-500 mt-1">{stepErrors.dob}</p>}
                                         </div>
                                         <div>
-                                            <Label>NID Number *</Label>
-                                            <Input value={data.nid} onChange={e => handleInputChange('nid', e.target.value)} placeholder="National ID" className={stepErrors.nid ? 'border-red-500' : ''} />
+                                            <Label>NID Number * (Numbers only)</Label>
+                                            <Input
+                                                value={data.nid}
+                                                onChange={e => {
+                                                    const value = e.target.value.replace(/[^0-9]/g, '');
+                                                    handleInputChange('nid', value);
+                                                }}
+                                                placeholder="National ID (10-17 digits)"
+                                                className={stepErrors.nid ? 'border-red-500' : ''}
+                                                maxLength={17}
+                                            />
                                             {stepErrors.nid && <p className="text-sm text-red-500 mt-1">{stepErrors.nid}</p>}
                                         </div>
+
+                                        {/* Contact Details Section */}
+                                        <div className="md:col-span-2 mt-4">
+                                            <h4 className="font-semibold text-primary mb-3 border-b pb-2">4. Contact Details</h4>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <Label>(a) Present Address *</Label>
+                                            <Input value={data.present_address} onChange={e => handleInputChange('present_address', e.target.value)} placeholder="Enter your present address" className={stepErrors.present_address ? 'border-red-500' : ''} />
+                                            {stepErrors.present_address && <p className="text-sm text-red-500 mt-1">{stepErrors.present_address}</p>}
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <Label>(b) Permanent Address *</Label>
+                                            <Input value={data.permanent_address} onChange={e => handleInputChange('permanent_address', e.target.value)} placeholder="Enter your permanent address" className={stepErrors.permanent_address ? 'border-red-500' : ''} />
+                                            {stepErrors.permanent_address && <p className="text-sm text-red-500 mt-1">{stepErrors.permanent_address}</p>}
+                                        </div>
                                         <div>
-                                            <Label>Phone *</Label>
+                                            <Label>(c) Mobile No. *</Label>
                                             <Input value={data.phone} onChange={e => handleInputChange('phone', e.target.value)} placeholder="+880" className={stepErrors.phone ? 'border-red-500' : ''} />
                                             {stepErrors.phone && <p className="text-sm text-red-500 mt-1">{stepErrors.phone}</p>}
                                         </div>
                                         <div>
-                                            <Label>Email *</Label>
+                                            <Label>(d) Email *</Label>
                                             <Input type="email" value={data.email} onChange={e => handleInputChange('email', e.target.value)} className={stepErrors.email ? 'border-red-500' : ''} />
                                             {stepErrors.email && <p className="text-sm text-red-500 mt-1">{stepErrors.email}</p>}
                                         </div>
                                         <div className="md:col-span-2">
-                                            <Label>Subject Choice *</Label>
-                                            <Select value={data.subject_choice} onValueChange={v => handleInputChange('subject_choice', v)}>
-                                                <SelectTrigger className={stepErrors.subject_choice ? 'border-red-500' : ''}><SelectValue placeholder="Select subject" /></SelectTrigger>
-                                                <SelectContent>{subjectChoices.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                                            </Select>
-                                            {stepErrors.subject_choice && <p className="text-sm text-red-500 mt-1">{stepErrors.subject_choice}</p>}
+                                            <Label>Subject</Label>
+                                            <div className="h-10 px-3 py-2 rounded-md border bg-muted flex items-center">
+                                                <span className="font-medium">Management</span>
+                                                <Badge className="ml-2 bg-primary/10 text-primary border-0">EMBA Program</Badge>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -445,7 +477,7 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
 
                                 {/* Step 4: Documents */}
                                 {currentStep === 4 && (
-                                    <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="max-w-md mx-auto">
                                         <div className="space-y-3">
                                             <Label>Passport Photo * (300×300px, max 200KB)</Label>
                                             <div className={`border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors ${stepErrors.passport_photo ? 'border-red-500' : ''}`}>
@@ -453,22 +485,121 @@ export default function Create({ session, subjectChoices, uploadConfig }) {
                                                 <Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'passport_photo')} className="mt-2" />
                                             </div>
                                             {(stepErrors.passport_photo || errors.passport_photo) && <p className="text-sm text-red-500">{stepErrors.passport_photo || errors.passport_photo}</p>}
+                                            <p className="text-xs text-muted-foreground text-center mt-2">Note: Signature will be collected manually during the admission process.</p>
                                         </div>
-                                        <div className="space-y-3">
-                                            <Label>Signature * (300×80px, max 200KB)</Label>
-                                            <div className={`border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors ${stepErrors.signature ? 'border-red-500' : ''}`}>
-                                                {signaturePreview ? <img src={signaturePreview} alt="Preview" className="h-16 mx-auto object-contain" /> : <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-2" />}
-                                                <Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'signature')} className="mt-2" />
+                                    </div>
+                                )}
+
+                                {/* Step 5: Payment */}
+                                {currentStep === 5 && (
+                                    <div className="space-y-6">
+                                        {/* Payment Header */}
+                                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 text-white">
+                                            <div className="absolute top-0 right-0 -mt-4 -mr-4 h-24 w-24 rounded-full bg-white/10 blur-2xl"></div>
+                                            <div className="absolute bottom-0 left-0 -mb-4 -ml-4 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+                                            <div className="relative">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <CreditCard className="h-5 w-5" />
+                                                    <span className="text-sm font-medium uppercase tracking-wider">Payment Information</span>
+                                                </div>
+                                                <p className="text-emerald-100 text-sm">Complete your payment via bKash/Nagad/Bank and enter the transaction details below.</p>
                                             </div>
-                                            {(stepErrors.signature || errors.signature) && <p className="text-sm text-red-500">{stepErrors.signature || errors.signature}</p>}
                                         </div>
+
+                                        {/* Payment Instructions */}
+                                        <Card className="border-amber-200 bg-amber-50">
+                                            <CardContent className="p-4">
+                                                <h4 className="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                                                    <AlertCircle className="h-4 w-4" /> Payment Instructions
+                                                </h4>
+                                                <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
+                                                    <li>Application fee: <strong>{paymentSettings?.payment_fee || 500} BDT</strong></li>
+                                                    {paymentSettings?.payment_bkash_number && (
+                                                        <li>bKash: <strong>{paymentSettings.payment_bkash_number}</strong></li>
+                                                    )}
+                                                    {paymentSettings?.payment_nagad_number && (
+                                                        <li>Nagad: <strong>{paymentSettings.payment_nagad_number}</strong></li>
+                                                    )}
+                                                    {paymentSettings?.payment_rocket_number && (
+                                                        <li>Rocket: <strong>{paymentSettings.payment_rocket_number}</strong></li>
+                                                    )}
+                                                    {paymentSettings?.payment_bank_name && (
+                                                        <li>Bank: <strong>{paymentSettings.payment_bank_name}</strong></li>
+                                                    )}
+                                                    {paymentSettings?.payment_bank_account && (
+                                                        <li>Account: <strong>{paymentSettings.payment_bank_account}</strong></li>
+                                                    )}
+                                                    <li>Keep your transaction ID/receipt for verification</li>
+                                                </ul>
+                                            </CardContent>
+                                        </Card>
+
+                                        {/* Payment Form */}
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="space-y-2">
+                                                <Label>Payment Method *</Label>
+                                                <Select value={data.payment_method} onValueChange={(v) => handleInputChange('payment_method', v)}>
+                                                    <SelectTrigger className={stepErrors.payment_method ? 'border-red-500' : ''}>
+                                                        <SelectValue placeholder="Select payment method" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="bKash">bKash</SelectItem>
+                                                        <SelectItem value="Nagad">Nagad</SelectItem>
+                                                        <SelectItem value="Rocket">Rocket</SelectItem>
+                                                        <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {stepErrors.payment_method && <p className="text-sm text-red-500">{stepErrors.payment_method}</p>}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>Amount Paid (BDT) *</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    step="0.01"
+                                                    value={data.payment_amount}
+                                                    onChange={e => handleInputChange('payment_amount', e.target.value)}
+                                                    placeholder={`e.g. ${paymentSettings?.payment_fee || 500}`}
+                                                    className={stepErrors.payment_amount ? 'border-red-500' : ''}
+                                                />
+                                                {stepErrors.payment_amount && <p className="text-sm text-red-500">{stepErrors.payment_amount}</p>}
+                                            </div>
+
+                                            <div className="md:col-span-2 space-y-2">
+                                                <Label>Transaction ID / Reference Number *</Label>
+                                                <Input
+                                                    value={data.payment_transaction_id}
+                                                    onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
+                                                    placeholder="e.g. TRX123456789 or Receipt No."
+                                                    className={stepErrors.payment_transaction_id ? 'border-red-500' : ''}
+                                                />
+                                                {stepErrors.payment_transaction_id && <p className="text-sm text-red-500">{stepErrors.payment_transaction_id}</p>}
+                                                <p className="text-xs text-muted-foreground">Enter the transaction ID from your bKash/Nagad/Bank receipt</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Summary */}
+                                        {data.payment_transaction_id && data.payment_method && data.payment_amount && (
+                                            <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                                    <span className="font-semibold text-green-700">Payment Details Ready</span>
+                                                </div>
+                                                <div className="grid grid-cols-3 gap-4 text-sm">
+                                                    <div><span className="text-green-600">Method:</span> <strong>{data.payment_method}</strong></div>
+                                                    <div><span className="text-green-600">Amount:</span> <strong>{data.payment_amount} BDT</strong></div>
+                                                    <div><span className="text-green-600">TRX ID:</span> <strong>{data.payment_transaction_id}</strong></div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
                                 {/* Navigation */}
                                 <div className="flex justify-between pt-6 border-t">
                                     <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1}><ArrowLeft className="h-4 w-4 mr-2" /> Previous</Button>
-                                    {currentStep < 4 ? (
+                                    {currentStep < 5 ? (
                                         <Button type="button" onClick={nextStep}>Next <ArrowRight className="h-4 w-4 ml-2" /></Button>
                                     ) : (
                                         <Button type="submit" disabled={processing} className="bg-gradient-to-r from-primary to-blue-600">

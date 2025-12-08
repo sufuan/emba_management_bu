@@ -5,14 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2 } from 'lucide-react';
 
-export default function Settings({ applyNowEnabled, activeSessionId, sessions, uploadConfig }) {
+export default function Settings({ applyNowEnabled, activeSessionId, sessions, uploadConfig, paymentSettings }) {
     const [isApplyEnabled, setIsApplyEnabled] = useState(applyNowEnabled);
     const [selectedSession, setSelectedSession] = useState(String(activeSessionId || ''));
     const [isToggling, setIsToggling] = useState(false);
     const [isUpdatingSession, setIsUpdatingSession] = useState(false);
+    const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+    const [payment, setPayment] = useState({
+        payment_fee: paymentSettings?.payment_fee || 500,
+        payment_bkash_number: paymentSettings?.payment_bkash_number || '',
+        payment_nagad_number: paymentSettings?.payment_nagad_number || '',
+        payment_rocket_number: paymentSettings?.payment_rocket_number || '',
+        payment_bank_name: paymentSettings?.payment_bank_name || '',
+        payment_bank_account: paymentSettings?.payment_bank_account || '',
+    });
 
     const toggleApplyNow = () => {
         setIsToggling(true);
@@ -32,6 +42,15 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
             preserveScroll: true,
             onSuccess: () => setIsUpdatingSession(false),
             onError: () => setIsUpdatingSession(false),
+        });
+    };
+
+    const updatePaymentSettings = () => {
+        setIsUpdatingPayment(true);
+        router.post('/admin/settings/payment', payment, {
+            preserveScroll: true,
+            onSuccess: () => setIsUpdatingPayment(false),
+            onError: () => setIsUpdatingPayment(false),
         });
     };
 
@@ -119,6 +138,52 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                                     </div>
                                 )}
                             </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Payment Settings */}
+                    <Card className="border-0 shadow-lg lg:col-span-2">
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600">
+                                    <CreditCard className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <CardTitle>Payment Settings</CardTitle>
+                                    <CardDescription>Configure application fee and payment methods</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2"><Banknote className="h-4 w-4" /> Application Fee (BDT)</Label>
+                                    <Input type="number" value={payment.payment_fee} onChange={e => setPayment({...payment, payment_fee: e.target.value})} placeholder="500" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> bKash Number</Label>
+                                    <Input value={payment.payment_bkash_number} onChange={e => setPayment({...payment, payment_bkash_number: e.target.value})} placeholder="01XXXXXXXXX" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Nagad Number</Label>
+                                    <Input value={payment.payment_nagad_number} onChange={e => setPayment({...payment, payment_nagad_number: e.target.value})} placeholder="01XXXXXXXXX" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Rocket Number</Label>
+                                    <Input value={payment.payment_rocket_number} onChange={e => setPayment({...payment, payment_rocket_number: e.target.value})} placeholder="01XXXXXXXXX" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Bank Name & Branch</Label>
+                                    <Input value={payment.payment_bank_name} onChange={e => setPayment({...payment, payment_bank_name: e.target.value})} placeholder="Sonali Bank, University Branch" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Bank Account Number</Label>
+                                    <Input value={payment.payment_bank_account} onChange={e => setPayment({...payment, payment_bank_account: e.target.value})} placeholder="XXXXXXXXXXXXXX" />
+                                </div>
+                            </div>
+                            <Button onClick={updatePaymentSettings} className="mt-4" disabled={isUpdatingPayment}>
+                                {isUpdatingPayment ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</> : 'Save Payment Settings'}
+                            </Button>
                         </CardContent>
                     </Card>
 

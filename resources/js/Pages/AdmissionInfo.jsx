@@ -38,7 +38,7 @@ export default function AdmissionInfo({ applyNowEnabled, activeSession }) {
                 <div className="container mx-auto px-4 text-center">
                     <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 mb-4">Admission {activeSession?.year_start || new Date().getFullYear()}</Badge>
                     <h1 className="text-4xl lg:text-5xl font-bold mb-4">Admission Guidelines</h1>
-                    <p className="text-slate-300 max-w-2xl mx-auto">Everything you need to know about applying to our mba program.</p>
+                    <p className="text-slate-300 max-w-2xl mx-auto">Everything you need to know about applying to our EMBA program.</p>
                     {applyNowEnabled && activeSession && (
                         <div className="mt-8">
                             <Link href="/apply">

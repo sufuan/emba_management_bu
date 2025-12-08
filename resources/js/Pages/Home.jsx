@@ -12,7 +12,7 @@ const features = [
     { icon: Briefcase, title: 'Executive Focus', desc: 'Designed for working professionals with 2+ years experience' },
     { icon: Clock, title: 'Flexible Schedule', desc: 'Weekend classes that fit your busy professional life' },
     { icon: Globe, title: 'Global Network', desc: 'Connect with industry leaders and alumni worldwide' },
-    { icon: Award, title: 'Accredited Program', desc: 'Internationally recognized MBA degree' },
+    { icon: Award, title: 'Accredited Program', desc: 'Internationally recognized EMBA degree' },
 ];
 
 const stats = [
@@ -43,15 +43,15 @@ export default function Home({ applyNowEnabled, activeSession }) {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="text-white space-y-8">
                             <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-sm py-1 px-3">
-                                {activeSession ? `Admissions Open: ${activeSession.session_name}` : 'Executive MBA Program'}
+                                {activeSession ? `Admissions Open: ${activeSession.session_name}` : 'Executive EMBA Program'}
                             </Badge>
                             <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
                                 Transform Your
                                 <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"> Career </span>
-                                with mba
+                                with EMBA
                             </h1>
                             <p className="text-lg text-slate-300 max-w-xl">
-                                Join our prestigious Executive MBA program and unlock your leadership potential.
+                                Join our prestigious Executive EMBA program and unlock your leadership potential.
                                 Learn from industry experts and build a powerful professional network.
                             </p>
                             <div className="flex flex-wrap gap-4">
@@ -97,7 +97,7 @@ export default function Home({ applyNowEnabled, activeSession }) {
                     <div className="text-center max-w-2xl mx-auto mb-16">
                         <Badge variant="outline" className="mb-4">Why Choose Us</Badge>
                         <h2 className="text-3xl lg:text-4xl font-bold mb-4">Program Highlights</h2>
-                        <p className="text-muted-foreground">Our mba program is designed to fit your lifestyle while delivering world-class education</p>
+                        <p className="text-muted-foreground">Our EMBA program is designed to fit your lifestyle while delivering world-class education</p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {features.map((feature, i) => (
@@ -139,7 +139,7 @@ export default function Home({ applyNowEnabled, activeSession }) {
                             <Card className="p-6 bg-primary text-white"><BookOpen className="h-8 w-8 mb-3" /><div className="text-2xl font-bold">48</div><div className="text-sm opacity-80">Credit Hours</div></Card>
                             <Card className="p-6"><Users className="h-8 w-8 mb-3 text-primary" /><div className="text-2xl font-bold">25</div><div className="text-sm text-muted-foreground">Expert Faculty</div></Card>
                             <Card className="p-6"><Star className="h-8 w-8 mb-3 text-yellow-500" /><div className="text-2xl font-bold">4.8</div><div className="text-sm text-muted-foreground">Student Rating</div></Card>
-                            <Card className="p-6 bg-gradient-to-br from-slate-800 to-slate-900 text-white"><Award className="h-8 w-8 mb-3" /><div className="text-2xl font-bold">Top 10</div><div className="text-sm opacity-80">MBA Programs</div></Card>
+                            <Card className="p-6 bg-gradient-to-br from-slate-800 to-slate-900 text-white"><Award className="h-8 w-8 mb-3" /><div className="text-2xl font-bold">Top 10</div><div className="text-sm opacity-80">EMBA Programs</div></Card>
                         </div>
                     </div>
                 </div>

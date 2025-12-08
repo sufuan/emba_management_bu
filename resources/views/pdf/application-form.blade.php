@@ -4,72 +4,77 @@
     <meta charset="UTF-8" />
     <title>Application Form - {{ $applicant->form_no }}</title>
     <style>
-        body { font-family: sans-serif; font-size: 12px; }
-        .section-title { font-size: 16px; font-weight: bold; margin-bottom: 10px; text-align:center; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        table td, table th { border: 1px solid #000; padding: 6px; }
-        .flex { display: flex; justify-content: space-between; }
-        .signature-right { text-align: right; font-weight: bold; margin-top: 40px; }
-        .office-box { border: 2px solid #000; padding: 15px; margin-top: 20px; }
-        .office-signatures { display: flex; justify-content: space-between; gap: 15px; }
+        @page { size: A4; margin: 12mm 12mm 12mm 12mm; }
+        body { font-family: sans-serif; font-size: 11.5px; line-height: 1.35; margin: 0; padding: 0; }
+        .section-title { font-size: 14px; font-weight: bold; margin: 6px 0; text-align: center; border: 1px solid #000; padding: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        table td, table th { border: 1px solid #000; padding: 4px 6px; font-size: 11px; }
+        p { margin: 4px 0; }
+        .page-break { page-break-before: always; }
+        .compact-row { margin: 3px 0; font-size: 11.5px; }
+        ul { margin: 6px 0 6px 20px; padding: 0; }
+        li { margin: 3px 0; font-size: 11px; }
     </style>
 </head>
-<body style="margin:60px;">
+<body>
 
-    <div style="text-align:center; margin-bottom:20px;">
-        @if(file_exists(public_path('logo/university_logo.png')))
-            <img src="{{ public_path('logo/university_logo.png') }}" alt="University Logo" style="width:80px; height:auto;">
-        @endif
-        <div style="font-size:20px; font-weight:bold;">UNIVERSITY OF BARISHAL</div>
-        <div>Faculty of Business Studies</div>
-        <div style="font-weight:bold;">Application Form for Executive MBA Admission</div>
-        <div>Session: {{ $session->session_name }}</div>
-        <div style="font-size:12px;">Please read the application guidelines provided at the end<br>before you complete the application form</div>
-    </div>
+    <!-- Header with Logo and Barcode -->
+    <table style="border: none; margin-bottom: 10px;">
+        <tr>
+            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+                @if(file_exists(public_path('logo/university_logo.png')))
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:65px; height:auto;">
+                @endif
+            </td>
+            <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
+                <div style="font-size: 18px; font-weight: bold;">DEPARTMENT OF MANAGEMENT</div>
+                <div style="font-size: 12px; margin-top: 2px;">University of Barishal</div>
+                <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">Application Form for EMBA Admission</div>
+                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
+                <div style="margin-top: 5px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px;" />
+                </div>
+            </td>
+            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+                <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
+                    @if($applicant->photo_path)
+                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
+                    @else
+                        <div style="font-size: 10px; padding-top: 40px;">Passport Photo</div>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <div style="position:absolute; top:140px; right:40px; width:120px; height:150px; border:1px solid #000; text-align:center;">
-        @if($applicant->photo_path)
-            <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
-        @else
-            <div style="font-size:10px; padding-top:40px;">Passport Size Photo</div>
-        @endif
-    </div>
-    <div class="section-title">ADMISSION APPLICATION FORM</div>
-    <div style="text-align:center; margin-bottom:15px;"><strong>Form No: {{ $applicant->form_no }}</strong> | <strong>Admission Roll: {{ $applicant->admission_roll }}</strong></div>
+    <div class="section-title">APPLICANT COPY</div>
+    <p style="text-align:center; margin-bottom:8px; font-size: 12px;"><strong>Form No: {{ $applicant->form_no }}</strong></p>
 
-    <p><strong>1. Full Name in Block Letters (in English):</strong> {{ strtoupper($applicant->full_name) }}</p>
+    <p class="compact-row"><strong>1. Full Name:</strong> {{ strtoupper($applicant->full_name) }}</p>
+    <p class="compact-row"><strong>2. Father's Name:</strong> {{ $applicant->fathers_name }} | <strong>Mother's Name:</strong> {{ $applicant->mothers_name }} | <strong>DOB:</strong> {{ $applicant->dob?->format('d/m/Y') }} | <strong>NID:</strong> {{ $applicant->nid }}</p>
+    <p class="compact-row"><strong>3. Present Address:</strong> {{ $applicant->present_address ?? 'N/A' }}</p>
+    <p class="compact-row"><strong>4. Permanent Address:</strong> {{ $applicant->permanent_address ?? 'N/A' }}</p>
+    <p class="compact-row"><strong>5. Mobile:</strong> {{ $applicant->phone }} | <strong>Email:</strong> {{ $applicant->email }}</p>
 
-    <p><strong>2. Father's Name:</strong> {{ $applicant->fathers_name }}</p>
-
-    <p><strong>3. Mother's Name:</strong> {{ $applicant->mothers_name }}</p>
-
-    <p><strong>4. Contact Details:</strong></p>
-    <p>(a) Mobile No.: {{ $applicant->phone }}</p>
-    <p>(b) Email: {{ $applicant->email }}</p>
-
-    <p><strong>5. Date of Birth (DD/MM/YYYY):</strong> {{ $applicant->dob?->format('d/m/Y') }}</p>
-
-    <p><strong>6. NID Number:</strong> {{ $applicant->nid }}</p>
-
-    <p><strong>7. Educational Qualifications of the Applicant</strong></p>
+    <p class="compact-row" style="margin-top: 5px;"><strong>6. Educational Qualifications:</strong></p>
     <table>
         <thead>
             <tr>
-                <th>Examination</th>
-                <th>Year of Passing</th>
-                <th>Board / University</th>
-                <th>Subject / Dept.</th>
-                <th>Division / CGPA</th>
+                <th style="width:20%;">Examination</th>
+                <th style="width:10%;">Year</th>
+                <th style="width:30%;">Board / University</th>
+                <th style="width:25%;">Subject / Dept.</th>
+                <th style="width:15%;">Result</th>
             </tr>
         </thead>
         <tbody>
             @php
                 $eduData = $applicant->education_json;
                 $rows = [
-                    ['key' => 'ssc', 'label' => 'SSC / Equivalent'],
-                    ['key' => 'hsc', 'label' => 'HSC / Equivalent'],
-                    ['key' => 'bachelor', 'label' => '4 Years Bachelor'],
-                    ['key' => 'master', 'label' => 'Master (if any)'],
+                    ['key' => 'ssc', 'label' => 'SSC'],
+                    ['key' => 'hsc', 'label' => 'HSC'],
+                    ['key' => 'bachelor', 'label' => 'Bachelor (4 Yr)'],
+                    ['key' => 'master', 'label' => 'Master'],
                 ];
             @endphp
             @foreach($rows as $row)
@@ -79,7 +84,6 @@
                     $subject = $edu['subject'] ?? $edu['department'] ?? '';
                     $year = $edu['year'] ?? '';
                     $result = $edu['result'] ?? '';
-                    // Skip master row if empty
                     $isEmpty = empty($year) && empty($board) && empty($subject) && empty($result);
                 @endphp
                 @if($row['key'] !== 'master' || !$isEmpty)
@@ -95,94 +99,118 @@
         </tbody>
     </table>
 
-    <p><strong>8. Job Experience (if any)</strong></p>
+    <p class="compact-row"><strong>7. Job Experience:</strong>
     @php
         $hasExperience = false;
+        $expList = [];
         if($applicant->experience_json && is_array($applicant->experience_json)) {
             foreach($applicant->experience_json as $exp) {
                 if(!empty($exp['position']) || !empty($exp['company']) || !empty($exp['duration'])) {
                     $hasExperience = true;
-                    break;
+                    $expList[] = ($exp['position'] ?? '') . ' at ' . ($exp['company'] ?? '') . ' (' . ($exp['duration'] ?? '') . ')';
                 }
             }
         }
     @endphp
-    @if($hasExperience)
-        <table>
-            <thead>
-                <tr>
-                    <th>Position</th>
-                    <th>Company/Organization</th>
-                    <th>Duration</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($applicant->experience_json as $exp)
-                    @if(!empty($exp['position']) || !empty($exp['company']) || !empty($exp['duration']))
-                    <tr>
-                        <td>{{ $exp['position'] ?? '' }}</td>
-                        <td>{{ $exp['company'] ?? '' }}</td>
-                        <td>{{ $exp['duration'] ?? '' }}</td>
-                    </tr>
+    {{ $hasExperience ? implode('; ', $expList) : 'N/A' }}
+    </p>
+
+    <p class="compact-row"><strong>8. Payment:</strong> Transaction ID: {{ $applicant->payment_transaction_id ?: 'N/A' }} | Method: {{ $applicant->payment_method ?: 'N/A' }} | Amount: {{ $applicant->payment_amount ? number_format($applicant->payment_amount, 2) . ' BDT' : 'N/A' }}</p>
+
+    <p class="compact-row" style="margin-top: 10px;"><strong>Declaration:</strong> The information provided is true and correct. I accept that the University reserves the right to terminate my admission if any information is found false. I will abide by all rules and regulations of the University.</p>
+
+    <table style="border: none; margin-top: 25px;">
+        <tr>
+            <td style="border: none; width: 70%;"></td>
+            <td style="border: none; width: 30%; text-align: center;">
+                ____________________<br>
+                <strong style="font-size: 11px;">Signature of Applicant</strong><br>
+                <span style="font-size: 10px;">Date: {{ $applicant->submitted_at?->format('d/m/Y') }}</span>
+            </td>
+        </tr>
+    </table>
+
+    <!-- PAGE 2: OFFICE COPY -->
+    <div class="page-break"></div>
+
+    <!-- Header for Page 2 -->
+    <table style="border: none; margin-bottom: 10px;">
+        <tr>
+            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+                @if(file_exists(public_path('logo/university_logo.png')))
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:65px; height:auto;">
+                @endif
+            </td>
+            <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
+                <div style="font-size: 18px; font-weight: bold;">DEPARTMENT OF MANAGEMENT</div>
+                <div style="font-size: 12px; margin-top: 2px;">University of Barishal</div>
+                <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">EMBA Admission - Session: {{ $session->session_name }}</div>
+                <div style="margin-top: 5px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px;" />
+                </div>
+            </td>
+            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+                <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
+                    @if($applicant->photo_path)
+                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
+                    @else
+                        <div style="font-size: 10px; padding-top: 40px;">Passport Photo</div>
                     @endif
-                @endforeach
-            </tbody>
-        </table>
-    @else
-        <p style="margin-left:20px;">N/A</p>
-    @endif
+                </div>
+            </td>
+        </tr>
+    </table>
 
-    <p><strong>9. Subject Choice:</strong> {{ $applicant->subject_choice }}</p>
+    <div class="section-title">OFFICE COPY</div>
 
-    <p><strong>Applicant's Declaration</strong></p>
-    <p>The information provided in this application form is true and correct. I accept that the University of Barishal reserves the right to terminate my admission at any time if any item of the information I gave is found to be false or incorrect.</p>
-    <p>I declare that if I get admission to the University of Barishal:</p>
-    <ul>
-        <li>I will abide by all the rules and regulations of the University.</li>
-        <li>During my studentship here, I will comply with any decision of any authority of the University or decisions of any person authorized by the University.</li>
-        <li>I will comply with any changes in the rules and ordinances of the University.</li>
-    </ul>
+    <p class="compact-row" style="text-align:center; margin-bottom:8px; font-size: 12px;"><strong>Form No: {{ $applicant->form_no }}</strong></p>
 
-    <div class="signature-right" style="text-align:right; margin-top:50px;">
-        @if($applicant->signature_path)
-            <img src="{{ public_path('storage/' . $applicant->signature_path) }}" style="width:150px; height:40px; object-fit:contain;" /><br>
-        @else
-            ____________________<br>
-        @endif
-        <strong>Signature of the Applicant</strong><br>
-        <small>Date: {{ $applicant->submitted_at?->format('d/m/Y') }}</small>
+    <table style="border:none; margin-bottom:8px;">
+        <tr>
+            <td style="border:none; width:50%; padding:4px 0;"><strong>Admission Roll:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:4px 0;"><strong>Registration No:</strong> ______________________</td>
+        </tr>
+        <tr>
+            <td style="border:none; width:50%; padding:4px 0;"><strong>Roll Number:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:4px 0;"><strong>Date of Admission:</strong> ______________________</td>
+        </tr>
+        <tr>
+            <td style="border:none; width:50%; padding:4px 0;"><strong>Merit Position:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:4px 0;"></td>
+        </tr>
+    </table>
+
+    <p class="compact-row"><strong>Applicant Name:</strong> {{ strtoupper($applicant->full_name) }}</p>
+    <p class="compact-row"><strong>Father's Name:</strong> {{ $applicant->fathers_name }} | <strong>Mother's Name:</strong> {{ $applicant->mothers_name }}</p>
+    <p class="compact-row"><strong>DOB:</strong> {{ $applicant->dob?->format('d/m/Y') }} | <strong>NID:</strong> {{ $applicant->nid }} | <strong>Mobile:</strong> {{ $applicant->phone }} | <strong>Email:</strong> {{ $applicant->email }}</p>
+    <p class="compact-row"><strong>Present Address:</strong> {{ $applicant->present_address ?? 'N/A' }}</p>
+    <p class="compact-row"><strong>Permanent Address:</strong> {{ $applicant->permanent_address ?? 'N/A' }}</p>
+
+    <p class="compact-row" style="margin-top:6px;"><strong>Payment:</strong> TRX ID: {{ $applicant->payment_transaction_id ?: 'N/A' }} | Method: {{ $applicant->payment_method ?: 'N/A' }} | Amount: {{ $applicant->payment_amount ? number_format($applicant->payment_amount, 2) . ' BDT' : 'N/A' }}</p>
+
+    <p class="compact-row" style="margin-top:10px;"><strong>Remarks:</strong></p>
+    <div style="border:1px solid #000; height:60px; margin-bottom:12px;"></div>
+
+    <table style="border:none; margin-top:20px;">
+        <tr>
+            <td style="border:none; text-align:center; width:33%;">
+                ______________________<br>
+                <span style="font-size:10px;"><strong>Scrutinizer</strong></span>
+            </td>
+            <td style="border:none; text-align:center; width:33%;">
+                ______________________<br>
+                <span style="font-size:10px;"><strong>Chairman</strong></span>
+            </td>
+            <td style="border:none; text-align:center; width:33%;">
+                ______________________<br>
+                <span style="font-size:10px;"><strong>Dean</strong></span>
+            </td>
+        </tr>
+    </table>
+
+    <div style="margin-top:15px; padding:8px; border:1px solid #ccc; background:#f9f9f9;">
+        <p style="font-size:10px; margin:0;"><strong>Instructions:</strong> Attach photocopies of NID and all certificates/transcripts. Attach proof of job experience (if any). Submit to Dean's office by deadline. Collect admit card for Admission Test. Test date will be communicated via email/mobile.</p>
     </div>
-
-    <h3>For Office Use Only</h3>
-    <div class="office-box">
-        <table style="border:none;">
-            <tr>
-                <td style="border:none; text-align:center; width:33%;">
-                    ______________________<br>
-                    <strong>Signature of the Scrutinizer</strong>
-                </td>
-                <td style="border:none; text-align:center; width:33%;">
-                    ______________________<br>
-                    <strong>Signature of the Chairman</strong>
-                </td>
-                <td style="border:none; text-align:center; width:33%;">
-                    ______________________<br>
-                    <strong>Signature of the Dean</strong>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <h3>Instructions for Completing the Application Form</h3>
-    <ul>
-        <li>Please affix two recent passport-size photographs on the specified boxes.</li>
-        <li>Please attach photocopies of the NID card and all certificates, mark sheets, and/or transcripts.</li>
-        <li>Please attach proof of all job experiences (if any).</li>
-        <li>Your application must be submitted to the Dean's office by the deadline.</li>
-        <li>Make sure all sections of the form are completed, including the admit card.</li>
-        <li>Collect the admit card, without which you cannot sit for the Admission Test.</li>
-        <li>The admission test date will be communicated via email and mobile.</li>
-    </ul>
 
 </body>
 </html>

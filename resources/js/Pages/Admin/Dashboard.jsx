@@ -76,7 +76,7 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                                     <tr className="border-b">
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Form No</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Name</th>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subject</th>
+                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Phone</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Status</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Date</th>
                                     </tr>
@@ -87,7 +87,7 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                                             <tr key={applicant.id} className="border-b hover:bg-slate-50">
                                                 <td className="py-3 px-4 font-medium">{applicant.form_no}</td>
                                                 <td className="py-3 px-4">{applicant.full_name}</td>
-                                                <td className="py-3 px-4">{applicant.subject_choice}</td>
+                                                <td className="py-3 px-4">{applicant.phone}</td>
                                                 <td className="py-3 px-4">
                                                     <Badge className={
                                                         applicant.status === 'verified' ? 'bg-green-100 text-green-700' :

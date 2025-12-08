@@ -22,7 +22,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>mba Applicants List</h1>
+        <h1>EMBA Applicants List</h1>
         <p>Generated on {{ now()->format('d M, Y h:i A') }} | Total: {{ $applicants->count() }} applicants</p>
     </div>
 
@@ -35,8 +35,8 @@
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Email</th>
-                <th>Subject</th>
                 <th>Status</th>
+                <th>Session</th>
             </tr>
         </thead>
         <tbody>
@@ -48,15 +48,15 @@
                 <td>{{ $applicant->full_name }}</td>
                 <td>{{ $applicant->phone }}</td>
                 <td>{{ $applicant->email }}</td>
-                <td>{{ $applicant->subject_choice }}</td>
                 <td><span class="status status-{{ $applicant->status }}">{{ ucfirst($applicant->status) }}</span></td>
+                <td>{{ $applicant->session->session_name ?? 'N/A' }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
     <div class="footer">
-        <p>mba Admission System</p>
+        <p>EMBA Admission System</p>
     </div>
 </body>
 </html>

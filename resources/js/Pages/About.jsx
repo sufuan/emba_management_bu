@@ -19,7 +19,7 @@ export default function About() {
             {/* Hero */}
             <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-20">
                 <div className="container mx-auto px-4 text-center">
-                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 mb-4">About mba</Badge>
+                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 mb-4">About EMBA</Badge>
                     <h1 className="text-4xl lg:text-5xl font-bold mb-4">Shaping Future Leaders</h1>
                     <p className="text-slate-300 max-w-2xl mx-auto">Learn about our mission, vision, and commitment to excellence in executive education.</p>
                 </div>

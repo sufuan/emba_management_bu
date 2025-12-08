@@ -22,6 +22,8 @@ class Applicant extends Model
         'nid',
         'phone',
         'email',
+        'present_address',
+        'permanent_address',
         'photo_path',
         'signature_path',
         'form_no',
@@ -29,6 +31,10 @@ class Applicant extends Model
         'subject_choice',
         'experience_json',
         'education_json',
+        'payment_transaction_id',
+        'payment_method',
+        'payment_amount',
+        'payment_date',
         'status',
         'submitted_at',
     ];
@@ -43,6 +49,8 @@ class Applicant extends Model
         'dob' => 'date',
         'experience_json' => 'array',
         'education_json' => 'array',
+        'payment_amount' => 'decimal:2',
+        'payment_date' => 'datetime',
         'submitted_at' => 'datetime',
     ];
 
