@@ -23,7 +23,7 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
+            <Head title="Register - EMBA Admission" />
 
             <form onSubmit={submit}>
                 <div>

@@ -14,7 +14,7 @@ const values = [
 export default function About() {
     return (
         <PublicLayout>
-            <Head title="About Us" />
+            <Head title="About Us - EMBA Program" />
 
             {/* Hero */}
             <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-20">

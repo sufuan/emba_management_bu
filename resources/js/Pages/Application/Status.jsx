@@ -18,7 +18,7 @@ export default function Status({ applicant }) {
 
     return (
         <PublicLayout>
-            <Head title="Application Status" />
+            <Head title="Application Status - EMBA" />
 
             <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-16">
                 <div className="container mx-auto px-4 text-center">

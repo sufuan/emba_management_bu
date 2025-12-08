@@ -23,7 +23,7 @@ export default function ResetPassword({ token, email }) {
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="Reset Password - EMBA" />
 
             <form onSubmit={submit}>
                 <div>

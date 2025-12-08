@@ -62,7 +62,7 @@ export default function Index({ sessions, activeSessionId }) {
 
     return (
         <AdminLayout>
-            <Head title="Manage Sessions" />
+            <Head title="Manage Sessions - EMBA Admin" />
 
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

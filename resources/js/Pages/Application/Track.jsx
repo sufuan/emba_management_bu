@@ -17,7 +17,7 @@ export default function Track() {
 
     return (
         <PublicLayout>
-            <Head title="Track Application" />
+            <Head title="Track Application - EMBA" />
 
             <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-20">
                 <div className="container mx-auto px-4 text-center">

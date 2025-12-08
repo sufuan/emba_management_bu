@@ -7,7 +7,7 @@ import { XCircle, Clock, Bell, ArrowLeft } from 'lucide-react';
 export default function Closed() {
     return (
         <PublicLayout>
-            <Head title="Applications Closed" />
+            <Head title="Applications Closed - EMBA Admission" />
 
             <section className="min-h-[70vh] flex items-center justify-center py-20">
                 <div className="container mx-auto px-4">

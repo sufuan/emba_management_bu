@@ -15,7 +15,7 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
 
     return (
         <AdminLayout>
-            <Head title="Admin Dashboard" />
+            <Head title="Admin Dashboard - EMBA" />
 
             <div className="space-y-8">
                 {/* Header */}

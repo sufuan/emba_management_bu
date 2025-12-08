@@ -31,7 +31,7 @@ const timeline = [
 export default function AdmissionInfo({ applyNowEnabled, activeSession }) {
     return (
         <PublicLayout>
-            <Head title="Admission Information" />
+            <Head title="Admission Information - EMBA" />
 
             {/* Hero */}
             <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-20">

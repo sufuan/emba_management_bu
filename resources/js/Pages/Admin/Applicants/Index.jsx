@@ -30,7 +30,7 @@ export default function Index({ applicants, filters, sessions }) {
 
     return (
         <AdminLayout>
-            <Head title="Manage Applicants" />
+            <Head title="Manage Applicants - EMBA Admin" />
 
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

@@ -9,7 +9,7 @@ import { CheckCircle2, Download, FileText, Printer, Share2 } from 'lucide-react'
 export default function Preview({ applicant }) {
     return (
         <PublicLayout>
-            <Head title="Application Submitted" />
+            <Head title="Application Submitted - EMBA" />
 
             <section className="bg-gradient-to-br from-green-600 to-emerald-600 text-white py-16">
                 <div className="container mx-auto px-4 text-center">

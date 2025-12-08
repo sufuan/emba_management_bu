@@ -56,7 +56,7 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
 
     return (
         <AdminLayout>
-            <Head title="Settings" />
+            <Head title="Settings - EMBA Admin" />
 
             <div className="space-y-6">
                 <div>

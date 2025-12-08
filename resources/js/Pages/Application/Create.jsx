@@ -216,7 +216,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
 
     return (
         <PublicLayout>
-            <Head title="Apply Now" />
+            <Head title="Apply Now - EMBA Admission" />
 
             <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-12">
                 <div className="container mx-auto px-4 text-center">
