@@ -22,16 +22,17 @@
     <table style="border: none; margin-bottom: 10px;">
         <tr>
             <td style="border: none; width: 20%; text-align: left; vertical-align: top; padding-left: 10px;">
-                @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
-                @endif
-                <div style="margin-top: 8px;">
-                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px; display:block;" />
+                
+                <div style="margin-top: 18px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:115px; height:42px; display:block;" />
                 </div>
-                <div style="font-size: 10px; margin-top: 3px;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
+                <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                <div style="font-size: 11px;">Department of Management Studies</div>
+                  @if(file_exists(public_path('logo/university_logo.png')))
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
+                @endif
+                <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
                 <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
                 <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
@@ -157,12 +158,12 @@
                     <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
                 @endif
                 <div style="margin-top: 8px;">
-                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px; display:block;" />
+                    <img src="{{ $barcodeBase64 }}" style="width:105px; height:38px; display:block;" />
                 </div>
-                <div style="font-size: 10px; margin-top: 3px;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
+                <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                <div style="font-size: 11px;">Department of Management Studies</div>
+                <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
                 <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
                 <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
