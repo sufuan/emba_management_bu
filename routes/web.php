@@ -50,6 +50,11 @@ Route::get('/application/{applicant}/admit-card/download', [PDFController::class
 | Admin Routes (Protected by Auth Middleware)
 |--------------------------------------------------------------------------
 */
+// Redirect /admin to login if not authenticated
+Route::get('/admin', function () {
+    return redirect()->route('login');
+})->middleware('guest');
+
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');

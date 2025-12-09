@@ -65,7 +65,7 @@ export default function Home({ applyNowEnabled, activeSession }) {
                                     <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
                                 )}
                                 <Link href="/admission-info">
-                                    <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 gap-2">
+                                    <Button size="lg" variant="outline" className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-blue-900 gap-2">
                                         Learn More <ChevronRight className="h-5 w-5" />
                                     </Button>
                                 </Link>
@@ -156,7 +156,7 @@ export default function Home({ applyNowEnabled, activeSession }) {
                         ) : (
                             <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
                         )}
-                        <Link href="/track"><Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10">Track Application</Button></Link>
+                      
                     </div>
                 </div>
             </section>

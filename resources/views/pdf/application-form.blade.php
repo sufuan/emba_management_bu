@@ -21,19 +21,20 @@
     <!-- Header with Logo and Barcode -->
     <table style="border: none; margin-bottom: 10px;">
         <tr>
-            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+            <td style="border: none; width: 20%; text-align: left; vertical-align: top; padding-left: 10px;">
                 @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:65px; height:auto;">
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
                 @endif
+                <div style="margin-top: 8px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px; display:block;" />
+                </div>
+                <div style="font-size: 10px; margin-top: 3px;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                <div style="font-size: 18px; font-weight: bold;">DEPARTMENT OF MANAGEMENT</div>
-                <div style="font-size: 12px; margin-top: 2px;">University of Barishal</div>
-                <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">Application Form for EMBA Admission</div>
+                <div style="font-size: 11px;">Department of Management Studies</div>
+                <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
+                <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
                 <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
-                <div style="margin-top: 5px;">
-                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px;" />
-                </div>
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
@@ -48,33 +49,49 @@
     </table>
 
     <div class="section-title">APPLICANT COPY</div>
-    <p style="text-align:center; margin-bottom:8px; font-size: 12px;"><strong>Form No: {{ $applicant->form_no }}</strong></p>
+    <div style="font-size: 12px; font-weight: bold; margin: 8px 0 6px 0;">Applicant Information</div>
 
-    <p class="compact-row"><strong>1. Full Name:</strong> {{ strtoupper($applicant->full_name) }}</p>
-    <p class="compact-row"><strong>2. Father's Name:</strong> {{ $applicant->fathers_name }} | <strong>Mother's Name:</strong> {{ $applicant->mothers_name }} | <strong>DOB:</strong> {{ $applicant->dob?->format('d/m/Y') }} | <strong>NID:</strong> {{ $applicant->nid }}</p>
-    <p class="compact-row"><strong>3. Present Address:</strong> {{ $applicant->present_address ?? 'N/A' }}</p>
-    <p class="compact-row"><strong>4. Permanent Address:</strong> {{ $applicant->permanent_address ?? 'N/A' }}</p>
-    <p class="compact-row"><strong>5. Mobile:</strong> {{ $applicant->phone }} | <strong>Email:</strong> {{ $applicant->email }}</p>
+    <table style="border: none; margin-bottom: 8px;">
+        <tr>
+            <td colspan="2" style="border: none; padding: 3px 0;"><strong>1. Full Name:</strong> {{ strtoupper($applicant->full_name) }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>2. Father's Name:</strong> {{ $applicant->fathers_name }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>3. Mother's Name:</strong> {{ $applicant->mothers_name }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>4. Present Address:</strong> {{ $applicant->present_address ?? 'N/A' }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>5. Permanent Address:</strong> {{ $applicant->permanent_address ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>6. Email:</strong> {{ $applicant->email }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>7. Mobile Number:</strong> {{ $applicant->phone }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>8. Date of Birth:</strong> {{ $applicant->dob?->format('d/m/Y') }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>9. NID Number:</strong> {{ $applicant->nid }}</td>
+        </tr>
+    </table>
 
-    <p class="compact-row" style="margin-top: 5px;"><strong>6. Educational Qualifications:</strong></p>
-    <table>
+    <p class="compact-row" style="margin-top: 5px;"><strong>10. Educational Qualifications:</strong></p>
+    <table style="width: 95%; margin-left: auto; margin-right: auto;">
         <thead>
             <tr>
-                <th style="width:20%;">Examination</th>
-                <th style="width:10%;">Year</th>
-                <th style="width:30%;">Board / University</th>
-                <th style="width:25%;">Subject / Dept.</th>
-                <th style="width:15%;">Result</th>
+                <th style="width:20%; text-align:center; vertical-align:middle;">Examination</th>
+                <th style="width:10%; text-align:center; vertical-align:middle;">Year</th>
+                <th style="width:30%; text-align:center; vertical-align:middle;">Board / University</th>
+                <th style="width:25%; text-align:center; vertical-align:middle;">Subject / Dept.</th>
+                <th style="width:15%; text-align:center; vertical-align:middle;">Result</th>
             </tr>
         </thead>
         <tbody>
             @php
                 $eduData = $applicant->education_json;
                 $rows = [
-                    ['key' => 'ssc', 'label' => 'SSC'],
-                    ['key' => 'hsc', 'label' => 'HSC'],
-                    ['key' => 'bachelor', 'label' => 'Bachelor (4 Yr)'],
-                    ['key' => 'master', 'label' => 'Master'],
+                    ['key' => 'ssc', 'label' => 'SSC/Equivalent'],
+                    ['key' => 'hsc', 'label' => 'HSC/Equivalent'],
+                    ['key' => 'bachelor', 'label' => 'Bachelor (4 Years)'],
+                    ['key' => 'master', 'label' => 'Master (If Any)'],
                 ];
             @endphp
             @foreach($rows as $row)
@@ -88,18 +105,18 @@
                 @endphp
                 @if($row['key'] !== 'master' || !$isEmpty)
                 <tr>
-                    <td>{{ $row['label'] }}</td>
-                    <td>{{ $year }}</td>
-                    <td>{{ $board }}</td>
-                    <td>{{ $subject }}</td>
-                    <td>{{ $result }}</td>
+                    <td style="text-align:center; vertical-align:middle;">{{ $row['label'] }}</td>
+                    <td style="text-align:center; vertical-align:middle;">{{ $year }}</td>
+                    <td style="text-align:center; vertical-align:middle;">{{ $board }}</td>
+                    <td style="text-align:center; vertical-align:middle;">{{ $subject }}</td>
+                    <td style="text-align:center; vertical-align:middle;">{{ $result }}</td>
                 </tr>
                 @endif
             @endforeach
         </tbody>
     </table>
 
-    <p class="compact-row"><strong>7. Job Experience:</strong>
+    <p class="compact-row"><strong>11. Job Experience (Optional):</strong>
     @php
         $hasExperience = false;
         $expList = [];
@@ -115,7 +132,7 @@
     {{ $hasExperience ? implode('; ', $expList) : 'N/A' }}
     </p>
 
-    <p class="compact-row"><strong>8. Payment:</strong> Transaction ID: {{ $applicant->payment_transaction_id ?: 'N/A' }} | Method: {{ $applicant->payment_method ?: 'N/A' }} | Amount: {{ $applicant->payment_amount ? number_format($applicant->payment_amount, 2) . ' BDT' : 'N/A' }}</p>
+    <p class="compact-row"><strong>12. Payment:</strong> Transaction ID: {{ $applicant->payment_transaction_id ?: 'N/A' }} | Method: {{ $applicant->payment_method ?: 'N/A' }} | Amount: {{ $applicant->payment_amount ? number_format($applicant->payment_amount, 2) . ' BDT' : 'N/A' }}</p>
 
     <p class="compact-row" style="margin-top: 10px;"><strong>Declaration:</strong> The information provided is true and correct. I accept that the University reserves the right to terminate my admission if any information is found false. I will abide by all rules and regulations of the University.</p>
 
@@ -124,8 +141,7 @@
             <td style="border: none; width: 70%;"></td>
             <td style="border: none; width: 30%; text-align: center;">
                 ____________________<br>
-                <strong style="font-size: 11px;">Signature of Applicant</strong><br>
-                <span style="font-size: 10px;">Date: {{ $applicant->submitted_at?->format('d/m/Y') }}</span>
+                <strong style="font-size: 11px;">Signature of Applicant</strong>
             </td>
         </tr>
     </table>
@@ -136,18 +152,20 @@
     <!-- Header for Page 2 -->
     <table style="border: none; margin-bottom: 10px;">
         <tr>
-            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+            <td style="border: none; width: 20%; text-align: left; vertical-align: top; padding-left: 10px;">
                 @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:65px; height:auto;">
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
                 @endif
+                <div style="margin-top: 8px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px; display:block;" />
+                </div>
+                <div style="font-size: 10px; margin-top: 3px;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                <div style="font-size: 18px; font-weight: bold;">DEPARTMENT OF MANAGEMENT</div>
-                <div style="font-size: 12px; margin-top: 2px;">University of Barishal</div>
-                <div style="font-size: 13px; font-weight: bold; margin-top: 4px;">EMBA Admission - Session: {{ $session->session_name }}</div>
-                <div style="margin-top: 5px;">
-                    <img src="{{ $barcodeBase64 }}" style="width:85px; height:30px;" />
-                </div>
+                <div style="font-size: 11px;">Department of Management Studies</div>
+                <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
+                <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
+                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
@@ -163,28 +181,44 @@
 
     <div class="section-title">OFFICE COPY</div>
 
-    <p class="compact-row" style="text-align:center; margin-bottom:8px; font-size: 12px;"><strong>Form No: {{ $applicant->form_no }}</strong></p>
-
-    <table style="border:none; margin-bottom:8px;">
+    <table style="border:none; margin-bottom:8px; margin-top:8px;">
         <tr>
-            <td style="border:none; width:50%; padding:4px 0;"><strong>Admission Roll:</strong> ______________________</td>
-            <td style="border:none; width:50%; padding:4px 0;"><strong>Registration No:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:3px 0;"><strong>Admission Roll:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:3px 0;"><strong>Registration No:</strong> ______________________</td>
         </tr>
         <tr>
-            <td style="border:none; width:50%; padding:4px 0;"><strong>Roll Number:</strong> ______________________</td>
-            <td style="border:none; width:50%; padding:4px 0;"><strong>Date of Admission:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:3px 0;"><strong>Roll Number:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:3px 0;"><strong>Date of Admission:</strong> ______________________</td>
         </tr>
         <tr>
-            <td style="border:none; width:50%; padding:4px 0;"><strong>Merit Position:</strong> ______________________</td>
-            <td style="border:none; width:50%; padding:4px 0;"></td>
+            <td style="border:none; width:50%; padding:3px 0;"><strong>Merit Position / Category:</strong> ______________________</td>
+            <td style="border:none; width:50%; padding:3px 0;"></td>
         </tr>
     </table>
 
-    <p class="compact-row"><strong>Applicant Name:</strong> {{ strtoupper($applicant->full_name) }}</p>
-    <p class="compact-row"><strong>Father's Name:</strong> {{ $applicant->fathers_name }} | <strong>Mother's Name:</strong> {{ $applicant->mothers_name }}</p>
-    <p class="compact-row"><strong>DOB:</strong> {{ $applicant->dob?->format('d/m/Y') }} | <strong>NID:</strong> {{ $applicant->nid }} | <strong>Mobile:</strong> {{ $applicant->phone }} | <strong>Email:</strong> {{ $applicant->email }}</p>
-    <p class="compact-row"><strong>Present Address:</strong> {{ $applicant->present_address ?? 'N/A' }}</p>
-    <p class="compact-row"><strong>Permanent Address:</strong> {{ $applicant->permanent_address ?? 'N/A' }}</p>
+    <div style="font-size: 12px; font-weight: bold; margin: 8px 0 6px 0;">Applicant Information</div>
+
+    <table style="border: none; margin-bottom: 8px;">
+        <tr>
+            <td colspan="2" style="border: none; padding: 3px 0;"><strong>Full Name:</strong> {{ strtoupper($applicant->full_name) }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Father's Name:</strong> {{ $applicant->fathers_name }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Mother's Name:</strong> {{ $applicant->mothers_name }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Present Address:</strong> {{ $applicant->present_address ?? 'N/A' }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Permanent Address:</strong> {{ $applicant->permanent_address ?? 'N/A' }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Email:</strong> {{ $applicant->email }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Mobile Number:</strong> {{ $applicant->phone }}</td>
+        </tr>
+        <tr>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>Date of Birth:</strong> {{ $applicant->dob?->format('d/m/Y') }}</td>
+            <td style="border: none; width: 50%; padding: 3px 0;"><strong>NID Number:</strong> {{ $applicant->nid }}</td>
+        </tr>
+    </table>
 
     <p class="compact-row" style="margin-top:6px;"><strong>Payment:</strong> TRX ID: {{ $applicant->payment_transaction_id ?: 'N/A' }} | Method: {{ $applicant->payment_method ?: 'N/A' }} | Amount: {{ $applicant->payment_amount ? number_format($applicant->payment_amount, 2) . ' BDT' : 'N/A' }}</p>
 
