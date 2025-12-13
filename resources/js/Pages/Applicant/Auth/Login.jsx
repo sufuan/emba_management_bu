@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Lock, Mail, Shield, GraduationCap, Building2 } from 'lucide-react';
+import { Mail, Lock, GraduationCap, Users, FileCheck, BookOpen } from 'lucide-react';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -15,17 +15,17 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('login'), {
+        post(route('applicant.login'), {
             onFinish: () => reset('password'),
         });
     };
 
     return (
         <>
-            <Head title="Administrator Login - EMBA Admission" />
+            <Head title="Applicant Login - EMBA Admission" />
             <div className="min-h-screen flex">
                 {/* Left Side - Branding */}
-                <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 p-12 flex-col justify-between relative overflow-hidden">
+                <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 p-12 flex-col justify-between relative overflow-hidden">
                     <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
                     
                     <div className="relative z-10">
@@ -34,8 +34,8 @@ export default function Login({ status, canResetPassword }) {
                                 <GraduationCap className="h-8 w-8 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-white">EMBA Admission</h1>
-                                <p className="text-blue-200 text-sm">Management Portal</p>
+                                <h1 className="text-2xl font-bold text-white">EMBA Program</h1>
+                                <p className="text-slate-300 text-sm">University of Barishal</p>
                             </div>
                         </div>
                     </div>
@@ -43,38 +43,47 @@ export default function Login({ status, canResetPassword }) {
                     <div className="relative z-10 space-y-6">
                         <div>
                             <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
-                                Administrative Access Portal
+                                Your Journey to Excellence Begins Here
                             </h2>
-                            <p className="text-lg text-blue-100 leading-relaxed">
-                                Secure login for authorized administrators to manage EMBA applications and admissions.
+                            <p className="text-lg text-slate-200 leading-relaxed">
+                                Welcome back! Sign in to continue your EMBA application process.
                             </p>
                         </div>
 
                         <div className="space-y-4 pt-8">
                             <div className="flex items-start gap-4 text-white/90">
                                 <div className="mt-1 h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                                    <Shield className="h-5 w-5" />
+                                    <FileCheck className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold mb-1">Secure Authentication</h3>
-                                    <p className="text-sm text-blue-200">Protected access with enterprise-grade security</p>
+                                    <h3 className="font-semibold mb-1">Track Your Application</h3>
+                                    <p className="text-sm text-slate-300">Monitor your admission status in real-time</p>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4 text-white/90">
                                 <div className="mt-1 h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                                    <Building2 className="h-5 w-5" />
+                                    <BookOpen className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold mb-1">Centralized Management</h3>
-                                    <p className="text-sm text-blue-200">Complete control over the admission process</p>
+                                    <h3 className="font-semibold mb-1">Easy Application</h3>
+                                    <p className="text-sm text-slate-300">Simple step-by-step application process</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4 text-white/90">
+                                <div className="mt-1 h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                                    <Users className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold mb-1">Expert Support</h3>
+                                    <p className="text-sm text-slate-300">Get help throughout your journey</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="relative z-10 text-blue-200 text-sm">
+                    <div className="relative z-10 text-slate-300 text-sm">
                         <p>© 2025 Department of Management Studies</p>
-                        <p className="text-blue-300">University of Barishal</p>
+                        <p className="text-slate-400">University of Barishal</p>
                     </div>
                 </div>
 
@@ -82,17 +91,17 @@ export default function Login({ status, canResetPassword }) {
                 <div className="flex-1 flex items-center justify-center p-8 bg-slate-50">
                     <div className="w-full max-w-md">
                         <div className="mb-8 lg:hidden text-center">
-                            <div className="inline-flex items-center justify-center h-16 w-16 bg-blue-900 rounded-xl mb-4">
+                            <div className="inline-flex items-center justify-center h-16 w-16 bg-slate-900 rounded-xl mb-4">
                                 <GraduationCap className="h-8 w-8 text-white" />
                             </div>
-                            <h1 className="text-2xl font-bold text-slate-900">EMBA Admission</h1>
+                            <h1 className="text-2xl font-bold text-slate-900">EMBA Program</h1>
                         </div>
 
                         <Card className="border-0 shadow-2xl">
                             <CardHeader className="space-y-1 pb-6">
-                                <CardTitle className="text-2xl font-bold">Administrator Login</CardTitle>
+                                <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
                                 <CardDescription className="text-base">
-                                    Enter your credentials to access the management portal
+                                    Sign in to your account to continue your application
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -113,7 +122,7 @@ export default function Login({ status, canResetPassword }) {
                                                 value={data.email}
                                                 onChange={(e) => setData('email', e.target.value)}
                                                 className="pl-11 h-12 border-slate-300"
-                                                placeholder="admin@university.edu"
+                                                placeholder="your.email@example.com"
                                                 autoComplete="username"
                                                 autoFocus
                                             />
@@ -142,32 +151,21 @@ export default function Login({ status, canResetPassword }) {
                                         )}
                                     </div>
 
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center space-x-2">
-                                            <Checkbox
-                                                id="remember"
-                                                checked={data.remember}
-                                                onCheckedChange={(checked) => setData('remember', checked)}
-                                            />
-                                            <Label htmlFor="remember" className="text-sm font-medium cursor-pointer">
-                                                Remember me
-                                            </Label>
-                                        </div>
-
-                                        {canResetPassword && (
-                                            <Link
-                                                href={route('password.request')}
-                                                className="text-sm font-semibold text-blue-900 hover:text-blue-700 transition-colors"
-                                            >
-                                                Forgot password?
-                                            </Link>
-                                        )}
+                                    <div className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id="remember"
+                                            checked={data.remember}
+                                            onCheckedChange={(checked) => setData('remember', checked)}
+                                        />
+                                        <Label htmlFor="remember" className="text-sm font-medium cursor-pointer">
+                                            Remember me
+                                        </Label>
                                     </div>
 
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="w-full h-12 bg-blue-900 hover:bg-blue-800 text-white font-semibold text-base"
+                                        className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-base"
                                     >
                                         {processing ? (
                                             <>
@@ -180,14 +178,31 @@ export default function Login({ status, canResetPassword }) {
                                     </Button>
                                 </form>
 
-                                <div className="mt-6 text-center">
+                                <div className="mt-6 space-y-3 text-center">
                                     <p className="text-sm text-slate-600">
-                                        Not an administrator?{' '}
+                                        Don't have an account?{' '}
                                         <Link
-                                            href={route('applicant.login')}
+                                            href={route('applicant.register')}
+                                            className="font-semibold text-slate-900 hover:text-slate-700 transition-colors"
+                                        >
+                                            Register Now →
+                                        </Link>
+                                    </p>
+                                    <div className="relative">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <span className="w-full border-t border-slate-200" />
+                                        </div>
+                                        <div className="relative flex justify-center text-xs uppercase">
+                                            <span className="bg-white px-2 text-slate-500">or</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-slate-600">
+                                        Administrator?{' '}
+                                        <Link
+                                            href={route('login')}
                                             className="font-semibold text-blue-900 hover:text-blue-700 transition-colors"
                                         >
-                                            Applicant Login →
+                                            Admin Login →
                                         </Link>
                                     </p>
                                 </div>
@@ -195,7 +210,7 @@ export default function Login({ status, canResetPassword }) {
                         </Card>
 
                         <p className="text-center text-sm text-slate-500 mt-8">
-                            By signing in, you agree to our terms of service and privacy policy.
+                            Need help? Contact the admissions office for assistance.
                         </p>
                     </div>
                 </div>

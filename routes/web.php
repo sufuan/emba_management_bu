@@ -23,18 +23,32 @@ Route::get('/admission-closed', [HomeController::class, 'closed'])->name('admiss
 
 /*
 |--------------------------------------------------------------------------
-| Application Routes (Protected by CheckApplyNow Middleware)
+| Applicant Authentication Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware([CheckApplyNow::class])->group(function () {
+require __DIR__.'/applicant.php';
+
+/*
+|--------------------------------------------------------------------------
+| Applicant Dashboard (Protected by Applicant Auth Only)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:applicant')->prefix('applicant')->name('applicant.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Applicant\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/my-application', [\App\Http\Controllers\Applicant\DashboardController::class, 'myApplication'])->name('application');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Application Routes (Protected by Applicant Auth + CheckApplyNow Middleware)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth:applicant', CheckApplyNow::class])->prefix('applicant')->name('applicant.')->group(function () {
     Route::get('/apply', [ApplicantController::class, 'create'])->name('application.create');
     Route::post('/apply', [ApplicantController::class, 'store'])->name('application.store');
 });
 
-// Application tracking (public)
-Route::get('/track', [ApplicantController::class, 'track'])->name('application.track');
-Route::post('/track/search', [ApplicantController::class, 'search'])->name('application.search');
-Route::get('/application/{applicant}/status', [ApplicantController::class, 'status'])->name('application.status');
+
 Route::get('/application/{applicant}/preview', [ApplicantController::class, 'preview'])->name('application.preview');
 
 // QR Code Verification (public)

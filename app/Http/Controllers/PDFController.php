@@ -23,16 +23,12 @@ class PDFController extends Controller
     }
 
     /**
-     * Download admit card PDF.
+     * Download admit card PDF (included in application PDF).
      */
     public function downloadAdmitCard(Applicant $applicant)
     {
-        // Only verified applicants can download admit card
-        if ($applicant->status !== 'verified') {
-            abort(403, 'Admit card not available yet. Please wait for verification.');
-        }
-
-        return $this->pdfService->downloadAdmitCardPDF($applicant);
+        // Admit card is now part of the application PDF
+        return $this->pdfService->downloadApplicationPDF($applicant);
     }
 
     /**

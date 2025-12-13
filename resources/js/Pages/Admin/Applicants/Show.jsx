@@ -160,14 +160,7 @@ export default function Show({ applicant }) {
                                     <div className="flex justify-between"><span className="text-muted-foreground">Session</span><span className="font-medium">{applicant.session?.session_name}</span></div>
                                 </div>
                                 <Separator />
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium">Change Status</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        <Button size="sm" variant={applicant.status === 'submitted' ? 'default' : 'outline'} onClick={() => handleStatusChange('submitted')}>Submitted</Button>
-                                        <Button size="sm" variant={applicant.status === 'pending' ? 'default' : 'outline'} onClick={() => handleStatusChange('pending')}>Pending</Button>
-                                        <Button size="sm" variant={applicant.status === 'verified' ? 'default' : 'outline'} className={applicant.status === 'verified' ? 'bg-green-600' : ''} onClick={() => handleStatusChange('verified')}>Verified</Button>
-                                    </div>
-                                </div>
+
                             </CardContent>
                         </Card>
                     </div>

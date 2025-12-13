@@ -147,6 +147,39 @@
         </tr>
     </table>
 
+    <!-- ADMIT CARD SECTION (on same page below Applicant Copy) -->
+    <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000;">
+        <div class="section-title" style="margin-bottom: 6px;">ADMIT CARD</div>
+        
+        <table style="border: none; margin-bottom: 6px;">
+            <tr>
+                <td colspan="2" style="border: none; padding: 3px 0;"><strong>Admission Roll:</strong> {{ $applicant->form_no }}</td>
+            </tr>
+            <tr>
+                <td style="border: none; width: 50%; padding: 3px 0;"><strong>1. Full Name:</strong> {{ strtoupper($applicant->full_name) }}</td>
+                <td style="border: none; width: 50%; padding: 3px 0;"><strong>4. Date of Birth:</strong> {{ $applicant->dob?->format('d/m/Y') }}</td>
+            </tr>
+            <tr>
+                <td style="border: none; width: 50%; padding: 3px 0;"><strong>2. Father's Name:</strong> {{ $applicant->fathers_name }}</td>
+                <td style="border: none; width: 50%; padding: 3px 0;"><strong>5. Phone Number:</strong> {{ $applicant->phone }}</td>
+            </tr>
+            <tr>
+                <td style="border: none; width: 50%; padding: 3px 0;"><strong>3. Mother's Name:</strong> {{ $applicant->mothers_name }}</td>
+                <td style="border: none; width: 50%; padding: 3px 0;"></td>
+            </tr>
+        </table>
+
+        <table style="border: none; margin-top: 15px;">
+            <tr>
+                <td style="border: none; width: 70%;"></td>
+                <td style="border: none; width: 30%; text-align: center;">
+                    ____________________<br>
+                    <strong style="font-size: 11px;">Signature of Applicant</strong>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <!-- PAGE 2: OFFICE COPY -->
     <div class="page-break"></div>
 

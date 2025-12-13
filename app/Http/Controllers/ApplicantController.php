@@ -68,6 +68,11 @@ class ApplicantController extends Controller
             $request->file('passport_photo')
         );
 
+        // Link applicant to authenticated applicant user
+        if ($user = $request->user('applicant')) {
+            $user->update(['applicant_id' => $applicant->id]);
+        }
+
         return redirect()->route('application.preview', $applicant->id)
             ->with('success', 'Application submitted successfully!');
     }
@@ -80,47 +85,6 @@ class ApplicantController extends Controller
         $applicant->load(['session', 'uploads']);
 
         return Inertia::render('Application/Preview', [
-            'applicant' => $applicant,
-        ]);
-    }
-
-    /**
-     * Track application status.
-     */
-    public function track(Request $request)
-    {
-        return Inertia::render('Application/Track');
-    }
-
-    /**
-     * Search application by form number or phone.
-     */
-    public function search(Request $request)
-    {
-        $validated = $request->validate([
-            'search' => 'required|string|min:3',
-        ]);
-
-        $applicant = Applicant::where('form_no', $validated['search'])
-            ->orWhere('phone', $validated['search'])
-            ->orWhere('email', $validated['search'])
-            ->first();
-
-        if (!$applicant) {
-            return back()->with('error', 'No application found.');
-        }
-
-        return redirect()->route('application.status', $applicant->id);
-    }
-
-    /**
-     * Show application status.
-     */
-    public function status(Applicant $applicant)
-    {
-        $applicant->load(['session', 'uploads']);
-
-        return Inertia::render('Application/Status', [
             'applicant' => $applicant,
         ]);
     }

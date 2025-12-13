@@ -16,8 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        $middleware->redirectGuestsTo('/admin/login');
-        $middleware->redirectUsersTo('/admin');
+        // Admin guard redirects
+        $middleware->redirectGuestsTo(fn ($request) => 
+            ($request->is('admin/*') || $request->is('admin')) ? route('login') : route('applicant.login')
+        );
+        
+        $middleware->redirectUsersTo(fn ($request) => 
+            auth()->guard('applicant')->check() ? route('applicant.dashboard') : route('admin.dashboard')
+        );
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

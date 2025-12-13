@@ -6,12 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle2, Download, FileText, Printer, Share2 } from 'lucide-react';
 
-export default function Preview({ applicant }) {
-    return (
-        <PublicLayout>
-            <Head title="Application Submitted - EMBA" />
-
-            <section className="bg-gradient-to-br from-green-600 to-emerald-600 text-white py-16">
+export default function Preview({ applicant, embedded = false }) {
+    const content = (
+        <>
+            <section className="bg-gradient-to-br from-green-600 to-emerald-600 text-white py-16 rounded-xl">
                 <div className="container mx-auto px-4 text-center">
                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="h-10 w-10" />
@@ -103,14 +101,25 @@ export default function Preview({ applicant }) {
                                 </div>
 
                                 <div className="flex justify-center gap-4 mt-6">
+                                    <Link href={route('applicant.dashboard')}><Button>Go to Dashboard</Button></Link>
                                     <Link href="/track"><Button variant="outline">Track Application</Button></Link>
-                                    <Link href="/"><Button>Back to Home</Button></Link>
                                 </div>
                             </CardContent>
                         </Card>
                     </div>
                 </div>
             </section>
+        </>
+    );
+
+    if (embedded) {
+        return content;
+    }
+
+    return (
+        <PublicLayout>
+            <Head title="Application Submitted - EMBA" />
+            {content}
         </PublicLayout>
     );
 }

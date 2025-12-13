@@ -11,7 +11,6 @@ export default function PublicLayout({ children }) {
         { name: 'Home', href: '/' },
         { name: 'About', href: '/about' },
         { name: 'Admission Info', href: '/admission-info' },
-        { name: 'Track Application', href: '/track' },
     ];
 
     return (
@@ -57,12 +56,18 @@ export default function PublicLayout({ children }) {
                                     {item.name}
                                 </Link>
                             ))}
+                            <Link
+                                href={route('applicant.login')}
+                                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                            >
+                                Applicant Login
+                            </Link>
                         </div>
 
                         {/* CTA Button */}
                         <div className="hidden md:flex items-center gap-4">
                             {applyNowEnabled ? (
-                                <Link href="/apply">
+                                <Link href={route('applicant.register')}>
                                     <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
                                         Apply Now
                                     </Button>
@@ -91,9 +96,16 @@ export default function PublicLayout({ children }) {
                                     {item.name}
                                 </Link>
                             ))}
+                            <Link
+                                href={route('applicant.login')}
+                                className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary"
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Applicant Login
+                            </Link>
                             <div className="pt-4">
                                 {applyNowEnabled ? (
-                                    <Link href="/apply" className="block">
+                                    <Link href={route('applicant.register')} className="block">
                                         <Button className="w-full">Apply Now</Button>
                                     </Link>
                                 ) : (

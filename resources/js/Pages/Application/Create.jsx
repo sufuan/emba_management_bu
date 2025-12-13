@@ -25,11 +25,11 @@ const educationRows = [
     { key: 'master', label: 'Master (if any)', required: false },
 ];
 
-export default function Create({ session, subjectChoices, uploadConfig, paymentSettings }) {
+export default function Create({ session, subjectChoices, uploadConfig, paymentSettings, auth }) {
     const [currentStep, setCurrentStep] = useState(1);
     const [stepErrors, setStepErrors] = useState({});
     const { data, setData, post, processing, errors } = useForm({
-        full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: '',
+        full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: auth?.user?.email || '',
         present_address: '', permanent_address: '',
         education_json: {
             ssc: { year: '', board: '', subject: '', result: '' },
@@ -192,7 +192,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
             formData.append('payment_amount', data.payment_amount);
             if (data.passport_photo) formData.append('passport_photo', data.passport_photo);
 
-            router.post('/apply', formData, {
+            router.post(route('applicant.application.store'), formData, {
                 forceFormData: true,
                 onError: (errors) => {
                     console.log('Submission errors:', errors);
@@ -215,21 +215,25 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
     };
 
     return (
-        <PublicLayout>
+        <>
             <Head title="Apply Now - EMBA Admission" />
 
-            <section className="bg-gradient-to-br from-slate-900 to-blue-900 text-white py-12">
-                <div className="container mx-auto px-4 text-center">
-                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 mb-4">{session.session_name}</Badge>
-                    <h1 className="text-3xl font-bold mb-2">Application Form</h1>
-                    <p className="text-slate-300">Complete all steps to submit your application</p>
+            {/* Application Header */}
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-8 rounded-2xl mb-8 shadow-xl overflow-hidden relative">
+                <div className="absolute top-0 right-0 -mt-8 -mr-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+                <div className="relative text-center px-4">
+                    <Badge className="bg-white/20 text-white border-white/30 mb-3">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        {session?.session_name || 'EMBA Admission'}
+                    </Badge>
+                    <h2 className="text-3xl font-bold mb-2">Complete Your Application</h2>
+                    <p className="text-blue-100">Fill in all required information across 5 steps</p>
                 </div>
-            </section>
+            </div>
 
-            <section className="py-12 bg-slate-50">
-                <div className="container mx-auto px-4">
-                    {/* Progress Steps */}
-                    <div className="max-w-3xl mx-auto mb-8">
+            {/* Progress Steps */}
+            <div className="max-w-3xl mx-auto mb-8">
                         <div className="flex justify-between">
                             {steps.map((step) => (
                                 <div key={step.id} className={`flex flex-col items-center ${currentStep >= step.id ? 'text-primary' : 'text-muted-foreground'}`}>
@@ -306,8 +310,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </div>
                                         <div>
                                             <Label>(d) Email *</Label>
-                                            <Input type="email" value={data.email} onChange={e => handleInputChange('email', e.target.value)} className={stepErrors.email ? 'border-red-500' : ''} />
-                                            {stepErrors.email && <p className="text-sm text-red-500 mt-1">{stepErrors.email}</p>}
+                                            <Input 
+                                                type="email" 
+                                                value={data.email} 
+                                                readOnly 
+                                                className="bg-slate-50 cursor-not-allowed"
+                                                title="Email cannot be changed (registered email)" 
+                                            />
+                                            <p className="text-xs text-slate-500 mt-1">Registered email (cannot be changed)</p>
                                         </div>
                                         <div className="md:col-span-2">
                                             <Label>Subject</Label>
@@ -610,9 +620,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                             </form>
                         </CardContent>
                     </Card>
-                </div>
-            </section>
-        </PublicLayout>
+        </>
     );
 }
 

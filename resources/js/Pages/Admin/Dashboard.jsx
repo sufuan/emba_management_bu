@@ -77,7 +77,6 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Form No</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Name</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Phone</th>
-                                        <th className="text-left py-3 px-4 font-medium text-muted-foreground">Status</th>
                                         <th className="text-left py-3 px-4 font-medium text-muted-foreground">Date</th>
                                     </tr>
                                 </thead>
@@ -88,15 +87,6 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                                                 <td className="py-3 px-4 font-medium">{applicant.form_no}</td>
                                                 <td className="py-3 px-4">{applicant.full_name}</td>
                                                 <td className="py-3 px-4">{applicant.phone}</td>
-                                                <td className="py-3 px-4">
-                                                    <Badge className={
-                                                        applicant.status === 'verified' ? 'bg-green-100 text-green-700' :
-                                                        applicant.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                                                        'bg-blue-100 text-blue-700'
-                                                    }>
-                                                        {applicant.status}
-                                                    </Badge>
-                                                </td>
                                                 <td className="py-3 px-4 text-muted-foreground">
                                                     {new Date(applicant.submitted_at).toLocaleDateString()}
                                                 </td>
@@ -104,7 +94,7 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="py-8 text-center text-muted-foreground">
+                                            <td colSpan="4" className="py-8 text-center text-muted-foreground">
                                                 No applications yet
                                             </td>
                                         </tr>
