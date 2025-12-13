@@ -224,11 +224,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                 <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
                 <div className="relative text-center px-4">
                     <Badge className="bg-white/20 text-white border-white/30 mb-3">
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {session?.session_name || 'EMBA Admission'}
+                        {session?.season && session?.session_name 
+                            ? `${session.season.charAt(0).toUpperCase() + session.season.slice(1)} ${session.session_name}` 
+                            : session?.session_name || 'EMBA Admission'}
                     </Badge>
                     <h2 className="text-3xl font-bold mb-2">Complete Your Application</h2>
-                    <p className="text-blue-100">Fill in all required information across 5 steps</p>
+                    <p className="text-blue-100">Applying for {session?.season && session?.session_name 
+                        ? `${session.season.charAt(0).toUpperCase() + session.season.slice(1)} ${session.session_name}` 
+                        : 'EMBA'} Session</p>
                 </div>
             </div>
 
@@ -524,19 +527,19 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                 </h4>
                                                 <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
                                                     <li>Application fee: <strong>{paymentSettings?.payment_fee || 500} BDT</strong></li>
-                                                    {paymentSettings?.payment_bkash_number && (
+                                                    {paymentSettings?.payment_bkash_enabled && paymentSettings?.payment_bkash_number && (
                                                         <li>bKash: <strong>{paymentSettings.payment_bkash_number}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_nagad_number && (
+                                                    {paymentSettings?.payment_nagad_enabled && paymentSettings?.payment_nagad_number && (
                                                         <li>Nagad: <strong>{paymentSettings.payment_nagad_number}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_rocket_number && (
+                                                    {paymentSettings?.payment_rocket_enabled && paymentSettings?.payment_rocket_number && (
                                                         <li>Rocket: <strong>{paymentSettings.payment_rocket_number}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_bank_name && (
+                                                    {paymentSettings?.payment_bank_enabled && paymentSettings?.payment_bank_name && (
                                                         <li>Bank: <strong>{paymentSettings.payment_bank_name}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_bank_account && (
+                                                    {paymentSettings?.payment_bank_enabled && paymentSettings?.payment_bank_account && (
                                                         <li>Account: <strong>{paymentSettings.payment_bank_account}</strong></li>
                                                     )}
                                                     <li>Keep your transaction ID/receipt for verification</li>
@@ -553,10 +556,18 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                         <SelectValue placeholder="Select payment method" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="bKash">bKash</SelectItem>
-                                                        <SelectItem value="Nagad">Nagad</SelectItem>
-                                                        <SelectItem value="Rocket">Rocket</SelectItem>
-                                                        <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                                                        {paymentSettings?.payment_bkash_enabled && (
+                                                            <SelectItem value="bKash">bKash</SelectItem>
+                                                        )}
+                                                        {paymentSettings?.payment_nagad_enabled && (
+                                                            <SelectItem value="Nagad">Nagad</SelectItem>
+                                                        )}
+                                                        {paymentSettings?.payment_rocket_enabled && (
+                                                            <SelectItem value="Rocket">Rocket</SelectItem>
+                                                        )}
+                                                        {paymentSettings?.payment_bank_enabled && (
+                                                            <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                                                        )}
                                                     </SelectContent>
                                                 </Select>
                                                 {stepErrors.payment_method && <p className="text-sm text-red-500">{stepErrors.payment_method}</p>}
@@ -566,13 +577,11 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                 <Label>Amount Paid (BDT) *</Label>
                                                 <Input
                                                     type="number"
-                                                    min="0"
-                                                    step="0.01"
                                                     value={data.payment_amount}
-                                                    onChange={e => handleInputChange('payment_amount', e.target.value)}
-                                                    placeholder={`e.g. ${paymentSettings?.payment_fee || 500}`}
-                                                    className={stepErrors.payment_amount ? 'border-red-500' : ''}
+                                                    readOnly
+                                                    className="bg-slate-50 cursor-not-allowed"
                                                 />
+                                                <p className="text-xs text-muted-foreground">Fixed application fee: {paymentSettings?.payment_fee || 500} BDT</p>
                                                 {stepErrors.payment_amount && <p className="text-sm text-red-500">{stepErrors.payment_amount}</p>}
                                             </div>
 

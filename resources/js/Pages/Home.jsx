@@ -31,7 +31,7 @@ const benefits = [
     'Entrepreneurship & Venture Creation',
 ];
 
-export default function Home({ applyNowEnabled, activeSession }) {
+export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication }) {
     return (
         <PublicLayout>
             <Head title="Home - EMBA Admission" />
@@ -68,17 +68,29 @@ export default function Home({ applyNowEnabled, activeSession }) {
                                 Learn from industry experts and build a powerful professional network.
                             </p>
                                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-sm py-1.5 px-4 inline-block">
-                                    {activeSession ? `Admissions Open: ${activeSession.session_name}` : 'Executive EMBA Program'}
+                                    {activeSession ? `Admissions Open: ${activeSession.formatted_name}` : 'Executive EMBA Program'}
                                 </Badge>
                             <div className="flex flex-wrap gap-4">
-                                {applyNowEnabled ? (
-                                    <Link href={route('applicant.register')}>
-                                        <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-xl shadow-blue-500/25 gap-2">
-                                            Apply Now <ArrowRight className="h-5 w-5" />
-                                        </Button>
-                                    </Link>
+                                {applicantAuth ? (
+                                    hasSubmittedApplication ? null : (
+                                        applyNowEnabled ? (
+                                            <Link href={route('applicant.application.create')}>
+                                                <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-xl shadow-blue-500/25 gap-2">
+                                                    Complete Application <ArrowRight className="h-5 w-5" />
+                                                </Button>
+                                            </Link>
+                                        ) : null
+                                    )
                                 ) : (
-                                    <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
+                                    applyNowEnabled ? (
+                                        <Link href={route('applicant.register')}>
+                                            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-xl shadow-blue-500/25 gap-2">
+                                                Apply Now <ArrowRight className="h-5 w-5" />
+                                            </Button>
+                                        </Link>
+                                    ) : (
+                                        <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
+                                    )
                                 )}
                                 <Link href="/admission-info">
                                     <Button size="lg" variant="outline" className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-blue-900 gap-2">
@@ -167,12 +179,33 @@ export default function Home({ applyNowEnabled, activeSession }) {
                     <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">Ready to Take the Next Step?</h2>
                     <p className="text-blue-100 mb-8 max-w-2xl mx-auto">Start your application today and join a community of ambitious professionals.</p>
                     <div className="flex flex-wrap justify-center gap-4">
-                        {applyNowEnabled ? (
-                            <Link href="/apply"><Button size="lg" variant="secondary" className="gap-2">Start Application <ArrowRight className="h-5 w-5" /></Button></Link>
+                        {applicantAuth ? (
+                            hasSubmittedApplication ? (
+                                <Link href={route('applicant.dashboard')}>
+                                    <Button size="lg" variant="secondary" className="gap-2">
+                                        View Application <ArrowRight className="h-5 w-5" />
+                                    </Button>
+                                </Link>
+                            ) : (
+                                applyNowEnabled ? (
+                                    <Link href={route('applicant.application.create')}>
+                                        <Button size="lg" variant="secondary" className="gap-2">
+                                            Complete Application <ArrowRight className="h-5 w-5" />
+                                        </Button>
+                                    </Link>
+                                ) : null
+                            )
                         ) : (
-                            <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
+                            applyNowEnabled ? (
+                                <Link href={route('applicant.register')}>
+                                    <Button size="lg" variant="secondary" className="gap-2">
+                                        Start Application <ArrowRight className="h-5 w-5" />
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
+                            )
                         )}
-                      
                     </div>
                 </div>
             </section>

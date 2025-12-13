@@ -103,7 +103,7 @@ export default function Dashboard({ auth, applicant, session, subjectChoices, up
                                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Session</label>
                                         <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
                                             <Calendar className="h-5 w-5 text-purple-600" />
-                                            <span className="font-bold text-purple-700 text-lg">{applicant.session?.name || 'N/A'}</span>
+                                            <span className="font-bold text-purple-700 text-lg">{applicant.session?.formatted_name || applicant.session?.session_name || 'N/A'}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2">

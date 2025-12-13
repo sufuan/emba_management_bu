@@ -21,6 +21,7 @@ class Session extends Model
      */
     protected $fillable = [
         'session_name',
+        'season',
         'year_start',
         'year_end',
         'is_active',
@@ -36,6 +37,17 @@ class Session extends Model
         'year_start' => 'integer',
         'year_end' => 'integer',
     ];
+
+    /**
+     * Get formatted session name with season.
+     *
+     * @return string
+     */
+    public function getFormattedNameAttribute(): string
+    {
+        $seasonName = ucfirst($this->season);
+        return "{$seasonName} {$this->session_name}";
+    }
 
     /**
      * Get all applicants for this session.

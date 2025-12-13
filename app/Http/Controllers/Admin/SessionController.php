@@ -39,10 +39,21 @@ class SessionController extends Controller
     {
         $validated = $request->validate([
             'session_name' => 'required|string|max:255',
+            'season' => 'required|in:summer,fall',
             'year_start' => 'required|integer|min:2020|max:2100',
             'year_end' => 'required|integer|min:2020|max:2100|gte:year_start',
             'is_active' => 'boolean',
         ]);
+
+        // Check for duplicate season+year combination
+        $exists = Session::where('year_start', $validated['year_start'])
+            ->where('year_end', $validated['year_end'])
+            ->where('season', $validated['season'])
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['season' => 'This season and year combination already exists.']);
+        }
 
         // If new session is active, deactivate others
         if ($validated['is_active'] ?? false) {
@@ -74,10 +85,22 @@ class SessionController extends Controller
     {
         $validated = $request->validate([
             'session_name' => 'required|string|max:255',
+            'season' => 'required|in:summer,fall',
             'year_start' => 'required|integer|min:2020|max:2100',
             'year_end' => 'required|integer|min:2020|max:2100|gte:year_start',
             'is_active' => 'boolean',
         ]);
+
+        // Check for duplicate season+year combination (excluding current session)
+        $exists = Session::where('year_start', $validated['year_start'])
+            ->where('year_end', $validated['year_end'])
+            ->where('season', $validated['season'])
+            ->where('id', '!=', $session->id)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['season' => 'This season and year combination already exists.']);
+        }
 
         // If this session is being activated, deactivate others
         if (($validated['is_active'] ?? false) && !$session->is_active) {

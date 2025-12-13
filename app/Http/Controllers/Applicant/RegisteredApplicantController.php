@@ -33,10 +33,13 @@ class RegisteredApplicantController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Generate unique temporary phone using timestamp and random string
+        $tempPhone = 'temp_' . time() . '_' . bin2hex(random_bytes(4));
+
         $user = ApplicantUser::create([
             'name' => $request->email, // Use email as name temporarily
             'email' => $request->email,
-            'phone' => 'pending', // Placeholder for phone
+            'phone' => $tempPhone, // Unique temporary placeholder
             'password' => Hash::make($request->password),
         ]);
 

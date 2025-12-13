@@ -74,10 +74,14 @@ class SettingController extends Controller
         $validated = $request->validate([
             'payment_fee' => 'required|numeric|min:0',
             'payment_bkash_number' => 'nullable|string|max:20',
+            'payment_bkash_enabled' => 'boolean',
             'payment_nagad_number' => 'nullable|string|max:20',
+            'payment_nagad_enabled' => 'boolean',
             'payment_rocket_number' => 'nullable|string|max:20',
+            'payment_rocket_enabled' => 'boolean',
             'payment_bank_name' => 'nullable|string|max:255',
             'payment_bank_account' => 'nullable|string|max:50',
+            'payment_bank_enabled' => 'boolean',
         ]);
 
         foreach ($validated as $key => $value) {

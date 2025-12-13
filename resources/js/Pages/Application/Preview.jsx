@@ -68,7 +68,7 @@ export default function Preview({ applicant, embedded = false }) {
                                             <div className="grid sm:grid-cols-2 gap-4 text-sm">
                                                 <div><span className="text-muted-foreground">Subject Choice:</span><p className="font-medium">{applicant.subject_choice}</p></div>
                                                 <div><span className="text-muted-foreground">Admission Roll:</span><p className="font-medium">{applicant.admission_roll}</p></div>
-                                                <div><span className="text-muted-foreground">Session:</span><p className="font-medium">{applicant.session?.session_name}</p></div>
+                                                <div><span className="text-muted-foreground">Session:</span><p className="font-medium">{applicant.session?.formatted_name || applicant.session?.session_name}</p></div>
                                                 <div><span className="text-muted-foreground">Status:</span><Badge className="capitalize">{applicant.status}</Badge></div>
                                             </div>
                                         </div>

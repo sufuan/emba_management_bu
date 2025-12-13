@@ -3,14 +3,14 @@ import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, FileText, CheckCircle2, Clock, AlertCircle, TrendingUp, Calendar, ArrowRight } from 'lucide-react';
+import { Users, FileText, GraduationCap, TrendingUp, Calendar, ArrowRight, UserCheck, Clock, CheckCircle2 } from 'lucide-react';
 
 export default function Dashboard({ stats, recentApplicants, activeSession }) {
     const statCards = [
         { title: 'Total Applications', value: stats?.total || 0, icon: FileText, color: 'bg-blue-500', change: '+12%' },
-        { title: 'Submitted', value: stats?.submitted || 0, icon: Clock, color: 'bg-slate-500' },
-        { title: 'Pending Review', value: stats?.pending || 0, icon: AlertCircle, color: 'bg-amber-500' },
-        { title: 'Verified', value: stats?.verified || 0, icon: CheckCircle2, color: 'bg-green-500' },
+        { title: 'This Month', value: stats?.this_month || 0, icon: Calendar, color: 'bg-purple-500' },
+        { title: 'Today', value: stats?.today || 0, icon: Clock, color: 'bg-cyan-500' },
+        { title: 'Total Applicants', value: stats?.total || 0, icon: Users, color: 'bg-green-500' },
     ];
 
     return (
@@ -27,7 +27,9 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                     {activeSession && (
                         <Badge variant="outline" className="text-sm py-2 px-4">
                             <Calendar className="h-4 w-4 mr-2" />
-                            Active Session: {activeSession.session_name}
+                            Active Session: {activeSession.season && activeSession.session_name 
+                                ? `${activeSession.season.charAt(0).toUpperCase() + activeSession.season.slice(1)} ${activeSession.session_name}` 
+                                : activeSession.session_name}
                         </Badge>
                     )}
                 </div>

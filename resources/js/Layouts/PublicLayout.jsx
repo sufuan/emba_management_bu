@@ -4,7 +4,7 @@ import { GraduationCap, Menu, X, Phone, Mail, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PublicLayout({ children }) {
-    const { auth, applyNowEnabled } = usePage().props;
+    const { auth, applyNowEnabled, applicantAuth, hasSubmittedApplication } = usePage().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navigation = [
@@ -56,24 +56,47 @@ export default function PublicLayout({ children }) {
                                     {item.name}
                                 </Link>
                             ))}
-                            <Link
-                                href={route('applicant.login')}
-                                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-                            >
-                                Applicant Login
-                            </Link>
+                            {applicantAuth ? (
+                                <Link
+                                    href={route('applicant.logout')}
+                                    method="post"
+                                    as="button"
+                                    className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                                >
+                                    Logout
+                                </Link>
+                            ) : (
+                                <Link
+                                    href={route('applicant.login')}
+                                    className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                                >
+                                    Applicant Login
+                                </Link>
+                            )}
                         </div>
 
                         {/* CTA Button */}
                         <div className="hidden md:flex items-center gap-4">
-                            {applyNowEnabled ? (
-                                <Link href={route('applicant.register')}>
-                                    <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
-                                        Apply Now
-                                    </Button>
-                                </Link>
+                            {applicantAuth ? (
+                                hasSubmittedApplication ? null : (
+                                    applyNowEnabled ? (
+                                        <Link href={route('applicant.application.create')}>
+                                            <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
+                                                Complete Application
+                                            </Button>
+                                        </Link>
+                                    ) : null
+                                )
                             ) : (
-                                <Button variant="secondary" disabled>Applications Closed</Button>
+                                applyNowEnabled ? (
+                                    <Link href={route('applicant.register')}>
+                                        <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
+                                            Apply Now
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Button variant="secondary" disabled>Applications Closed</Button>
+                                )
                             )}
                         </div>
 
@@ -96,20 +119,42 @@ export default function PublicLayout({ children }) {
                                     {item.name}
                                 </Link>
                             ))}
-                            <Link
-                                href={route('applicant.login')}
-                                className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary"
-                                onClick={() => setMobileMenuOpen(false)}
-                            >
-                                Applicant Login
-                            </Link>
+                            {applicantAuth ? (
+                                <Link
+                                    href={route('applicant.logout')}
+                                    method="post"
+                                    as="button"
+                                    className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary w-full text-left"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    Logout
+                                </Link>
+                            ) : (
+                                <Link
+                                    href={route('applicant.login')}
+                                    className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    Applicant Login
+                                </Link>
+                            )}
                             <div className="pt-4">
-                                {applyNowEnabled ? (
-                                    <Link href={route('applicant.register')} className="block">
-                                        <Button className="w-full">Apply Now</Button>
-                                    </Link>
+                                {applicantAuth ? (
+                                    hasSubmittedApplication ? null : (
+                                        applyNowEnabled ? (
+                                            <Link href={route('applicant.application.create')} className="block">
+                                                <Button className="w-full">Complete Application</Button>
+                                            </Link>
+                                        ) : null
+                                    )
                                 ) : (
-                                    <Button variant="secondary" disabled className="w-full">Applications Closed</Button>
+                                    applyNowEnabled ? (
+                                        <Link href={route('applicant.register')} className="block">
+                                            <Button className="w-full">Apply Now</Button>
+                                        </Link>
+                                    ) : (
+                                        <Button variant="secondary" disabled className="w-full">Applications Closed</Button>
+                                    )
                                 )}
                             </div>
                         </div>

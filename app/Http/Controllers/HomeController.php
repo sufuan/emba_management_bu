@@ -20,11 +20,25 @@ class HomeController extends Controller
             $activeSession = Session::where('id', $activeSessionId)
                 ->where('is_active', true)
                 ->first();
+            
+            if ($activeSession) {
+                $activeSession->append('formatted_name');
+            }
+        }
+
+        // Get applicant user if authenticated
+        $applicantUser = auth('applicant')->user();
+        $hasSubmittedApplication = false;
+
+        if ($applicantUser) {
+            $hasSubmittedApplication = $applicantUser->applicant_id !== null;
         }
 
         return Inertia::render('Home', [
             'applyNowEnabled' => $applyNowEnabled,
             'activeSession' => $activeSession,
+            'applicantAuth' => $applicantUser,
+            'hasSubmittedApplication' => $hasSubmittedApplication,
         ]);
     }
 
@@ -49,11 +63,25 @@ class HomeController extends Controller
             $activeSession = Session::where('id', $activeSessionId)
                 ->where('is_active', true)
                 ->first();
+            
+            if ($activeSession) {
+                $activeSession->append('formatted_name');
+            }
+        }
+
+        // Get applicant user if authenticated
+        $applicantUser = auth('applicant')->user();
+        $hasSubmittedApplication = false;
+
+        if ($applicantUser) {
+            $hasSubmittedApplication = $applicantUser->applicant_id !== null;
         }
 
         return Inertia::render('AdmissionInfo', [
             'applyNowEnabled' => $applyNowEnabled,
             'activeSession' => $activeSession,
+            'applicantAuth' => $applicantUser,
+            'hasSubmittedApplication' => $hasSubmittedApplication,
         ]);
     }
 

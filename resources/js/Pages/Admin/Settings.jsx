@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
 import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2 } from 'lucide-react';
 
@@ -18,10 +19,14 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
     const [payment, setPayment] = useState({
         payment_fee: paymentSettings?.payment_fee || 500,
         payment_bkash_number: paymentSettings?.payment_bkash_number || '',
+        payment_bkash_enabled: paymentSettings?.payment_bkash_enabled ?? true,
         payment_nagad_number: paymentSettings?.payment_nagad_number || '',
+        payment_nagad_enabled: paymentSettings?.payment_nagad_enabled ?? true,
         payment_rocket_number: paymentSettings?.payment_rocket_number || '',
+        payment_rocket_enabled: paymentSettings?.payment_rocket_enabled ?? true,
         payment_bank_name: paymentSettings?.payment_bank_name || '',
         payment_bank_account: paymentSettings?.payment_bank_account || '',
+        payment_bank_enabled: paymentSettings?.payment_bank_enabled ?? true,
     });
 
     const toggleApplyNow = () => {
@@ -123,7 +128,11 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                                         <SelectTrigger><SelectValue placeholder="Choose a session" /></SelectTrigger>
                                         <SelectContent>
                                             {sessions?.map(s => (
-                                                <SelectItem key={s.id} value={String(s.id)}>{s.session_name}</SelectItem>
+                                                <SelectItem key={s.id} value={String(s.id)}>
+                                                    {s.season && s.session_name 
+                                                        ? `${s.season.charAt(0).toUpperCase() + s.season.slice(1)} ${s.session_name}` 
+                                                        : s.session_name}
+                                                </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -154,34 +163,91 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                                 </div>
                             </div>
                         </CardHeader>
-                        <CardContent>
-                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2"><Banknote className="h-4 w-4" /> Application Fee (BDT)</Label>
-                                    <Input type="number" value={payment.payment_fee} onChange={e => setPayment({...payment, payment_fee: e.target.value})} placeholder="500" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> bKash Number</Label>
-                                    <Input value={payment.payment_bkash_number} onChange={e => setPayment({...payment, payment_bkash_number: e.target.value})} placeholder="01XXXXXXXXX" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Nagad Number</Label>
-                                    <Input value={payment.payment_nagad_number} onChange={e => setPayment({...payment, payment_nagad_number: e.target.value})} placeholder="01XXXXXXXXX" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2"><Phone className="h-4 w-4" /> Rocket Number</Label>
-                                    <Input value={payment.payment_rocket_number} onChange={e => setPayment({...payment, payment_rocket_number: e.target.value})} placeholder="01XXXXXXXXX" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Bank Name & Branch</Label>
-                                    <Input value={payment.payment_bank_name} onChange={e => setPayment({...payment, payment_bank_name: e.target.value})} placeholder="Sonali Bank, University Branch" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="flex items-center gap-2"><Building2 className="h-4 w-4" /> Bank Account Number</Label>
-                                    <Input value={payment.payment_bank_account} onChange={e => setPayment({...payment, payment_bank_account: e.target.value})} placeholder="XXXXXXXXXXXXXX" />
-                                </div>
+                        <CardContent className="space-y-6">
+                            {/* Application Fee */}
+                            <div className="space-y-2">
+                                <Label className="flex items-center gap-2"><Banknote className="h-4 w-4" /> Application Fee (BDT)</Label>
+                                <Input type="number" value={payment.payment_fee} onChange={e => setPayment({...payment, payment_fee: e.target.value})} placeholder="500" className="max-w-xs" />
                             </div>
-                            <Button onClick={updatePaymentSettings} className="mt-4" disabled={isUpdatingPayment}>
+
+                            {/* bKash */}
+                            <div className="p-4 border rounded-lg space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-base"><Phone className="h-4 w-4" /> bKash</Label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-muted-foreground">{payment.payment_bkash_enabled ? 'Enabled' : 'Disabled'}</span>
+                                        <Switch 
+                                            checked={payment.payment_bkash_enabled} 
+                                            onCheckedChange={(checked) => setPayment({...payment, payment_bkash_enabled: checked})}
+                                        />
+                                    </div>
+                                </div>
+                                {payment.payment_bkash_enabled && (
+                                    <Input value={payment.payment_bkash_number} onChange={e => setPayment({...payment, payment_bkash_number: e.target.value})} placeholder="01XXXXXXXXX" />
+                                )}
+                            </div>
+
+                            {/* Nagad */}
+                            <div className="p-4 border rounded-lg space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-base"><Phone className="h-4 w-4" /> Nagad</Label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-muted-foreground">{payment.payment_nagad_enabled ? 'Enabled' : 'Disabled'}</span>
+                                        <Switch 
+                                            checked={payment.payment_nagad_enabled} 
+                                            onCheckedChange={(checked) => setPayment({...payment, payment_nagad_enabled: checked})}
+                                        />
+                                    </div>
+                                </div>
+                                {payment.payment_nagad_enabled && (
+                                    <Input value={payment.payment_nagad_number} onChange={e => setPayment({...payment, payment_nagad_number: e.target.value})} placeholder="01XXXXXXXXX" />
+                                )}
+                            </div>
+
+                            {/* Rocket */}
+                            <div className="p-4 border rounded-lg space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-base"><Phone className="h-4 w-4" /> Rocket</Label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-muted-foreground">{payment.payment_rocket_enabled ? 'Enabled' : 'Disabled'}</span>
+                                        <Switch 
+                                            checked={payment.payment_rocket_enabled} 
+                                            onCheckedChange={(checked) => setPayment({...payment, payment_rocket_enabled: checked})}
+                                        />
+                                    </div>
+                                </div>
+                                {payment.payment_rocket_enabled && (
+                                    <Input value={payment.payment_rocket_number} onChange={e => setPayment({...payment, payment_rocket_number: e.target.value})} placeholder="01XXXXXXXXX" />
+                                )}
+                            </div>
+
+                            {/* Bank Transfer */}
+                            <div className="p-4 border rounded-lg space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <Label className="flex items-center gap-2 text-base"><Building2 className="h-4 w-4" /> Bank Transfer</Label>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-muted-foreground">{payment.payment_bank_enabled ? 'Enabled' : 'Disabled'}</span>
+                                        <Switch 
+                                            checked={payment.payment_bank_enabled} 
+                                            onCheckedChange={(checked) => setPayment({...payment, payment_bank_enabled: checked})}
+                                        />
+                                    </div>
+                                </div>
+                                {payment.payment_bank_enabled && (
+                                    <div className="grid md:grid-cols-2 gap-3">
+                                        <div>
+                                            <Label className="text-sm">Bank Name & Branch</Label>
+                                            <Input value={payment.payment_bank_name} onChange={e => setPayment({...payment, payment_bank_name: e.target.value})} placeholder="Sonali Bank, University Branch" />
+                                        </div>
+                                        <div>
+                                            <Label className="text-sm">Account Number</Label>
+                                            <Input value={payment.payment_bank_account} onChange={e => setPayment({...payment, payment_bank_account: e.target.value})} placeholder="XXXXXXXXXXXXXX" />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <Button onClick={updatePaymentSettings} disabled={isUpdatingPayment}>
                                 {isUpdatingPayment ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</> : 'Save Payment Settings'}
                             </Button>
                         </CardContent>

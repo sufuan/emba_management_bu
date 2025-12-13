@@ -62,10 +62,14 @@ class Setting extends Model
         return [
             'payment_fee' => self::getValue('payment_fee', 500),
             'payment_bkash_number' => self::getValue('payment_bkash_number', '01XXXXXXXXX'),
+            'payment_bkash_enabled' => self::getValue('payment_bkash_enabled', true),
             'payment_nagad_number' => self::getValue('payment_nagad_number', '01XXXXXXXXX'),
+            'payment_nagad_enabled' => self::getValue('payment_nagad_enabled', true),
             'payment_rocket_number' => self::getValue('payment_rocket_number', '01XXXXXXXXX'),
+            'payment_rocket_enabled' => self::getValue('payment_rocket_enabled', true),
             'payment_bank_name' => self::getValue('payment_bank_name', 'Sonali Bank, University of Barishal Branch'),
             'payment_bank_account' => self::getValue('payment_bank_account', 'XXXXXXXXXXXXXX'),
+            'payment_bank_enabled' => self::getValue('payment_bank_enabled', true),
         ];
     }
 }
