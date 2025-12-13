@@ -304,7 +304,7 @@
             </td>
             <td style="border:none; text-align:center; width:33%;">
                 ______________________<br>
-                <span style="font-size:10px;"><strong>Dean</strong></span>
+                <span style="font-size:10px;"><strong>Program Coordinator</strong></span>
             </td>
         </tr>
     </table>

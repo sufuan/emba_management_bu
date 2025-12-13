@@ -17,10 +17,13 @@ class SettingController extends Controller
     public function index()
     {
         $sessions = Session::orderBy('year_start', 'desc')->get();
+        
+        // Get active session from database
+        $activeSession = Session::where('is_active', true)->first();
 
         return Inertia::render('Admin/Settings', [
             'applyNowEnabled' => config('admission.apply_now_enabled'),
-            'activeSessionId' => config('admission.active_session_id'),
+            'activeSessionId' => $activeSession?->id,
             'sessions' => $sessions,
             'uploadConfig' => config('admission.uploads'),
             'paymentSettings' => Setting::getPaymentSettings(),
@@ -54,14 +57,11 @@ class SettingController extends Controller
             'session_id' => 'required|exists:admission_sessions,id',
         ]);
 
-        $this->updateEnvValue('ADMISSION_ACTIVE_SESSION_ID', $validated['session_id']);
-
-        // Also update the session's is_active flag
+        // Deactivate all sessions
         Session::where('is_active', true)->update(['is_active' => false]);
+        
+        // Activate the selected session
         Session::find($validated['session_id'])->update(['is_active' => true]);
-
-        // Clear config cache
-        Artisan::call('config:clear');
 
         return back()->with('success', 'Active session updated successfully.');
     }

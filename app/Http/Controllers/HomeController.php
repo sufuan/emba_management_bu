@@ -13,17 +13,12 @@ class HomeController extends Controller
     public function index()
     {
         $applyNowEnabled = config('admission.apply_now_enabled');
-        $activeSessionId = config('admission.active_session_id');
-        $activeSession = null;
-
-        if ($activeSessionId) {
-            $activeSession = Session::where('id', $activeSessionId)
-                ->where('is_active', true)
-                ->first();
-            
-            if ($activeSession) {
-                $activeSession->append('formatted_name');
-            }
+        
+        // Get active session from database
+        $activeSession = Session::where('is_active', true)->first();
+        
+        if ($activeSession) {
+            $activeSession->append('formatted_name');
         }
 
         // Get applicant user if authenticated
@@ -56,17 +51,12 @@ class HomeController extends Controller
     public function admissionInfo()
     {
         $applyNowEnabled = config('admission.apply_now_enabled');
-        $activeSessionId = config('admission.active_session_id');
-        $activeSession = null;
-
-        if ($activeSessionId) {
-            $activeSession = Session::where('id', $activeSessionId)
-                ->where('is_active', true)
-                ->first();
-            
-            if ($activeSession) {
-                $activeSession->append('formatted_name');
-            }
+        
+        // Get active session from database
+        $activeSession = Session::where('is_active', true)->first();
+        
+        if ($activeSession) {
+            $activeSession->append('formatted_name');
         }
 
         // Get applicant user if authenticated

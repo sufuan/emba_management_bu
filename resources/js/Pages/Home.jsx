@@ -41,7 +41,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
                 <div className="container mx-auto px-4 py-24 lg:py-32 relative">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="text-white space-y-8">
+                        <div className="text-white space-y-2">
                             <div className="flex items-center gap-2">
                                 <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400"></div>
                                 <span className="text-blue-300 font-semibold tracking-wider text-sm uppercase">University of Barishal</span>
@@ -67,9 +67,12 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                                 Join our prestigious Executive MBA program and unlock your leadership potential.
                                 Learn from industry experts and build a powerful professional network.
                             </p>
-                                   <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-sm py-1.5 px-4 inline-block">
-                                    {activeSession ? `Admissions Open: ${activeSession.formatted_name}` : 'Executive EMBA Program'}
+                            
+                            {applyNowEnabled && activeSession && (
+                                <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-sm py-1.5 px-4 inline-block">
+                                    Admissions Open: {activeSession.formatted_name}
                                 </Badge>
+                            )}
                             <div className="flex flex-wrap gap-4">
                                 {applicantAuth ? (
                                     hasSubmittedApplication ? null : (
