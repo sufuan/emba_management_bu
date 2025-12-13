@@ -68,9 +68,13 @@ class ApplicantController extends Controller
             $request->file('passport_photo')
         );
 
-        // Link applicant to authenticated applicant user
+        // Link applicant to authenticated applicant user and update with real name and phone
         if ($user = $request->user('applicant')) {
-            $user->update(['applicant_id' => $applicant->id]);
+            $user->update([
+                'applicant_id' => $applicant->id,
+                'name' => $validated['full_name'],
+                'phone' => $validated['phone'],
+            ]);
         }
 
         return redirect()->route('application.preview', $applicant->id)
@@ -83,6 +87,11 @@ class ApplicantController extends Controller
     public function preview(Applicant $applicant)
     {
         $applicant->load(['session', 'uploads']);
+        
+        // Append formatted_name to session
+        if ($applicant->session) {
+            $applicant->session->append('formatted_name');
+        }
 
         return Inertia::render('Application/Preview', [
             'applicant' => $applicant,

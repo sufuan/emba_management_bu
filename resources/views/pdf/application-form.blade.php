@@ -35,7 +35,7 @@
                 <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
                 <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
-                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
+                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->formatted_name }}</div>
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
@@ -78,11 +78,11 @@
     <table style="width: 95%; margin-left: auto; margin-right: auto;">
         <thead>
             <tr>
-                <th style="width:20%; text-align:center; vertical-align:middle;">Examination</th>
-                <th style="width:10%; text-align:center; vertical-align:middle;">Year</th>
-                <th style="width:30%; text-align:center; vertical-align:middle;">Board / University</th>
-                <th style="width:25%; text-align:center; vertical-align:middle;">Subject / Dept.</th>
-                <th style="width:15%; text-align:center; vertical-align:middle;">Result</th>
+                <th style="width:20%; text-align:center; vertical-align:middle; padding: 2px 4px;">Examination</th>
+                <th style="width:10%; text-align:center; vertical-align:middle; padding: 2px 4px;">Year</th>
+                <th style="width:30%; text-align:center; vertical-align:middle; padding: 2px 4px;">Board / University</th>
+                <th style="width:25%; text-align:center; vertical-align:middle; padding: 2px 4px;">Subject / Dept.</th>
+                <th style="width:15%; text-align:center; vertical-align:middle; padding: 2px 4px;">Result</th>
             </tr>
         </thead>
         <tbody>
@@ -106,11 +106,11 @@
                 @endphp
                 @if($row['key'] !== 'master' || !$isEmpty)
                 <tr>
-                    <td style="text-align:center; vertical-align:middle;">{{ $row['label'] }}</td>
-                    <td style="text-align:center; vertical-align:middle;">{{ $year }}</td>
-                    <td style="text-align:center; vertical-align:middle;">{{ $board }}</td>
-                    <td style="text-align:center; vertical-align:middle;">{{ $subject }}</td>
-                    <td style="text-align:center; vertical-align:middle;">{{ $result }}</td>
+                    <td style="text-align:center; vertical-align:middle; padding: 2px 4px;">{{ $row['label'] }}</td>
+                    <td style="text-align:center; vertical-align:middle; padding: 2px 4px;">{{ $year }}</td>
+                    <td style="text-align:center; vertical-align:middle; padding: 2px 4px;">{{ $board }}</td>
+                    <td style="text-align:center; vertical-align:middle; padding: 2px 4px;">{{ $subject }}</td>
+                    <td style="text-align:center; vertical-align:middle; padding: 2px 4px;">{{ $result }}</td>
                 </tr>
                 @endif
             @endforeach
@@ -148,7 +148,39 @@
     </table>
 
     <!-- ADMIT CARD SECTION (on same page below Applicant Copy) -->
-    <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000;">
+    <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #000;">">
+        
+        <!-- Header for Admit Card -->
+         <table style="border: none; margin-bottom: 10px;">
+        <tr>
+            <td style="border: none; width: 20%; text-align: left; vertical-align: top; padding-left: 10px;">
+                
+                <div style="margin-top: 18px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:115px; height:42px; display:block;" />
+                </div>
+                <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
+            </td>
+            <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
+                  @if(file_exists(public_path('logo/university_logo.png')))
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
+                @endif
+                <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
+                <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
+                <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
+                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->formatted_name }}</div>
+            </td>
+            <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
+                <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
+                    @if($applicant->photo_path)
+                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
+                    @else
+                        <div style="font-size: 10px; padding-top: 40px;">Passport Photo</div>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    </table>
+        
         <div class="section-title" style="margin-bottom: 6px;">ADMIT CARD</div>
         
         <table style="border: none; margin-bottom: 6px;">
@@ -184,22 +216,23 @@
     <div class="page-break"></div>
 
     <!-- Header for Page 2 -->
-    <table style="border: none; margin-bottom: 10px;">
+      <table style="border: none; margin-bottom: 10px;">
         <tr>
             <td style="border: none; width: 20%; text-align: left; vertical-align: top; padding-left: 10px;">
-                @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
-                @endif
-                <div style="margin-top: 8px;">
-                    <img src="{{ $barcodeBase64 }}" style="width:105px; height:38px; display:block;" />
+                
+                <div style="margin-top: 18px;">
+                    <img src="{{ $barcodeBase64 }}" style="width:115px; height:42px; display:block;" />
                 </div>
                 <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
+                  @if(file_exists(public_path('logo/university_logo.png')))
+                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
+                @endif
                 <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
                 <div style="font-size: 13px; font-weight: bold; margin-top: 5px;">Application Form for Executive MBA</div>
-                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->session_name }}</div>
+                <div style="font-size: 11px; margin-top: 2px;">Session: {{ $session->formatted_name }}</div>
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">

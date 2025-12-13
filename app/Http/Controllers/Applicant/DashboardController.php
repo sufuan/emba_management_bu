@@ -22,10 +22,16 @@ class DashboardController extends Controller
         // Get active session and settings for the application form
         $activeSession = Session::where('is_active', true)->first();
         $settings = Setting::first();
+        
+        // Append formatted_name to applicant session
+        if ($applicant && $applicant->session) {
+            $applicant->load('session');
+            $applicant->session->append('formatted_name');
+        }
 
         return Inertia::render('Applicant/Dashboard', [
             'user' => $user,
-            'applicant' => $applicant ? $applicant->load('session') : null,
+            'applicant' => $applicant,
             'session' => $activeSession,
             'subjectChoices' => config('admission.subject_choices', ['Management']),
             'uploadConfig' => config('admission.upload_config'),
@@ -51,10 +57,18 @@ class DashboardController extends Controller
         // Get active session and settings for the application form
         $activeSession = Session::where('is_active', true)->first();
         $settings = Setting::first();
+        
+        // Append formatted_name to applicant session
+        if ($applicant) {
+            $applicant->load('session');
+            if ($applicant->session) {
+                $applicant->session->append('formatted_name');
+            }
+        }
 
         return Inertia::render('Application/MyApplication', [
             'user' => $user,
-            'applicant' => $applicant ? $applicant->load('session') : null,
+            'applicant' => $applicant,
             'session' => $activeSession,
             'subjectChoices' => config('admission.subject_choices', ['Management']),
             'uploadConfig' => config('admission.upload_config'),

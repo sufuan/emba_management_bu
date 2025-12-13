@@ -96,7 +96,7 @@ export default function Dashboard({ auth, applicant, session, subjectChoices, up
                                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Form Number</label>
                                         <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                                             <IdCard className="h-5 w-5 text-blue-600" />
-                                            <span className="font-bold text-blue-700 text-lg">{applicant.form_number}</span>
+                                            <span className="font-bold text-blue-700 text-lg">{applicant.form_no}</span>
                                         </div>
                                     </div>
                                     <div className="space-y-2">

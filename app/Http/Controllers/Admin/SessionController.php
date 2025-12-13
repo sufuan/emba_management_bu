@@ -18,9 +18,12 @@ class SessionController extends Controller
             ->orderBy('year_start', 'desc')
             ->get();
 
+        // Get active session ID from database
+        $activeSession = Session::where('is_active', true)->first();
+
         return Inertia::render('Admin/Sessions/Index', [
             'sessions' => $sessions,
-            'activeSessionId' => config('admission.active_session_id'),
+            'activeSessionId' => $activeSession?->id,
         ]);
     }
 
