@@ -29,8 +29,8 @@
                 <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                  @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
+                @if(!empty($logoBase64))
+                    <img src="{{ $logoBase64 }}" alt="Logo" style="width:50px; height:auto; display:block;">
                 @endif
                 <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
@@ -39,8 +39,8 @@
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
-                    @if($applicant->photo_path)
-                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
+                    @if(!empty($photoBase64))
+                        <img src="{{ $photoBase64 }}" style="width:100%; height:100%; object-fit:cover;" />
                     @else
                         <div style="font-size: 10px; padding-top: 40px;">Passport Photo</div>
                     @endif
@@ -161,8 +161,8 @@
                 <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                  @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
+                @if(!empty($logoBase64))
+                    <img src="{{ $logoBase64 }}" alt="Logo" style="width:50px; height:auto; display:block;">
                 @endif
                 <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
@@ -171,8 +171,8 @@
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
-                    @if($applicant->photo_path)
-                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
+                    @if(!empty($photoBase64))
+                        <img src="{{ $photoBase64 }}" style="width:100%; height:100%; object-fit:cover;" />
                     @else
                         <div style="font-size: 10px; padding-top: 40px;">Passport Photo</div>
                     @endif
@@ -226,8 +226,8 @@
                 <div style="font-size: 9px; margin-top: 3px; white-space: nowrap;"><strong>Form No: {{ $applicant->form_no }}</strong></div>
             </td>
             <td style="border: none; width: 60%; text-align: center; vertical-align: middle;">
-                  @if(file_exists(public_path('logo/university_logo.png')))
-                    <img src="{{ public_path('logo/university_logo.png') }}" alt="Logo" style="width:50px; height:auto; display:block;">
+                @if(!empty($logoBase64))
+                    <img src="{{ $logoBase64 }}" alt="Logo" style="width:50px; height:auto; display:block;">
                 @endif
                 <div style="font-size: 14px; font-weight: bold;">Department of Management Studies</div>
                 <div style="font-size: 16px; font-weight: bold; margin-top: 3px;">University of Barishal</div>
@@ -236,8 +236,8 @@
             </td>
             <td style="border: none; width: 20%; text-align: center; vertical-align: top;">
                 <div style="width: 80px; height: 100px; border: 1px solid #000; margin: 0 auto;">
-                    @if($applicant->photo_path)
-                        <img src="{{ public_path('storage/' . $applicant->photo_path) }}" style="width:100%; height:100%; object-fit:cover;" />
+                    @if(!empty($photoBase64))
+                        <img src="{{ $photoBase64 }}" style="width:100%; height:100%; object-fit:cover;" />
                     @else
                         <div style="font-size: 10px; padding-top: 40px;">Passport Photo</div>
                     @endif

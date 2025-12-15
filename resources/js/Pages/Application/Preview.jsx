@@ -76,13 +76,21 @@ export default function Preview({ applicant, embedded = false }) {
 
                                     {/* Photo */}
                                     <div className="text-center">
-                                        {applicant.photo_path && (
-                                            <img src={`/storage/${applicant.photo_path}`} alt="Applicant" className="w-32 h-40 object-cover rounded-lg shadow-md mx-auto mb-4 border-4 border-white" />
+                                        {(applicant.photo_base64 || applicant.photo_path) && (
+                                            <img
+                                                src={applicant.photo_base64 || `/storage/${applicant.photo_path}`}
+                                                alt="Applicant"
+                                                className="w-32 h-40 object-cover rounded-lg shadow-md mx-auto mb-4 border-4 border-white"
+                                            />
                                         )}
-                                        {applicant.signature_path && (
+                                        {(applicant.signature_base64 || applicant.signature_path) && (
                                             <div className="mt-4">
                                                 <p className="text-xs text-muted-foreground mb-2">Signature</p>
-                                                <img src={`/storage/${applicant.signature_path}`} alt="Signature" className="h-12 mx-auto" />
+                                                <img
+                                                    src={applicant.signature_base64 || `/storage/${applicant.signature_path}`}
+                                                    alt="Signature"
+                                                    className="h-12 mx-auto"
+                                                />
                                             </div>
                                         )}
                                     </div>

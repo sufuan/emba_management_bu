@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Applicant extends Model
 {
@@ -76,5 +77,67 @@ class Applicant extends Model
     public function pdfLogs(): HasMany
     {
         return $this->hasMany(PdfLog::class);
+    }
+
+    /**
+     * Base64 data URI for applicant photo.
+     */
+    public function getPhotoBase64Attribute(): ?string
+    {
+        if (!$this->photo_path) {
+            return null;
+        }
+
+        $disk = Storage::disk('public');
+        $fullPath = $disk->path($this->photo_path);
+        if (!is_file($fullPath)) {
+            return null;
+        }
+
+        $data = @file_get_contents($fullPath);
+        if ($data === false) {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        $mime = match ($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            default => 'image/jpeg',
+        };
+
+        return 'data:' . $mime . ';base64,' . base64_encode($data);
+    }
+
+    /**
+     * Base64 data URI for applicant signature.
+     */
+    public function getSignatureBase64Attribute(): ?string
+    {
+        if (!$this->signature_path) {
+            return null;
+        }
+
+        $disk = Storage::disk('public');
+        $fullPath = $disk->path($this->signature_path);
+        if (!is_file($fullPath)) {
+            return null;
+        }
+
+        $data = @file_get_contents($fullPath);
+        if ($data === false) {
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        $mime = match ($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            default => 'image/jpeg',
+        };
+
+        return 'data:' . $mime . ';base64,' . base64_encode($data);
     }
 }

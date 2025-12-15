@@ -22,19 +22,66 @@ class PDFService
     }
 
     /**
+     * Get university logo as base64 data URI.
+     */
+    protected function getLogoBase64(): ?string
+    {
+        // Logo is in root directory after moving public contents
+        $path = base_path('logo/university_logo.png');
+        if (!is_file($path)) {
+            return null;
+        }
+        $data = @file_get_contents($path);
+        if ($data === false) {
+            return null;
+        }
+        return 'data:image/png;base64,' . base64_encode($data);
+    }
+
+    /**
+     * Get applicant photo as base64 data URI from storage public disk.
+     */
+    protected function getPhotoBase64(?string $photoPath): ?string
+    {
+        if (!$photoPath) {
+            return null;
+        }
+        $fullPath = Storage::disk('public')->path($photoPath);
+        if (!is_file($fullPath)) {
+            return null;
+        }
+        $data = @file_get_contents($fullPath);
+        if ($data === false) {
+            return null;
+        }
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+        $mime = match ($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            default => 'image/jpeg',
+        };
+        return 'data:' . $mime . ';base64,' . base64_encode($data);
+    }
+
+    /**
      * Generate Application Form PDF.
      */
     public function generateApplicationPDF(Applicant $applicant): string
     {
         $applicant->load(['session', 'uploads']);
 
-        // Generate barcode
+        // Generate barcode and embed assets
         $barcodeBase64 = $this->generateBarcodeBase64($applicant->form_no);
+        $logoBase64 = $this->getLogoBase64();
+        $photoBase64 = $this->getPhotoBase64($applicant->photo_path);
 
         $pdf = Pdf::loadView('pdf.application-form', [
             'applicant' => $applicant,
             'session' => $applicant->session,
             'barcodeBase64' => $barcodeBase64,
+            'logoBase64' => $logoBase64,
+            'photoBase64' => $photoBase64,
         ]);
 
         $pdf->setPaper('A4', 'portrait');
@@ -68,13 +115,17 @@ class PDFService
     {
         $applicant->load(['session', 'uploads']);
 
-        // Generate barcode
+        // Generate barcode and embed assets
         $barcodeBase64 = $this->generateBarcodeBase64($applicant->form_no);
+        $logoBase64 = $this->getLogoBase64();
+        $photoBase64 = $this->getPhotoBase64($applicant->photo_path);
 
         $pdf = Pdf::loadView('pdf.application-form', [
             'applicant' => $applicant,
             'session' => $applicant->session,
             'barcodeBase64' => $barcodeBase64,
+            'logoBase64' => $logoBase64,
+            'photoBase64' => $photoBase64,
         ]);
 
         $filename = sprintf('application_%s.pdf', $applicant->form_no);
@@ -91,13 +142,17 @@ class PDFService
     {
         $applicant->load(['session', 'uploads']);
 
-        // Generate barcode
+        // Generate barcode and embed assets
         $barcodeBase64 = $this->generateBarcodeBase64($applicant->form_no);
+        $logoBase64 = $this->getLogoBase64();
+        $photoBase64 = $this->getPhotoBase64($applicant->photo_path);
 
         $pdf = Pdf::loadView('pdf.application-form', [
             'applicant' => $applicant,
             'session' => $applicant->session,
             'barcodeBase64' => $barcodeBase64,
+            'logoBase64' => $logoBase64,
+            'photoBase64' => $photoBase64,
         ]);
 
         return $pdf->stream('application_preview.pdf');

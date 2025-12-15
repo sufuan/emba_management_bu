@@ -147,9 +147,22 @@ export default function Show({ applicant }) {
                             </div>
                             <CardContent className="p-4 space-y-4">
                                 <div className="text-center">
-                                    {applicant.photo_path && <img src={`/storage/${applicant.photo_path}`} alt="" className="w-32 h-40 object-cover rounded-lg mx-auto border-4 border-white shadow-lg" />}
+                                    {(applicant.photo_base64 || applicant.photo_path) && (
+                                        <img
+                                            src={applicant.photo_base64 || `/storage/${applicant.photo_path}`}
+                                            alt=""
+                                            className="w-32 h-40 object-cover rounded-lg mx-auto border-4 border-white shadow-lg"
+                                        />
+                                    )}
                                     {applicant.signature_path && (
-                                        <div className="mt-4"><p className="text-xs text-muted-foreground mb-1">Signature</p><img src={`/storage/${applicant.signature_path}`} alt="" className="h-12 mx-auto" /></div>
+                                        <div className="mt-4">
+                                            <p className="text-xs text-muted-foreground mb-1">Signature</p>
+                                            <img
+                                                src={applicant.signature_base64 || `/storage/${applicant.signature_path}`}
+                                                alt=""
+                                                className="h-12 mx-auto"
+                                            />
+                                        </div>
                                     )}
                                 </div>
                                 <Separator />

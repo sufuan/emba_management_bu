@@ -93,6 +93,9 @@ class ApplicantController extends Controller
             $applicant->session->append('formatted_name');
         }
 
+        // Append base64 image attributes for client rendering
+        $applicant->append(['photo_base64', 'signature_base64']);
+
         return Inertia::render('Application/Preview', [
             'applicant' => $applicant,
         ]);

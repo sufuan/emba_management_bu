@@ -67,6 +67,8 @@ class ApplicantController extends Controller
     public function show(Applicant $applicant)
     {
         $applicant->load(['session', 'uploads', 'pdfLogs']);
+        // Provide base64 for images to avoid /storage dependency in admin show
+        $applicant->append(['photo_base64', 'signature_base64']);
 
         return Inertia::render('Admin/Applicants/Show', [
             'applicant' => $applicant,
