@@ -8,12 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
-import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2 } from 'lucide-react';
+import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2, Shield, UserCheck, Users } from 'lucide-react';
 
-export default function Settings({ applyNowEnabled, activeSessionId, sessions, uploadConfig, paymentSettings }) {
+export default function Settings({ applyNowEnabled, activeSessionId, sessions, uploadConfig, paymentSettings, requireApplicantAuth }) {
     const [isApplyEnabled, setIsApplyEnabled] = useState(applyNowEnabled);
+    const [requireAuth, setRequireAuth] = useState(requireApplicantAuth);
     const [selectedSession, setSelectedSession] = useState(String(activeSessionId || ''));
     const [isToggling, setIsToggling] = useState(false);
+    const [isTogglingAuth, setIsTogglingAuth] = useState(false);
     const [isUpdatingSession, setIsUpdatingSession] = useState(false);
     const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
     const [payment, setPayment] = useState({
@@ -38,6 +40,18 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                 setIsToggling(false);
             },
             onError: () => setIsToggling(false),
+        });
+    };
+
+    const toggleApplicantAuth = () => {
+        setIsTogglingAuth(true);
+        router.post('/admin/settings/toggle-auth', {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setRequireAuth(!requireAuth);
+                setIsTogglingAuth(false);
+            },
+            onError: () => setIsTogglingAuth(false),
         });
     };
 
@@ -102,6 +116,64 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                                 <div className="flex items-center gap-2 mt-4 p-3 bg-amber-50 text-amber-800 rounded-lg text-sm">
                                     <AlertTriangle className="h-4 w-4" />
                                     <span>Users cannot submit new applications while disabled</span>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {/* Applicant Authentication Toggle */}
+                    <Card className="border-0 shadow-lg">
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className={`p-3 rounded-xl ${requireAuth ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
+                                    <Shield className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <CardTitle>Applicant Authentication</CardTitle>
+                                    <CardDescription>Require users to register before applying</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                                <div>
+                                    <p className="font-medium flex items-center gap-2">
+                                        {requireAuth ? (
+                                            <><UserCheck className="h-4 w-4 text-blue-600" /> Registered Users Only</>
+                                        ) : (
+                                            <><Users className="h-4 w-4 text-purple-600" /> Guest Applications Allowed</>
+                                        )}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        {requireAuth 
+                                            ? 'Users must register and login to submit applications' 
+                                            : 'Users can apply directly without creating an account'}
+                                    </p>
+                                </div>
+                                <Badge className={requireAuth ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}>
+                                    {requireAuth ? 'Required' : 'Optional'}
+                                </Badge>
+                            </div>
+                            <Button 
+                                onClick={toggleApplicantAuth} 
+                                disabled={isTogglingAuth} 
+                                className={`w-full mt-4 ${requireAuth ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            >
+                                {isTogglingAuth ? (
+                                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...</>
+                                ) : (
+                                    requireAuth ? 'Allow Guest Applications' : 'Require Authentication'
+                                )}
+                            </Button>
+                            {!requireAuth && (
+                                <div className="flex items-start gap-2 mt-4 p-3 bg-amber-50 text-amber-800 rounded-lg text-sm">
+                                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="font-medium">Guest Mode Active</p>
+                                        <p className="text-xs mt-1">
+                                            Guest applicants won't have accounts or dashboard access. They can only download admit cards after submission. Email and NID must be unique.
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                         </CardContent>

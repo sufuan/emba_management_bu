@@ -7,16 +7,18 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
-import { Search, Filter, MoreVertical, Eye, Download, FileText, Trash2 } from 'lucide-react';
+import { Search, Filter, MoreVertical, Eye, Download, FileText, Trash2, UserCheck, Users } from 'lucide-react';
 
 export default function Index({ applicants, filters, sessions }) {
     const [search, setSearch] = useState(filters?.search || '');
     const [session, setSession] = useState(filters?.session_id ? String(filters.session_id) : 'all');
+    const [accountType, setAccountType] = useState(filters?.account_type || 'all');
 
     const handleFilter = () => {
         const params = {};
         if (search) params.search = search;
         if (session !== 'all') params.session_id = session;
+        if (accountType !== 'all') params.account_type = accountType;
         router.get('/admin/applicants', params, { preserveState: true });
     };
 
@@ -30,6 +32,7 @@ export default function Index({ applicants, filters, sessions }) {
         const params = {};
         if (search) params.search = search;
         if (session !== 'all') params.session_id = session;
+        if (accountType !== 'all') params.account_type = accountType;
         return new URLSearchParams(params).toString();
     };
 
@@ -78,6 +81,14 @@ export default function Index({ applicants, filters, sessions }) {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            <Select value={accountType} onValueChange={setAccountType}>
+                                <SelectTrigger className="w-full md:w-48"><SelectValue placeholder="Account Type" /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Types</SelectItem>
+                                    <SelectItem value="registered">Registered</SelectItem>
+                                    <SelectItem value="guest">Guest</SelectItem>
+                                </SelectContent>
+                            </Select>
                             <Button onClick={handleFilter} className="gap-2"><Filter className="h-4 w-4" /> Filter</Button>
                         </div>
                     </CardContent>
@@ -94,6 +105,7 @@ export default function Index({ applicants, filters, sessions }) {
                                         <th className="text-left py-4 px-4 font-medium">Applicant</th>
                                         <th className="text-left py-4 px-4 font-medium">Contact</th>
                                         <th className="text-left py-4 px-4 font-medium">Session</th>
+                                        <th className="text-left py-4 px-4 font-medium">Type</th>
                                         <th className="text-left py-4 px-4 font-medium">Date</th>
                                         <th className="text-right py-4 px-4 font-medium">Actions</th>
                                     </tr>
@@ -116,6 +128,15 @@ export default function Index({ applicants, filters, sessions }) {
                                                         : a.session?.session_name || 'N/A'}
                                                 </Badge>
                                             </td>
+                                            <td className="py-4 px-4">
+                                                <Badge className={a.account_type === 'Registered' ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-purple-100 text-purple-700 border-purple-200'}>
+                                                    {a.account_type === 'Registered' ? (
+                                                        <><UserCheck className="h-3 w-3 mr-1" /> Registered</>
+                                                    ) : (
+                                                        <><Users className="h-3 w-3 mr-1" /> Guest</>
+                                                    )}
+                                                </Badge>
+                                            </td>
                                             <td className="py-4 px-4 text-muted-foreground text-sm">{new Date(a.submitted_at).toLocaleDateString()}</td>
                                             <td className="py-4 px-4 text-right">
                                                 <DropdownMenu>
@@ -128,7 +149,7 @@ export default function Index({ applicants, filters, sessions }) {
                                             </td>
                                         </tr>
                                     )) : (
-                                        <tr><td colSpan="6" className="py-12 text-center text-muted-foreground">No applicants found</td></tr>
+                                        <tr><td colSpan="7" className="py-12 text-center text-muted-foreground">No applicants found</td></tr>
                                     )}
                                 </tbody>
                             </table>

@@ -27,11 +27,16 @@ class ApplicantController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        $requireAuth = Setting::getValue('require_applicant_auth', true);
+        $authenticatedUser = $request->user('applicant');
+
         return Inertia::render('Application/Create', [
             'session' => $activeSession,
             'subjectChoices' => config('admission.subject_choices'),
             'uploadConfig' => config('admission.uploads'),
             'paymentSettings' => Setting::getPaymentSettings(),
+            'requireAuth' => $requireAuth,
+            'userEmail' => $authenticatedUser?->email,
         ]);
     }
 
@@ -45,9 +50,9 @@ class ApplicantController extends Controller
             'fathers_name' => 'required|string|max:255',
             'mothers_name' => 'required|string|max:255',
             'dob' => 'required|date|before:today',
-            'nid' => 'required|string|regex:/^[0-9]+$/|min:10|max:17',
+            'nid' => 'required|string|regex:/^[0-9]+$/|min:10|max:17|unique:applicants,nid',
             'phone' => 'required|string|max:20',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|max:255|unique:applicants,email',
             'present_address' => 'required|string|max:500',
             'permanent_address' => 'required|string|max:500',
             'experience_json' => 'nullable|string',
@@ -65,17 +70,9 @@ class ApplicantController extends Controller
 
         $applicant = $this->applicantService->createApplicant(
             $validated,
-            $request->file('passport_photo')
+            $request->file('passport_photo'),
+            $request->user('applicant') // Pass authenticated user or null
         );
-
-        // Link applicant to authenticated applicant user and update with real name and phone
-        if ($user = $request->user('applicant')) {
-            $user->update([
-                'applicant_id' => $applicant->id,
-                'name' => $validated['full_name'],
-                'phone' => $validated['phone'],
-            ]);
-        }
 
         return redirect()->route('application.preview', $applicant->id)
             ->with('success', 'Application submitted successfully!');

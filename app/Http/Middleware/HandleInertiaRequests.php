@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,6 +36,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'applyNowEnabled' => config('admission.apply_now_enabled'),
+            'requireApplicantAuth' => Setting::getValue('require_applicant_auth', true),
         ];
     }
 }

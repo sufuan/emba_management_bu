@@ -40,10 +40,10 @@ Route::middleware('auth:applicant')->prefix('applicant')->name('applicant.')->gr
 
 /*
 |--------------------------------------------------------------------------
-| Application Routes (Protected by Applicant Auth + CheckApplyNow Middleware)
+| Application Routes (Protected by OptionalApplicantAuth + CheckApplyNow Middleware)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:applicant', CheckApplyNow::class])->prefix('applicant')->name('applicant.')->group(function () {
+Route::middleware(['optional.applicant.auth', CheckApplyNow::class])->prefix('applicant')->name('applicant.')->group(function () {
     Route::get('/apply', [ApplicantController::class, 'create'])->name('application.create');
     Route::post('/apply', [ApplicantController::class, 'store'])->name('application.store');
 });
@@ -94,6 +94,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Settings
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/toggle-apply', [AdminSettingController::class, 'toggleApplyNow'])->name('settings.toggle-apply');
+    Route::post('/settings/toggle-auth', [AdminSettingController::class, 'toggleApplicantAuth'])->name('settings.toggle-auth');
     Route::post('/settings/active-session', [AdminSettingController::class, 'updateActiveSession'])->name('settings.active-session');
     Route::post('/settings/payment', [AdminSettingController::class, 'updatePaymentSettings'])->name('settings.payment');
 

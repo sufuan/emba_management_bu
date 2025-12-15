@@ -31,7 +31,7 @@ const benefits = [
     'Entrepreneurship & Venture Creation',
 ];
 
-export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication }) {
+export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication, requireApplicantAuth }) {
     return (
         <PublicLayout>
             <Head title="Home - EMBA Admission" />
@@ -39,25 +39,25 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-                <div className="container mx-auto px-4 py-24 lg:py-32 relative">
+                <div className="container mx-auto px-4 py-24 lg:py-16 relative">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="text-white space-y-2">
                             <div className="flex items-center gap-2">
                                 <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400"></div>
-                                <span className="text-blue-300 font-semibold tracking-wider text-sm uppercase">University of Barishal</span>
+                                <span className="text-blue-300 font-semibold tracking-wider text-xl uppercase">University of Barishal</span>
                             </div>
                             <div className="space-y-4">
-                                <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
+                                <h1 className="text-3xl lg:text-4xl font-bold leading-tight">
                                     Transform Your{' '}
                                     <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
                                         Career
                                     </span>
                                     <br />
-                                    <span className="text-3xl lg:text-5xl">with an Executive MBA in</span>
+                                    <span className="text-3xl lg:text-4xl">with an Executive MBA in</span>
                                 </h1>
                                 <div className="relative inline-block">
                                     <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/30 to-cyan-600/30 rounded-lg blur-xl"></div>
-                                    <h2 className="relative text-3xl lg:text-5xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-100 bg-clip-text text-transparent">
+                                    <h2 className="relative text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-100 bg-clip-text text-transparent">
                                         Management Studies
                                     </h2>
                                 </div> <br />
@@ -86,7 +86,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                                     )
                                 ) : (
                                     applyNowEnabled ? (
-                                        <Link href={route('applicant.register')}>
+                                        <Link href={requireApplicantAuth ? route('applicant.register') : route('applicant.application.create')}>
                                             <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-xl shadow-blue-500/25 gap-2">
                                                 Apply Now <ArrowRight className="h-5 w-5" />
                                             </Button>

@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Register middleware aliases
+        $middleware->alias([
+            'optional.applicant.auth' => \App\Http\Middleware\OptionalApplicantAuth::class,
+        ]);
+
         // Admin guard redirects
         $middleware->redirectGuestsTo(fn ($request) => 
             ($request->is('admin/*') || $request->is('admin')) ? route('login') : route('applicant.login')

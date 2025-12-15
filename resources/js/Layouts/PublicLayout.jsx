@@ -4,7 +4,7 @@ import { GraduationCap, Menu, X, Phone, Mail, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
 export default function PublicLayout({ children }) {
-    const { auth, applyNowEnabled, applicantAuth, hasSubmittedApplication } = usePage().props;
+    const { auth, applyNowEnabled, applicantAuth, hasSubmittedApplication, requireApplicantAuth } = usePage().props;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const navigation = [
@@ -57,14 +57,22 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             ))}
                             {applicantAuth ? (
-                                <Link
-                                    href={route('applicant.logout')}
-                                    method="post"
-                                    as="button"
-                                    className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
-                                >
-                                    Logout
-                                </Link>
+                                <>
+                                    <Link
+                                        href={route('applicant.dashboard')}
+                                        className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href={route('applicant.logout')}
+                                        method="post"
+                                        as="button"
+                                        className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                                    >
+                                        Logout
+                                    </Link>
+                                </>
                             ) : (
                                 <Link
                                     href={route('applicant.login')}
@@ -77,26 +85,22 @@ export default function PublicLayout({ children }) {
 
                         {/* CTA Button */}
                         <div className="hidden md:flex items-center gap-4">
-                            {applicantAuth ? (
-                                hasSubmittedApplication ? null : (
-                                    applyNowEnabled ? (
-                                        <Link href={route('applicant.application.create')}>
-                                            <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
-                                                Complete Application
-                                            </Button>
-                                        </Link>
-                                    ) : null
-                                )
-                            ) : (
-                                applyNowEnabled ? (
+                            {applyNowEnabled ? (
+                                requireApplicantAuth ? (
                                     <Link href={route('applicant.register')}>
                                         <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
                                             Apply Now
                                         </Button>
                                     </Link>
                                 ) : (
-                                    <Button variant="secondary" disabled>Applications Closed</Button>
+                                    <Link href={route('applicant.application.create')}>
+                                        <Button className="bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-600/90 shadow-lg">
+                                            Apply Now
+                                        </Button>
+                                    </Link>
                                 )
+                            ) : (
+                                <Button variant="secondary" disabled>Applications Closed</Button>
                             )}
                         </div>
 
@@ -120,15 +124,24 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             ))}
                             {applicantAuth ? (
-                                <Link
-                                    href={route('applicant.logout')}
-                                    method="post"
-                                    as="button"
-                                    className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary w-full text-left"
-                                    onClick={() => setMobileMenuOpen(false)}
-                                >
-                                    Logout
-                                </Link>
+                                <>
+                                    <Link
+                                        href={route('applicant.dashboard')}
+                                        className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        href={route('applicant.logout')}
+                                        method="post"
+                                        as="button"
+                                        className="block py-2 text-sm font-medium text-foreground/80 hover:text-primary w-full text-left"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                        Logout
+                                    </Link>
+                                </>
                             ) : (
                                 <Link
                                     href={route('applicant.login')}
@@ -139,22 +152,18 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             )}
                             <div className="pt-4">
-                                {applicantAuth ? (
-                                    hasSubmittedApplication ? null : (
-                                        applyNowEnabled ? (
-                                            <Link href={route('applicant.application.create')} className="block">
-                                                <Button className="w-full">Complete Application</Button>
-                                            </Link>
-                                        ) : null
-                                    )
-                                ) : (
-                                    applyNowEnabled ? (
+                                {applyNowEnabled ? (
+                                    requireApplicantAuth ? (
                                         <Link href={route('applicant.register')} className="block">
                                             <Button className="w-full">Apply Now</Button>
                                         </Link>
                                     ) : (
-                                        <Button variant="secondary" disabled className="w-full">Applications Closed</Button>
+                                        <Link href={route('applicant.application.create')} className="block">
+                                            <Button className="w-full">Apply Now</Button>
+                                        </Link>
                                     )
+                                ) : (
+                                    <Button variant="secondary" disabled className="w-full">Applications Closed</Button>
                                 )}
                             </div>
                         </div>

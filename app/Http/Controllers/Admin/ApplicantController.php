@@ -26,7 +26,7 @@ class ApplicantController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Applicant::with(['session', 'uploads']);
+        $query = Applicant::with(['session', 'uploads', 'applicantUser']);
 
         // Filter by session
         if ($request->filled('session_id')) {
@@ -36,6 +36,15 @@ class ApplicantController extends Controller
         // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Filter by account type
+        if ($request->filled('account_type')) {
+            if ($request->account_type === 'registered') {
+                $query->whereNotNull('applicant_user_id');
+            } elseif ($request->account_type === 'guest') {
+                $query->whereNull('applicant_user_id');
+            }
         }
 
         // Search
@@ -50,13 +59,27 @@ class ApplicantController extends Controller
             });
         }
 
-        $applicants = $query->latest()->paginate(15)->withQueryString();
+        $applicants = $query->latest()->paginate(15)->withQueryString()->through(function ($applicant) {
+            return [
+                'id' => $applicant->id,
+                'full_name' => $applicant->full_name,
+                'email' => $applicant->email,
+                'phone' => $applicant->phone,
+                'form_no' => $applicant->form_no,
+                'admission_roll' => $applicant->admission_roll,
+                'status' => $applicant->status,
+                'submitted_at' => $applicant->submitted_at,
+                'session' => $applicant->session,
+                'account_type' => $applicant->account_type, // Add accessor for Registered/Guest
+            ];
+        });
+
         $sessions = Session::all();
 
         return Inertia::render('Admin/Applicants/Index', [
             'applicants' => $applicants,
             'sessions' => $sessions,
-            'filters' => $request->only(['session_id', 'status', 'search']),
+            'filters' => $request->only(['session_id', 'status', 'search', 'account_type']),
             'statuses' => config('admission.statuses'),
         ]);
     }

@@ -27,6 +27,7 @@ class SettingController extends Controller
             'sessions' => $sessions,
             'uploadConfig' => config('admission.uploads'),
             'paymentSettings' => Setting::getPaymentSettings(),
+            'requireApplicantAuth' => Setting::getValue('require_applicant_auth', true),
         ]);
     }
 
@@ -89,6 +90,19 @@ class SettingController extends Controller
         }
 
         return back()->with('success', 'Payment settings updated successfully.');
+    }
+
+    /**
+     * Toggle Applicant Authentication requirement.
+     */
+    public function toggleApplicantAuth(Request $request)
+    {
+        $currentValue = Setting::getValue('require_applicant_auth', true);
+        $newValue = !$currentValue;
+
+        Setting::setValue('require_applicant_auth', $newValue);
+
+        return back()->with('success', 'Applicant authentication setting updated successfully.');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Applicant;
+use App\Models\ApplicantUser;
 use App\Models\Session;
 use App\Models\Upload;
 use Illuminate\Http\UploadedFile;
@@ -14,9 +15,9 @@ class ApplicantService
     /**
      * Create a new applicant with all related data.
      */
-    public function createApplicant(array $data, ?UploadedFile $photo = null): Applicant
+    public function createApplicant(array $data, ?UploadedFile $photo = null, ?ApplicantUser $authenticatedUser = null): Applicant
     {
-        return DB::transaction(function () use ($data, $photo) {
+        return DB::transaction(function () use ($data, $photo, $authenticatedUser) {
             $sessionId = $data['session_id'] ?? config('admission.active_session_id');
             $session = Session::findOrFail($sessionId);
 
@@ -27,6 +28,7 @@ class ApplicantService
             // Create applicant
             $applicant = Applicant::create([
                 'session_id' => $sessionId,
+                'applicant_user_id' => $authenticatedUser?->id, // Link to user if authenticated, null for guests
                 'full_name' => $data['full_name'],
                 'fathers_name' => $data['fathers_name'],
                 'mothers_name' => $data['mothers_name'],
@@ -48,6 +50,15 @@ class ApplicantService
                 'status' => 'submitted',
                 'submitted_at' => now(),
             ]);
+
+            // If authenticated user, link applicant to user and update name/phone
+            if ($authenticatedUser) {
+                $authenticatedUser->update([
+                    'applicant_id' => $applicant->id,
+                    'name' => $data['full_name'],
+                    'phone' => $data['phone'],
+                ]);
+            }
 
             // Handle file uploads
             if ($photo) {

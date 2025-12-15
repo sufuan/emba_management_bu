@@ -25,11 +25,11 @@ const educationRows = [
     { key: 'master', label: 'Master (if any)', required: false },
 ];
 
-export default function Create({ session, subjectChoices, uploadConfig, paymentSettings, auth }) {
+export default function Create({ session, subjectChoices, uploadConfig, paymentSettings, auth, requireAuth, userEmail }) {
     const [currentStep, setCurrentStep] = useState(1);
     const [stepErrors, setStepErrors] = useState({});
     const { data, setData, post, processing, errors } = useForm({
-        full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: auth?.user?.email || '',
+        full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: userEmail || '',
         present_address: '', permanent_address: '',
         education_json: {
             ssc: { year: '', board: '', subject: '', result: '' },
@@ -316,11 +316,21 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             <Input 
                                                 type="email" 
                                                 value={data.email} 
-                                                readOnly 
-                                                className="bg-slate-50 cursor-not-allowed"
-                                                title="Email cannot be changed (registered email)" 
+                                                onChange={e => handleInputChange('email', e.target.value)}
+                                                readOnly={requireAuth && userEmail} 
+                                                className={`${(requireAuth && userEmail) ? 'bg-slate-50 cursor-not-allowed' : ''} ${stepErrors.email ? 'border-red-500' : ''}`}
+                                                title={requireAuth && userEmail ? "Email cannot be changed (registered email)" : "Enter your email address"} 
+                                                placeholder="your.email@example.com"
                                             />
-                                            <p className="text-xs text-slate-500 mt-1">Registered email (cannot be changed)</p>
+                                            {requireAuth && userEmail ? (
+                                                <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                                                    <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                                    Registered email (cannot be changed)
+                                                </p>
+                                            ) : (
+                                                <p className="text-xs text-slate-500 mt-1">Enter a valid email address</p>
+                                            )}
+                                            {stepErrors.email && <p className="text-sm text-red-500 mt-1">{stepErrors.email}</p>}
                                         </div>
                                         <div className="md:col-span-2">
                                             <Label>Subject</Label>

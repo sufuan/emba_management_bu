@@ -16,6 +16,7 @@ class Applicant extends Model
      */
     protected $fillable = [
         'session_id',
+        'applicant_user_id',
         'full_name',
         'fathers_name',
         'mothers_name',
@@ -61,6 +62,14 @@ class Applicant extends Model
     public function session(): BelongsTo
     {
         return $this->belongsTo(Session::class);
+    }
+
+    /**
+     * Get the applicant user (if registered).
+     */
+    public function applicantUser(): BelongsTo
+    {
+        return $this->belongsTo(ApplicantUser::class);
     }
 
     /**
@@ -139,5 +148,13 @@ class Applicant extends Model
         };
 
         return 'data:' . $mime . ';base64,' . base64_encode($data);
+    }
+
+    /**
+     * Get the account type of the applicant.
+     */
+    public function getAccountTypeAttribute(): string
+    {
+        return $this->applicant_user_id ? 'Registered' : 'Guest';
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Session;
+use App\Models\Setting;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -46,6 +47,15 @@ class DatabaseSeeder extends Seeder
             'year_start' => 2024,
             'year_end' => 2025,
             'is_active' => false,
+        ]);
+
+        // Seed authentication toggle setting
+        Setting::create([
+            'key' => 'require_applicant_auth',
+            'value' => 'true',
+            'type' => 'boolean',
+            'group' => 'application',
+            'label' => 'Require Applicant Authentication',
         ]);
     }
 }
