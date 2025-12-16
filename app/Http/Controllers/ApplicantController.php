@@ -23,9 +23,8 @@ class ApplicantController extends Controller
      */
     public function create(Request $request)
     {
-        $activeSession = Session::where('id', config('admission.active_session_id'))
-            ->where('is_active', true)
-            ->firstOrFail();
+        // Get active session from middleware
+        $activeSession = $request->input('active_session') ?? Session::where('is_active', true)->firstOrFail();
 
         $requireAuth = Setting::getValue('require_applicant_auth', true);
         $authenticatedUser = $request->user('applicant');
@@ -67,6 +66,10 @@ class ApplicantController extends Controller
         $validated['education_json'] = json_decode($validated['education_json'] ?? '[]', true) ?: [];
         $validated['experience_json'] = json_decode($validated['experience_json'] ?? '[]', true) ?: [];
         $validated['payment_date'] = now();
+
+        // Get active session from middleware or database
+        $activeSession = $request->input('active_session') ?? Session::where('is_active', true)->firstOrFail();
+        $validated['session_id'] = $activeSession->id;
 
         $applicant = $this->applicantService->createApplicant(
             $validated,

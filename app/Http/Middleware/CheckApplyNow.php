@@ -18,43 +18,17 @@ class CheckApplyNow
     public function handle(Request $request, Closure $next): Response
     {
         $applyNowEnabled = config('admission.apply_now_enabled');
-        $activeSessionId = config('admission.active_session_id');
 
         // Check if Apply Now is disabled
         if (!$applyNowEnabled) {
-            if ($request->wantsJson() || $request->header('X-Inertia')) {
-                return response()->json([
-                    'message' => 'Applications are currently closed.',
-                    'apply_now_enabled' => false,
-                ], 403);
-            }
-            return redirect()->route('admission.closed');
+            return redirect()->route('home')->with('error', 'Applications are currently closed.');
         }
 
-        // Check if active session exists
-        if (!$activeSessionId) {
-            if ($request->wantsJson() || $request->header('X-Inertia')) {
-                return response()->json([
-                    'message' => 'No active admission session.',
-                    'apply_now_enabled' => false,
-                ], 403);
-            }
-            return redirect()->route('admission.closed');
-        }
-
-        // Verify session exists and is active
-        $session = Session::where('id', $activeSessionId)
-            ->where('is_active', true)
-            ->first();
+        // Get active session from database
+        $session = Session::where('is_active', true)->first();
 
         if (!$session) {
-            if ($request->wantsJson() || $request->header('X-Inertia')) {
-                return response()->json([
-                    'message' => 'Active admission session not found.',
-                    'apply_now_enabled' => false,
-                ], 403);
-            }
-            return redirect()->route('admission.closed');
+            return redirect()->route('home')->with('error', 'No active admission session. Please contact admin.');
         }
 
         // Share session data with request

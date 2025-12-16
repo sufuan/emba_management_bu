@@ -14,8 +14,8 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $activeSessionId = config('admission.active_session_id');
-        $activeSession = $activeSessionId ? Session::find($activeSessionId) : null;
+        // Get active session from database
+        $activeSession = Session::where('is_active', true)->first();
 
         // Get statistics
         $stats = [

@@ -123,7 +123,7 @@ export default function Index({ applicants, filters, sessions }) {
                                             <td className="py-4 px-4"><p className="text-sm">{a.phone}</p><p className="text-xs text-muted-foreground">{a.email}</p></td>
                                             <td className="py-4 px-4">
                                                 <Badge variant="outline">
-                                                    {a.session?.season && a.session?.session_name 
+                                                    {a.session?.use_season && a.session?.season && a.session?.session_name 
                                                         ? `${a.session.season.charAt(0).toUpperCase() + a.session.season.slice(1)} ${a.session.session_name}` 
                                                         : a.session?.session_name || 'N/A'}
                                                 </Badge>

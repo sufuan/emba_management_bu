@@ -224,14 +224,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                 <div className="absolute bottom-0 left-0 -mb-8 -ml-8 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
                 <div className="relative text-center px-4">
                     <Badge className="bg-white/20 text-white border-white/30 mb-3">
-                        {session?.season && session?.session_name 
+                        {session?.use_season && session?.season && session?.session_name 
                             ? `${session.season.charAt(0).toUpperCase() + session.season.slice(1)} ${session.session_name}` 
                             : session?.session_name || 'EMBA Admission'}
                     </Badge>
                     <h2 className="text-3xl font-bold mb-2">Complete Your Application</h2>
-                    <p className="text-blue-100">Applying for {session?.season && session?.session_name 
+                    <p className="text-blue-100">Applying for {session?.use_season && session?.season && session?.session_name 
                         ? `${session.season.charAt(0).toUpperCase() + session.season.slice(1)} ${session.session_name}` 
-                        : 'EMBA'} Session</p>
+                        : session?.session_name || 'EMBA'} Session</p>
                 </div>
             </div>
 

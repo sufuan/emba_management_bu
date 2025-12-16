@@ -27,7 +27,7 @@ export default function Dashboard({ stats, recentApplicants, activeSession }) {
                     {activeSession && (
                         <Badge variant="outline" className="text-sm py-2 px-4">
                             <Calendar className="h-4 w-4 mr-2" />
-                            Active Session: {activeSession.season && activeSession.session_name 
+                            Active Session: {activeSession.use_season && activeSession.season && activeSession.session_name 
                                 ? `${activeSession.season.charAt(0).toUpperCase() + activeSession.season.slice(1)} ${activeSession.session_name}` 
                                 : activeSession.session_name}
                         </Badge>

@@ -49,7 +49,7 @@
                 <td>{{ $applicant->phone }}</td>
                 <td>{{ $applicant->email }}</td>
                 <td><span class="status status-{{ $applicant->status }}">{{ ucfirst($applicant->status) }}</span></td>
-                <td>{{ $applicant->session->session_name ?? 'N/A' }}</td>
+                <td>@if($applicant->session){{ $applicant->session->use_season && $applicant->session->season ? ucfirst($applicant->session->season) . ' ' . $applicant->session->session_name : $applicant->session->session_name }}@else N/A @endif</td>
             </tr>
             @endforeach
         </tbody>

@@ -10,13 +10,11 @@ import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
 import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2, Shield, UserCheck, Users } from 'lucide-react';
 
-export default function Settings({ applyNowEnabled, activeSessionId, sessions, uploadConfig, paymentSettings, requireApplicantAuth }) {
+export default function Settings({ applyNowEnabled, sessions, uploadConfig, paymentSettings, requireApplicantAuth }) {
     const [isApplyEnabled, setIsApplyEnabled] = useState(applyNowEnabled);
     const [requireAuth, setRequireAuth] = useState(requireApplicantAuth);
-    const [selectedSession, setSelectedSession] = useState(String(activeSessionId || ''));
     const [isToggling, setIsToggling] = useState(false);
     const [isTogglingAuth, setIsTogglingAuth] = useState(false);
-    const [isUpdatingSession, setIsUpdatingSession] = useState(false);
     const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
     const [payment, setPayment] = useState({
         payment_fee: paymentSettings?.payment_fee || 500,
@@ -52,15 +50,6 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                 setIsTogglingAuth(false);
             },
             onError: () => setIsTogglingAuth(false),
-        });
-    };
-
-    const updateActiveSession = () => {
-        setIsUpdatingSession(true);
-        router.post('/admin/settings/active-session', { session_id: selectedSession }, {
-            preserveScroll: true,
-            onSuccess: () => setIsUpdatingSession(false),
-            onError: () => setIsUpdatingSession(false),
         });
     };
 
@@ -176,49 +165,6 @@ export default function Settings({ applyNowEnabled, activeSessionId, sessions, u
                                     </div>
                                 </div>
                             )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Active Session */}
-                    <Card className="border-0 shadow-lg">
-                        <CardHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 rounded-xl bg-blue-100 text-blue-600">
-                                    <Calendar className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <CardTitle>Active Session</CardTitle>
-                                    <CardDescription>Set the current admission session</CardDescription>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label>Select Session</Label>
-                                    <Select value={selectedSession} onValueChange={setSelectedSession}>
-                                        <SelectTrigger><SelectValue placeholder="Choose a session" /></SelectTrigger>
-                                        <SelectContent>
-                                            {sessions?.map(s => (
-                                                <SelectItem key={s.id} value={String(s.id)}>
-                                                    {s.season && s.session_name 
-                                                        ? `${s.season.charAt(0).toUpperCase() + s.season.slice(1)} ${s.session_name}` 
-                                                        : s.session_name}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <Button onClick={updateActiveSession} className="w-full" disabled={isUpdatingSession || !selectedSession || selectedSession === String(activeSessionId)}>
-                                    {isUpdatingSession ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...</> : 'Update Active Session'}
-                                </Button>
-                                {selectedSession && selectedSession === String(activeSessionId) && (
-                                    <div className="flex items-center gap-2 p-3 bg-green-50 text-green-800 rounded-lg text-sm">
-                                        <CheckCircle2 className="h-4 w-4" />
-                                        <span>This session is currently active</span>
-                                    </div>
-                                )}
-                            </div>
                         </CardContent>
                     </Card>
 

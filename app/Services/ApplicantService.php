@@ -18,7 +18,8 @@ class ApplicantService
     public function createApplicant(array $data, ?UploadedFile $photo = null, ?ApplicantUser $authenticatedUser = null): Applicant
     {
         return DB::transaction(function () use ($data, $photo, $authenticatedUser) {
-            $sessionId = $data['session_id'] ?? config('admission.active_session_id');
+            // Get session from data or find active session from database
+            $sessionId = $data['session_id'] ?? Session::where('is_active', true)->firstOrFail()->id;
             $session = Session::findOrFail($sessionId);
 
             // Generate form number and admission roll

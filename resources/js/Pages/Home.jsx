@@ -39,7 +39,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-                <div className="container mx-auto px-4 py-24 lg:py-16 relative">
+                <div className="container mx-auto px-4 py-20 lg:py-32 relative">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div className="text-white space-y-2">
                             <div className="flex items-center gap-2">

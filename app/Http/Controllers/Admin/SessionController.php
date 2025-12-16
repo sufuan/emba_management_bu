@@ -42,20 +42,25 @@ class SessionController extends Controller
     {
         $validated = $request->validate([
             'session_name' => 'required|string|max:255',
-            'season' => 'required|in:summer,fall',
+            'use_season' => 'boolean',
+            'season' => 'nullable|required_if:use_season,true|in:summer,fall',
             'year_start' => 'required|integer|min:2020|max:2100',
             'year_end' => 'required|integer|min:2020|max:2100|gte:year_start',
             'is_active' => 'boolean',
         ]);
 
-        // Check for duplicate season+year combination
+        // Set use_season default if not provided
+        $validated['use_season'] = $validated['use_season'] ?? false;
+
+        // Check for duplicate session combination
         $exists = Session::where('year_start', $validated['year_start'])
             ->where('year_end', $validated['year_end'])
-            ->where('season', $validated['season'])
+            ->where('season', $validated['season'] ?? null)
+            ->where('use_season', $validated['use_season'])
             ->exists();
 
         if ($exists) {
-            return back()->withErrors(['season' => 'This season and year combination already exists.']);
+            return back()->withErrors(['session_name' => 'This session configuration already exists.']);
         }
 
         // If new session is active, deactivate others
@@ -88,21 +93,26 @@ class SessionController extends Controller
     {
         $validated = $request->validate([
             'session_name' => 'required|string|max:255',
-            'season' => 'required|in:summer,fall',
+            'use_season' => 'boolean',
+            'season' => 'nullable|required_if:use_season,true|in:summer,fall',
             'year_start' => 'required|integer|min:2020|max:2100',
             'year_end' => 'required|integer|min:2020|max:2100|gte:year_start',
             'is_active' => 'boolean',
         ]);
 
-        // Check for duplicate season+year combination (excluding current session)
+        // Set use_season default if not provided
+        $validated['use_season'] = $validated['use_season'] ?? false;
+
+        // Check for duplicate session combination (excluding current session)
         $exists = Session::where('year_start', $validated['year_start'])
             ->where('year_end', $validated['year_end'])
-            ->where('season', $validated['season'])
+            ->where('season', $validated['season'] ?? null)
+            ->where('use_season', $validated['use_season'])
             ->where('id', '!=', $session->id)
             ->exists();
 
         if ($exists) {
-            return back()->withErrors(['season' => 'This season and year combination already exists.']);
+            return back()->withErrors(['session_name' => 'This session configuration already exists.']);
         }
 
         // If this session is being activated, deactivate others

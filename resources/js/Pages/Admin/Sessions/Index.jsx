@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -22,6 +23,7 @@ export default function Index({ sessions, activeSessionId }) {
         year_start: currentYear,
         year_end: currentYear + 1,
         is_active: false,
+        use_season: false,
     });
 
     // Auto-update session_name when years or season change
@@ -52,10 +54,11 @@ export default function Index({ sessions, activeSessionId }) {
         setEditSession(session);
         setData({ 
             session_name: session.session_name, 
-            season: session.season,
+            season: session.season || 'fall',
             year_start: session.year_start, 
             year_end: session.year_end, 
-            is_active: session.is_active 
+            is_active: session.is_active,
+            use_season: session.use_season ?? false
         });
         setIsOpen(true);
     };
@@ -87,38 +90,58 @@ export default function Index({ sessions, activeSessionId }) {
                                 <DialogTitle>{editSession ? 'Edit Session' : 'Create New Session'}</DialogTitle>
                             </DialogHeader>
                             <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="flex items-center justify-between p-4 border rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                                    <div className="space-y-0.5">
+                                        <Label htmlFor="use-season" className="text-base font-semibold text-slate-800">Use Fall/Summer</Label>
+                                        <p className="text-sm text-slate-600">Enable season-based session naming (e.g., Fall 2025-26)</p>
+                                    </div>
+                                    <Switch 
+                                        id="use-season"
+                                        checked={data.use_season} 
+                                        onCheckedChange={(checked) => setData('use_season', checked)}
+                                    />
+                                </div>
+
                                 <div>
                                     <Label>Year Start</Label>
                                     <Input type="number" value={data.year_start} onChange={e => handleYearChange('year_start', e.target.value)} min="2020" max="2050" />
                                     {errors.year_start && <p className="text-sm text-red-500 mt-1">{errors.year_start}</p>}
                                 </div>
-                                <div>
-                                    <Label>Season</Label>
-                                    <Select value={data.season} onValueChange={(value) => setData('season', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select season" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="fall">
-                                                <div className="flex items-center gap-2">
-                                                    <Snowflake className="h-4 w-4 text-blue-500" />
-                                                    <span>Fall</span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="summer">
-                                                <div className="flex items-center gap-2">
-                                                    <Sun className="h-4 w-4 text-amber-500" />
-                                                    <span>Summer</span>
-                                                </div>
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.season && <p className="text-sm text-red-500 mt-1">{errors.season}</p>}
-                                </div>
+
+                                {data.use_season && (
+                                    <div>
+                                        <Label>Season</Label>
+                                        <Select value={data.season} onValueChange={(value) => setData('season', value)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select season" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="fall">
+                                                    <div className="flex items-center gap-2">
+                                                        <Snowflake className="h-4 w-4 text-blue-500" />
+                                                        <span>Fall</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem value="summer">
+                                                    <div className="flex items-center gap-2">
+                                                        <Sun className="h-4 w-4 text-amber-500" />
+                                                        <span>Summer</span>
+                                                    </div>
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.season && <p className="text-sm text-red-500 mt-1">{errors.season}</p>}
+                                    </div>
+                                )}
+
                                 <div>
                                     <Label>Session Name (Auto-generated)</Label>
                                     <Input value={data.session_name} readOnly className="bg-slate-50 cursor-not-allowed" />
-                                    <p className="text-xs text-muted-foreground mt-1">Format: YYYY-YY (e.g., 2025-26)</p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {data.use_season 
+                                            ? `Format: ${data.season.charAt(0).toUpperCase() + data.season.slice(1)} YYYY-YY (e.g., Fall 2025-26)`
+                                            : 'Format: YYYY-YY (e.g., 2025-26)'}
+                                    </p>
                                     {errors.session_name && <p className="text-sm text-red-500 mt-1">{errors.session_name}</p>}
                                 </div>
                                 <DialogFooter>
@@ -135,19 +158,28 @@ export default function Index({ sessions, activeSessionId }) {
                             <CardHeader className="pb-2">
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center gap-2">
-                                        {session.season === 'summer' ? (
-                                            <Sun className={`h-5 w-5 ${session.id === activeSessionId ? 'text-amber-600' : 'text-amber-500'}`} />
-                                        ) : (
-                                            <Snowflake className={`h-5 w-5 ${session.id === activeSessionId ? 'text-blue-600' : 'text-blue-500'}`} />
+                                        {session.use_season && session.season && (
+                                            session.season === 'summer' ? (
+                                                <Sun className={`h-5 w-5 ${session.id === activeSessionId ? 'text-amber-600' : 'text-amber-500'}`} />
+                                            ) : (
+                                                <Snowflake className={`h-5 w-5 ${session.id === activeSessionId ? 'text-blue-600' : 'text-blue-500'}`} />
+                                            )
                                         )}
                                         <CardTitle className={`text-lg ${session.id === activeSessionId ? 'text-green-700' : ''}`}>
-                                            {session.season.charAt(0).toUpperCase() + session.season.slice(1)} {session.session_name}
+                                            {session.use_season && session.season
+                                                ? `${session.season.charAt(0).toUpperCase() + session.season.slice(1)} ${session.session_name}`
+                                                : session.session_name}
                                         </CardTitle>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 flex-wrap">
                                         {session.id === activeSessionId && <Badge className="bg-green-600 text-white hover:bg-green-700">Active</Badge>}
-                                        <Badge variant={session.season === 'summer' ? 'default' : 'secondary'} className={session.season === 'summer' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}>
-                                            {session.season === 'summer' ? 'Summer' : 'Fall'}
+                                        {session.use_season && session.season && (
+                                            <Badge variant={session.season === 'summer' ? 'default' : 'secondary'} className={session.season === 'summer' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}>
+                                                {session.season === 'summer' ? 'Summer' : 'Fall'}
+                                            </Badge>
+                                        )}
+                                        <Badge variant="outline" className={session.use_season ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-slate-50 text-slate-700 border-slate-200'}>
+                                            {session.use_season ? 'Season-Based' : 'Year-Based'}
                                         </Badge>
                                     </div>
                                 </div>

@@ -59,7 +59,7 @@
             <td class="center-box">
                 Faculty of Business Studies<br>
                 Application Form for Executive EMBA Admission<br>
-                Session: {{ $session->session_name ?? '' }}
+                Session: @if($session->use_season && $session->season){{ ucfirst($session->season) }} {{ $session->session_name }}@else{{ $session->session_name }}@endif
             </td>
 
             <td class="right-box">

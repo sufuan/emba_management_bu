@@ -25,6 +25,7 @@ class Session extends Model
         'year_start',
         'year_end',
         'is_active',
+        'use_season',
     ];
 
     /**
@@ -36,6 +37,7 @@ class Session extends Model
         'is_active' => 'boolean',
         'year_start' => 'integer',
         'year_end' => 'integer',
+        'use_season' => 'boolean',
     ];
 
     /**
@@ -45,8 +47,12 @@ class Session extends Model
      */
     public function getFormattedNameAttribute(): string
     {
-        $seasonName = ucfirst($this->season);
-        return "{$seasonName} {$this->session_name}";
+        if ($this->use_season && $this->season) {
+            $seasonName = ucfirst($this->season);
+            return "{$seasonName} {$this->session_name}";
+        }
+        
+        return $this->session_name;
     }
 
     /**
