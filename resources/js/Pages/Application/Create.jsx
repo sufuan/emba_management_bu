@@ -278,7 +278,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             {stepErrors.dob && <p className="text-sm text-red-500 mt-1">{stepErrors.dob}</p>}
                                         </div>
                                         <div>
-                                            <Label>NID Number * (Numbers only)</Label>
+                                            <Label>NID Number</Label>
                                             <Input
                                                 value={data.nid}
                                                 onChange={e => {

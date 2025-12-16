@@ -24,15 +24,8 @@ class OptionalApplicantAuth
         // If authentication is required, enforce auth:applicant guard
         if ($requireAuth) {
             if (!Auth::guard('applicant')->check()) {
-                if ($request->expectsJson() || $request->header('X-Inertia')) {
-                    return response()->json([
-                        'message' => 'Please login to continue.',
-                        'redirect' => route('applicant.login'),
-                    ], 401);
-                }
-
-                return redirect()->route('applicant.login')
-                    ->with('warning', 'Please login to continue with your application.');
+                return redirect()->route('applicant.register')
+                    ->with('info', 'Please register to apply for admission.');
             }
         }
 
