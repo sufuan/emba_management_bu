@@ -21,7 +21,7 @@ const steps = [
 const educationRows = [
     { key: 'ssc', label: 'SSC / Equivalent', required: true },
     { key: 'hsc', label: 'HSC / Equivalent', required: true },
-    { key: 'bachelor', label: '4 Years Bachelor', required: true },
+    { key: 'bachelor', label: 'Bachelor 2/3/4/5 years', required: true },
     { key: 'master', label: 'Master (if any)', required: false },
 ];
 

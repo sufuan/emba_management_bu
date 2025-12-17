@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -15,10 +16,12 @@ return new class extends Migration
             // Add applicant_user_id as nullable foreign key
             $table->foreignId('applicant_user_id')->nullable()->after('id')->constrained('applicant_users')->onDelete('set null');
             
-            // Add unique constraints for email and NID
+            // Add unique constraint for email
             $table->unique('email');
-            $table->unique('nid');
         });
+        
+        // Add unique constraint for NID (varchar column)
+        DB::statement('ALTER TABLE applicants ADD UNIQUE KEY applicants_nid_unique (nid)');
     }
 
     /**
@@ -26,10 +29,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Drop NID unique constraint
+        DB::statement('ALTER TABLE applicants DROP INDEX applicants_nid_unique');
+        
         Schema::table('applicants', function (Blueprint $table) {
-            // Drop unique constraints
+            // Drop unique constraint
             $table->dropUnique(['email']);
-            $table->dropUnique(['nid']);
             
             // Drop foreign key and column
             $table->dropForeign(['applicant_user_id']);

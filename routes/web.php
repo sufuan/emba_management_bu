@@ -19,6 +19,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/admission-closed', [HomeController::class, 'closed'])->name('admission.closed');
+Route::get('/download/offline-form', function () {
+    $pdfUrl = 'https://bu-embamgt.com/pdf/offline-form.pdf';
+    $pdfContent = file_get_contents($pdfUrl);
+    return response($pdfContent, 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="EMBA-Offline-Application-Form.pdf"',
+    ]);
+})->name('download.offline-form');
 
 /*
 |--------------------------------------------------------------------------

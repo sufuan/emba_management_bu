@@ -18,10 +18,10 @@ export default function Index({ sessions, activeSessionId }) {
 
     const currentYear = new Date().getFullYear();
     const { data, setData, post, put, processing, reset, errors } = useForm({
-        session_name: `${currentYear}-${(currentYear + 1).toString().slice(-2)}`,
+        session_name: `${currentYear}`,
         season: 'winter',
         year_start: currentYear,
-        year_end: currentYear + 1,
+        year_end: null,
         is_active: false,
         use_season: false,
     });
@@ -33,8 +33,8 @@ export default function Index({ sessions, activeSessionId }) {
             setData({
                 ...data,
                 year_start: yearVal,
-                year_end: yearVal + 1,
-                session_name: `${yearVal}-${(yearVal + 1).toString().slice(-2)}`
+                year_end: null,
+                session_name: `${yearVal}`
             });
         } else {
             setData(field, yearVal);
@@ -139,8 +139,8 @@ export default function Index({ sessions, activeSessionId }) {
                                     <Input value={data.session_name} readOnly className="bg-slate-50 cursor-not-allowed" />
                                     <p className="text-xs text-muted-foreground mt-1">
                                         {data.use_season 
-                                            ? `Format: ${data.season.charAt(0).toUpperCase() + data.season.slice(1)} YYYY-YY (e.g., Winter 2025-26)`
-                                            : 'Format: YYYY-YY (e.g., 2025-26)'}
+                                            ? `Format: ${data.season.charAt(0).toUpperCase() + data.season.slice(1)} YYYY (e.g., Winter 2025)`
+                                            : 'Format: YYYY (e.g., 2025)'}
                                     </p>
                                     {errors.session_name && <p className="text-sm text-red-500 mt-1">{errors.session_name}</p>}
                                 </div>
@@ -188,7 +188,7 @@ export default function Index({ sessions, activeSessionId }) {
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Academic Year</span>
-                                        <span className="font-medium">{session.year_start} - {session.year_end}</span>
+                                        <span className="font-medium">{session.year_start}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Applicants</span>

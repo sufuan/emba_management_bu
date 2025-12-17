@@ -9,6 +9,7 @@ use App\Models\Upload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ApplicantService
 {
@@ -29,17 +30,17 @@ class ApplicantService
             // Create applicant
             $applicant = Applicant::create([
                 'session_id' => $sessionId,
-                'applicant_user_id' => $authenticatedUser?->id, // Link to user if authenticated, null for guests
+                'applicant_user_id' => $authenticatedUser?->id,
                 'full_name' => $data['full_name'],
                 'fathers_name' => $data['fathers_name'],
                 'mothers_name' => $data['mothers_name'],
                 'dob' => $data['dob'],
-                'nid' => $data['nid'], // Will be auto-encrypted by model cast
+                'nid' => $data['nid'],
                 'phone' => $data['phone'],
                 'email' => $data['email'],
                 'present_address' => $data['present_address'] ?? null,
                 'permanent_address' => $data['permanent_address'] ?? null,
-                'subject_choice' => 'Management', // Fixed to Management as per requirement
+                'subject_choice' => 'Management',
                 'experience_json' => $data['experience_json'] ?? null,
                 'education_json' => $data['education_json'] ?? null,
                 'payment_transaction_id' => $data['payment_transaction_id'] ?? null,

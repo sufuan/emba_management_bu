@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('fathers_name');
             $table->string('mothers_name');
             $table->date('dob');
-            $table->text('nid'); // Encrypted NID
+            $table->string('nid', 500); // Encrypted NID
             $table->string('phone');
             $table->string('email');
             $table->string('photo_path')->nullable();

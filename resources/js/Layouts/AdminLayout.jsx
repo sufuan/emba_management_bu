@@ -124,7 +124,7 @@ export default function AdminLayout({ children, title }) {
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
-                                    <Link href="/logout" method="post" as="button" className="flex items-center gap-2 w-full text-red-600">
+                                    <Link href="/admin/logout" method="post" as="button" className="flex items-center gap-2 w-full text-red-600">
                                         <LogOut className="h-4 w-4" /> Logout
                                     </Link>
                                 </DropdownMenuItem>

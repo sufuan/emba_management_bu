@@ -83,11 +83,12 @@ export default function PublicLayout({ children }) {
                         </div>
                         {/* CTA Buttons */}
                         <div className="hidden md:flex items-center gap-3">
-                            <a href="https://bu-embamgt.com/pdf/offline-form.pdf" download="EMBA-Offline-Application-Form.pdf">
+                            <a href="/pdf/offline-form.pdf" download>
                                 <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
                                     Offline Apply
                                 </Button>
                             </a>
+
                             {applyNowEnabled ? (
                                 requireApplicantAuth ? (
                                     <Link href={route('applicant.register')}>
@@ -155,11 +156,11 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             )}
                             <div className="pt-4 space-y-3">
-                                <a href="https://bu-embamgt.com/pdf/offline-form.pdf" download="EMBA-Offline-Application-Form.pdf" className="block">
+                                <Link href={route('download.offline-form')} className="block">
                                     <Button variant="outline" className="w-full border-primary text-primary hover:text-white">
                                         Offline Apply
                                     </Button>
-                                </a>
+                                </Link>
                                 {applyNowEnabled ? (
                                     requireApplicantAuth ? (
                                         <Link href={route('applicant.register')} className="block">
