@@ -162,7 +162,7 @@ export default function Register() {
                     <div className="mt-6 text-center">
                         <div className="inline-flex items-center gap-2 text-sm text-slate-600">
                             <Shield className="h-4 w-4" />
-                            <span>Your information is secure and encrypted</span>
+                            <span>Helpline: +8801711352874</span>
                         </div>
                     </div>
 

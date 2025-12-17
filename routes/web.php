@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/admission-info', [HomeController::class, 'admissionInfo'])->name('admission.info');
 Route::get('/admission-closed', [HomeController::class, 'closed'])->name('admission.closed');
 
 /*

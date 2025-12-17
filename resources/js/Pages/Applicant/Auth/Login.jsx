@@ -50,35 +50,6 @@ export default function Login({ status }) {
                             </p>
                         </div>
 
-                        <div className="space-y-4 pt-8">
-                            <div className="flex items-start gap-4 text-white/90">
-                                <div className="mt-1 h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                                    <FileCheck className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Track Your Application</h3>
-                                    <p className="text-sm text-slate-300">Monitor your admission status in real-time</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4 text-white/90">
-                                <div className="mt-1 h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                                    <BookOpen className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Easy Application</h3>
-                                    <p className="text-sm text-slate-300">Simple step-by-step application process</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-4 text-white/90">
-                                <div className="mt-1 h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                                    <Users className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold mb-1">Expert Support</h3>
-                                    <p className="text-sm text-slate-300">Get help throughout your journey</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <div className="relative z-10 text-slate-300 text-sm">

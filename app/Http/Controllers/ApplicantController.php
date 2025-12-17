@@ -28,14 +28,17 @@ class ApplicantController extends Controller
 
         $requireAuth = Setting::getValue('require_applicant_auth', true);
         $authenticatedUser = $request->user('applicant');
-
+        
+        $paymentSettings = Setting::getPaymentSettings();
+        
         return Inertia::render('Application/Create', [
             'session' => $activeSession,
             'subjectChoices' => config('admission.subject_choices'),
             'uploadConfig' => config('admission.uploads'),
-            'paymentSettings' => Setting::getPaymentSettings(),
+            'paymentSettings' => $paymentSettings,
             'requireAuth' => $requireAuth,
             'userEmail' => $authenticatedUser?->email,
+            '_timestamp' => now()->timestamp, // Force cache bust
         ]);
     }
 

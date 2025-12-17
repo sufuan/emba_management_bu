@@ -43,7 +43,7 @@ class SessionController extends Controller
         $validated = $request->validate([
             'session_name' => 'required|string|max:255',
             'use_season' => 'boolean',
-            'season' => 'nullable|required_if:use_season,true|in:summer,fall',
+            'season' => 'nullable|required_if:use_season,true|in:summer,winter',
             'year_start' => 'required|integer|min:2020|max:2100',
             'year_end' => 'required|integer|min:2020|max:2100|gte:year_start',
             'is_active' => 'boolean',
@@ -94,7 +94,7 @@ class SessionController extends Controller
         $validated = $request->validate([
             'session_name' => 'required|string|max:255',
             'use_season' => 'boolean',
-            'season' => 'nullable|required_if:use_season,true|in:summer,fall',
+            'season' => 'nullable|required_if:use_season,true|in:summer,winter',
             'year_start' => 'required|integer|min:2020|max:2100',
             'year_end' => 'required|integer|min:2020|max:2100|gte:year_start',
             'is_active' => 'boolean',

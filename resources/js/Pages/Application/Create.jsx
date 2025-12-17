@@ -98,13 +98,13 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         if (!file) return;
 
         // Constraints for passport photo
-        const constraints = { width: 300, height: 300, maxSize: 200 * 1024, label: 'Passport Photo (300×300px)' };
+        const constraints = { width: 300, height: 300, maxSize: 1024 * 1024, label: 'Passport Photo (300×300px)' };
 
         // Validate file size first
         if (file.size > constraints.maxSize) {
             setStepErrors(prev => ({
                 ...prev,
-                [field]: `File size must be less than 200KB. Current: ${Math.round(file.size / 1024)}KB`
+                [field]: `File size must be less than 1MB. Current: ${Math.round(file.size / 1024)}KB`
             }));
             e.target.value = '';
             return;
@@ -247,11 +247,11 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                 </div>
                             ))}
                         </div>
-                        <div className="relative mt-4"><div className="absolute inset-0 h-2 bg-muted rounded-full" /><div className="absolute h-2 bg-primary rounded-full transition-all" style={{ width: `${((currentStep - 1) / 3) * 100}%` }} /></div>
+                        <div className="relative mt-4"><div className="absolute inset-0 h-2 bg-muted rounded-full" /><div className="absolute h-2 bg-primary rounded-full transition-all" style={{ width: `${((currentStep - 1) / 4) * 100}%` }} /></div>
                     </div>
 
                     <Card className="max-w-3xl mx-auto border-0 shadow-xl">
-                        <CardHeader><CardTitle>{steps[currentStep - 1].name}</CardTitle><CardDescription>Step {currentStep} of 4</CardDescription></CardHeader>
+                        <CardHeader><CardTitle>{steps[currentStep - 1].name}</CardTitle><CardDescription>Step {currentStep} of 5</CardDescription></CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Step 1: Personal Info */}
@@ -421,7 +421,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                                         <Input
                                                                             value={edu.result}
                                                                             onChange={e => updateEducation(row.key, 'result', e.target.value)}
-                                                                            placeholder="e.g. 4.50"
+                                                                            placeholder={row.key === 'ssc' || row.key === 'hsc' ? 'e.g. 5.00' : 'e.g. 4.00'}
                                                                             className={`h-9 text-sm ${stepErrors[`${row.key}_result`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
                                                                         />
                                                                     </td>
@@ -502,7 +502,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                 {currentStep === 4 && (
                                     <div className="max-w-md mx-auto">
                                         <div className="space-y-3">
-                                            <Label>Passport Photo * (300×300px, max 200KB)</Label>
+                                            <Label>Passport Photo * (300×300px, max 1MB)</Label>
                                             <div className={`border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors ${stepErrors.passport_photo ? 'border-red-500' : ''}`}>
                                                 {photoPreview ? <img src={photoPreview} alt="Preview" className="w-32 h-32 mx-auto object-cover rounded" /> : <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-2" />}
                                                 <Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'passport_photo')} className="mt-2" />
@@ -525,7 +525,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                     <CreditCard className="h-5 w-5" />
                                                     <span className="text-sm font-medium uppercase tracking-wider">Payment Information</span>
                                                 </div>
-                                                <p className="text-emerald-100 text-sm">Complete your payment via bKash/Nagad/Bank and enter the transaction details below.</p>
+                                                <p className="text-emerald-100 text-sm">Complete your payment via bKash/Nagad and enter the transaction details below.</p>
                                             </div>
                                         </div>
 
@@ -558,55 +558,63 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </Card>
 
                                         {/* Payment Form */}
-                                        <div className="grid md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <Label>Payment Method *</Label>
-                                                <Select value={data.payment_method} onValueChange={(v) => handleInputChange('payment_method', v)}>
-                                                    <SelectTrigger className={stepErrors.payment_method ? 'border-red-500' : ''}>
-                                                        <SelectValue placeholder="Select payment method" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {paymentSettings?.payment_bkash_enabled && (
-                                                            <SelectItem value="bKash">bKash</SelectItem>
-                                                        )}
-                                                        {paymentSettings?.payment_nagad_enabled && (
-                                                            <SelectItem value="Nagad">Nagad</SelectItem>
-                                                        )}
-                                                        {paymentSettings?.payment_rocket_enabled && (
-                                                            <SelectItem value="Rocket">Rocket</SelectItem>
-                                                        )}
-                                                        {paymentSettings?.payment_bank_enabled && (
-                                                            <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                                                        )}
-                                                    </SelectContent>
-                                                </Select>
-                                                {stepErrors.payment_method && <p className="text-sm text-red-500">{stepErrors.payment_method}</p>}
+                                        {(!paymentSettings?.payment_bkash_enabled && !paymentSettings?.payment_nagad_enabled && !paymentSettings?.payment_rocket_enabled && !paymentSettings?.payment_bank_enabled) ? (
+                                            <div className="md:col-span-2 p-6 bg-red-50 border border-red-200 rounded-xl text-center">
+                                                <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-3" />
+                                                <h4 className="text-lg font-semibold text-red-800 mb-2">No Payment Methods Available</h4>
+                                                <p className="text-red-600 text-sm">Payment methods have not been configured yet. Please contact the admission office for assistance.</p>
                                             </div>
+                                        ) : (
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <Label>Payment Method *</Label>
+                                                    <Select value={data.payment_method} onValueChange={(v) => handleInputChange('payment_method', v)}>
+                                                        <SelectTrigger className={stepErrors.payment_method ? 'border-red-500' : ''}>
+                                                            <SelectValue placeholder="Select payment method" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {paymentSettings?.payment_bkash_enabled && (
+                                                                <SelectItem value="bKash">bKash</SelectItem>
+                                                            )}
+                                                            {paymentSettings?.payment_nagad_enabled && (
+                                                                <SelectItem value="Nagad">Nagad</SelectItem>
+                                                            )}
+                                                            {paymentSettings?.payment_rocket_enabled && (
+                                                                <SelectItem value="Rocket">Rocket</SelectItem>
+                                                            )}
+                                                            {paymentSettings?.payment_bank_enabled && (
+                                                                <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    {stepErrors.payment_method && <p className="text-sm text-red-500">{stepErrors.payment_method}</p>}
+                                                </div>
 
-                                            <div className="space-y-2">
-                                                <Label>Amount Paid (BDT) *</Label>
-                                                <Input
-                                                    type="number"
-                                                    value={data.payment_amount}
-                                                    readOnly
-                                                    className="bg-slate-50 cursor-not-allowed"
-                                                />
-                                                <p className="text-xs text-muted-foreground">Fixed application fee: {paymentSettings?.payment_fee || 500} BDT</p>
-                                                {stepErrors.payment_amount && <p className="text-sm text-red-500">{stepErrors.payment_amount}</p>}
-                                            </div>
+                                                <div className="space-y-2">
+                                                    <Label>Amount Paid (BDT) *</Label>
+                                                    <Input
+                                                        type="number"
+                                                        value={data.payment_amount}
+                                                        readOnly
+                                                        className="bg-slate-50 cursor-not-allowed"
+                                                    />
+                                                    <p className="text-xs text-muted-foreground">Fixed application fee: {paymentSettings?.payment_fee || 500} BDT</p>
+                                                    {stepErrors.payment_amount && <p className="text-sm text-red-500">{stepErrors.payment_amount}</p>}
+                                                </div>
 
-                                            <div className="md:col-span-2 space-y-2">
-                                                <Label>Transaction ID / Reference Number *</Label>
-                                                <Input
-                                                    value={data.payment_transaction_id}
-                                                    onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
-                                                    placeholder="e.g. TRX123456789 or Receipt No."
-                                                    className={stepErrors.payment_transaction_id ? 'border-red-500' : ''}
-                                                />
-                                                {stepErrors.payment_transaction_id && <p className="text-sm text-red-500">{stepErrors.payment_transaction_id}</p>}
-                                                <p className="text-xs text-muted-foreground">Enter the transaction ID from your bKash/Nagad/Bank receipt</p>
+                                                <div className="md:col-span-2 space-y-2">
+                                                    <Label>Transaction ID / Reference Number *</Label>
+                                                    <Input
+                                                        value={data.payment_transaction_id}
+                                                        onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
+                                                        placeholder="e.g. TRX123456789 or Receipt No."
+                                                        className={stepErrors.payment_transaction_id ? 'border-red-500' : ''}
+                                                    />
+                                                    {stepErrors.payment_transaction_id && <p className="text-sm text-red-500">{stepErrors.payment_transaction_id}</p>}
+                                                    <p className="text-xs text-muted-foreground">Enter the transaction ID from your bKash/Nagad/Bank receipt</p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
 
                                         {/* Summary */}
                                         {data.payment_transaction_id && data.payment_method && data.payment_amount && (

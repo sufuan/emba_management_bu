@@ -91,7 +91,7 @@
                 $rows = [
                     ['key' => 'ssc', 'label' => 'SSC/Equivalent'],
                     ['key' => 'hsc', 'label' => 'HSC/Equivalent'],
-                    ['key' => 'bachelor', 'label' => 'Bachelor (4 Years)'],
+                    ['key' => 'bachelor', 'label' => 'Bachelor 2/3/4/5 years(Please Encircle)'],
                     ['key' => 'master', 'label' => 'Master (If Any)'],
                 ];
             @endphp

@@ -10,7 +10,6 @@ export default function PublicLayout({ children }) {
     const navigation = [
         { name: 'Home', href: '/' },
         { name: 'About', href: '/about' },
-        { name: 'Admission Info', href: '/admission-info' },
     ];
 
     return (
@@ -19,8 +18,8 @@ export default function PublicLayout({ children }) {
             <div className="bg-primary text-primary-foreground py-2">
                 <div className="container mx-auto px-4 flex justify-between items-center text-sm">
                     <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> +880 1234-567890</span>
-                        <span className="hidden sm:flex items-center gap-1"><Mail className="h-3 w-3" /> admission@EMBA.edu</span>
+                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> +8801711352874</span>
+                        <span className="hidden sm:flex items-center gap-1"><Mail className="h-3 w-3" />chair_mgt@bu.ac.bd</span>
                     </div>
                     <div className="flex items-center gap-2">
                         {auth?.user && (
@@ -82,9 +81,13 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             )}
                         </div>
-
-                        {/* CTA Button */}
-                        <div className="hidden md:flex items-center gap-4">
+                        {/* CTA Buttons */}
+                        <div className="hidden md:flex items-center gap-3">
+                            <a href="https://bu-embamgt.com/pdf/offline-form.pdf" download="EMBA-Offline-Application-Form.pdf">
+                                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
+                                    Offline Apply
+                                </Button>
+                            </a>
                             {applyNowEnabled ? (
                                 requireApplicantAuth ? (
                                     <Link href={route('applicant.register')}>
@@ -151,7 +154,12 @@ export default function PublicLayout({ children }) {
                                     Applicant Login
                                 </Link>
                             )}
-                            <div className="pt-4">
+                            <div className="pt-4 space-y-3">
+                                <a href="https://bu-embamgt.com/pdf/offline-form.pdf" download="EMBA-Offline-Application-Form.pdf" className="block">
+                                    <Button variant="outline" className="w-full border-primary text-primary hover:text-white">
+                                        Offline Apply
+                                    </Button>
+                                </a>
                                 {applyNowEnabled ? (
                                     requireApplicantAuth ? (
                                         <Link href={route('applicant.register')} className="block">
@@ -203,9 +211,9 @@ export default function PublicLayout({ children }) {
                         <div>
                             <h4 className="font-semibold text-white mb-4">Contact</h4>
                             <ul className="space-y-2 text-sm">
-                                <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> University Campus, Dhaka</li>
-                                <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +880 1234-567890</li>
-                                <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> admission@EMBA.edu</li>
+                                <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Department of Management Studies, University of Barishal, Barishal-8254</li>
+                                <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> +8801711352874 , +8801724958807</li>
+                                <li className="flex items-center gap-2"><Mail className="h-4 w-4" />chair_mgt@bu.ac.bd</li>
                             </ul>
                         </div>
                     </div>

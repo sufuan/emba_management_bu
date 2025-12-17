@@ -19,7 +19,7 @@ export default function Index({ sessions, activeSessionId }) {
     const currentYear = new Date().getFullYear();
     const { data, setData, post, put, processing, reset, errors } = useForm({
         session_name: `${currentYear}-${(currentYear + 1).toString().slice(-2)}`,
-        season: 'fall',
+        season: 'winter',
         year_start: currentYear,
         year_end: currentYear + 1,
         is_active: false,
@@ -54,7 +54,7 @@ export default function Index({ sessions, activeSessionId }) {
         setEditSession(session);
         setData({ 
             session_name: session.session_name, 
-            season: session.season || 'fall',
+            season: session.season || 'winter',
             year_start: session.year_start, 
             year_end: session.year_end, 
             is_active: session.is_active,
@@ -92,8 +92,8 @@ export default function Index({ sessions, activeSessionId }) {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="flex items-center justify-between p-4 border rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
                                     <div className="space-y-0.5">
-                                        <Label htmlFor="use-season" className="text-base font-semibold text-slate-800">Use Fall/Summer</Label>
-                                        <p className="text-sm text-slate-600">Enable season-based session naming (e.g., Fall 2025-26)</p>
+                                        <Label htmlFor="use-season" className="text-base font-semibold text-slate-800">Use Winter/Summer</Label>
+                                        <p className="text-sm text-slate-600">Enable season-based session naming (e.g., Winter 2025-26)</p>
                                     </div>
                                     <Switch 
                                         id="use-season"
@@ -116,15 +116,15 @@ export default function Index({ sessions, activeSessionId }) {
                                                 <SelectValue placeholder="Select season" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="fall">
+                                                <SelectItem value="winter">
                                                     <div className="flex items-center gap-2">
-                                                        <Snowflake className="h-4 w-4 text-blue-500" />
-                                                        <span>Fall</span>
+                                                       
+                                                        <span>Winter</span>
                                                     </div>
                                                 </SelectItem>
                                                 <SelectItem value="summer">
                                                     <div className="flex items-center gap-2">
-                                                        <Sun className="h-4 w-4 text-amber-500" />
+                                                     
                                                         <span>Summer</span>
                                                     </div>
                                                 </SelectItem>
@@ -139,7 +139,7 @@ export default function Index({ sessions, activeSessionId }) {
                                     <Input value={data.session_name} readOnly className="bg-slate-50 cursor-not-allowed" />
                                     <p className="text-xs text-muted-foreground mt-1">
                                         {data.use_season 
-                                            ? `Format: ${data.season.charAt(0).toUpperCase() + data.season.slice(1)} YYYY-YY (e.g., Fall 2025-26)`
+                                            ? `Format: ${data.season.charAt(0).toUpperCase() + data.season.slice(1)} YYYY-YY (e.g., Winter 2025-26)`
                                             : 'Format: YYYY-YY (e.g., 2025-26)'}
                                     </p>
                                     {errors.session_name && <p className="text-sm text-red-500 mt-1">{errors.session_name}</p>}
@@ -175,7 +175,7 @@ export default function Index({ sessions, activeSessionId }) {
                                         {session.id === activeSessionId && <Badge className="bg-green-600 text-white hover:bg-green-700">Active</Badge>}
                                         {session.use_season && session.season && (
                                             <Badge variant={session.season === 'summer' ? 'default' : 'secondary'} className={session.season === 'summer' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}>
-                                                {session.season === 'summer' ? 'Summer' : 'Fall'}
+                                                {session.season === 'summer' ? 'Summer' : 'Winter'}
                                             </Badge>
                                         )}
                                         <Badge variant="outline" className={session.use_season ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-slate-50 text-slate-700 border-slate-200'}>

@@ -75,20 +75,41 @@ class SettingController extends Controller
         $validated = $request->validate([
             'payment_fee' => 'required|numeric|min:0',
             'payment_bkash_number' => 'nullable|string|max:20',
-            'payment_bkash_enabled' => 'boolean',
+            'payment_bkash_enabled' => 'nullable|boolean',
             'payment_nagad_number' => 'nullable|string|max:20',
-            'payment_nagad_enabled' => 'boolean',
+            'payment_nagad_enabled' => 'nullable|boolean',
             'payment_rocket_number' => 'nullable|string|max:20',
-            'payment_rocket_enabled' => 'boolean',
+            'payment_rocket_enabled' => 'nullable|boolean',
             'payment_bank_name' => 'nullable|string|max:255',
             'payment_bank_account' => 'nullable|string|max:50',
-            'payment_bank_enabled' => 'boolean',
+            'payment_bank_enabled' => 'nullable|boolean',
         ]);
+
+        // Ensure boolean values are properly set (false if not present)
+        $validated['payment_bkash_enabled'] = $validated['payment_bkash_enabled'] ?? false;
+        $validated['payment_nagad_enabled'] = $validated['payment_nagad_enabled'] ?? false;
+        $validated['payment_rocket_enabled'] = $validated['payment_rocket_enabled'] ?? false;
+        $validated['payment_bank_enabled'] = $validated['payment_bank_enabled'] ?? false;
+
+        // Ensure at least one payment method is enabled
+        $enabledMethods = array_filter([
+            $validated['payment_bkash_enabled'],
+            $validated['payment_nagad_enabled'],
+            $validated['payment_rocket_enabled'],
+            $validated['payment_bank_enabled'],
+        ]);
+
+        if (empty($enabledMethods)) {
+            return back()->withErrors(['payment' => 'At least one payment method must be enabled.']);
+        }
 
         foreach ($validated as $key => $value) {
             Setting::setValue($key, $value);
         }
 
+        // Clear all payment-related cache
+        \Illuminate\Support\Facades\Cache::forget('payment_settings');
+        
         return back()->with('success', 'Payment settings updated successfully.');
     }
 

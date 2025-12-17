@@ -29,6 +29,26 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
         payment_bank_enabled: paymentSettings?.payment_bank_enabled ?? true,
     });
 
+    // Check if at least one payment method will remain enabled
+    const canDisablePaymentMethod = (methodToDisable) => {
+        const enabledMethods = [
+            methodToDisable !== 'bkash' && payment.payment_bkash_enabled,
+            methodToDisable !== 'nagad' && payment.payment_nagad_enabled,
+            methodToDisable !== 'rocket' && payment.payment_rocket_enabled,
+            methodToDisable !== 'bank' && payment.payment_bank_enabled,
+        ].filter(Boolean);
+        return enabledMethods.length > 0;
+    };
+
+    // Handle payment method toggle with validation
+    const handlePaymentToggle = (method, checked) => {
+        if (!checked && !canDisablePaymentMethod(method)) {
+            alert('At least one payment method must remain enabled.');
+            return;
+        }
+        setPayment({...payment, [`payment_${method}_enabled`]: checked});
+    };
+
     const toggleApplyNow = () => {
         setIsToggling(true);
         router.post('/admin/settings/toggle-apply', {}, {
@@ -196,7 +216,7 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                                         <span className="text-sm text-muted-foreground">{payment.payment_bkash_enabled ? 'Enabled' : 'Disabled'}</span>
                                         <Switch 
                                             checked={payment.payment_bkash_enabled} 
-                                            onCheckedChange={(checked) => setPayment({...payment, payment_bkash_enabled: checked})}
+                                            onCheckedChange={(checked) => handlePaymentToggle('bkash', checked)}
                                         />
                                     </div>
                                 </div>
@@ -213,7 +233,7 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                                         <span className="text-sm text-muted-foreground">{payment.payment_nagad_enabled ? 'Enabled' : 'Disabled'}</span>
                                         <Switch 
                                             checked={payment.payment_nagad_enabled} 
-                                            onCheckedChange={(checked) => setPayment({...payment, payment_nagad_enabled: checked})}
+                                            onCheckedChange={(checked) => handlePaymentToggle('nagad', checked)}
                                         />
                                     </div>
                                 </div>
@@ -230,7 +250,7 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                                         <span className="text-sm text-muted-foreground">{payment.payment_rocket_enabled ? 'Enabled' : 'Disabled'}</span>
                                         <Switch 
                                             checked={payment.payment_rocket_enabled} 
-                                            onCheckedChange={(checked) => setPayment({...payment, payment_rocket_enabled: checked})}
+                                            onCheckedChange={(checked) => handlePaymentToggle('rocket', checked)}
                                         />
                                     </div>
                                 </div>
@@ -247,7 +267,7 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                                         <span className="text-sm text-muted-foreground">{payment.payment_bank_enabled ? 'Enabled' : 'Disabled'}</span>
                                         <Switch 
                                             checked={payment.payment_bank_enabled} 
-                                            onCheckedChange={(checked) => setPayment({...payment, payment_bank_enabled: checked})}
+                                            onCheckedChange={(checked) => handlePaymentToggle('bank', checked)}
                                         />
                                     </div>
                                 </div>
@@ -264,6 +284,17 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                                     </div>
                                 )}
                             </div>
+
+                            {/* Warning if no methods enabled */}
+                            {!payment.payment_bkash_enabled && !payment.payment_nagad_enabled && !payment.payment_rocket_enabled && !payment.payment_bank_enabled && (
+                                <div className="flex items-start gap-2 p-3 bg-red-50 text-red-800 rounded-lg text-sm border border-red-200">
+                                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="font-medium">No Payment Methods Enabled!</p>
+                                        <p className="text-xs mt-1">At least one payment method must be enabled for applicants to submit applications.</p>
+                                    </div>
+                                </div>
+                            )}
 
                             <Button onClick={updatePaymentSettings} disabled={isUpdatingPayment}>
                                 {isUpdatingPayment ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</> : 'Save Payment Settings'}

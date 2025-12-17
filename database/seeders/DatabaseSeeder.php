@@ -24,10 +24,10 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Create initial sessions (seasonal format: Summer/Fall YYYY-YY)
+        // Create initial sessions (seasonal format: Summer/Winter YYYY-YY)
         Session::create([
             'session_name' => '2025-26',
-            'season' => 'fall',
+            'season' => 'winter',
             'year_start' => 2025,
             'year_end' => 2026,
             'is_active' => true,
@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
 
         Session::create([
             'session_name' => '2024-25',
-            'season' => 'fall',
+            'season' => 'winter',
             'year_start' => 2024,
             'year_end' => 2025,
             'is_active' => false,

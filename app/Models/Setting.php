@@ -37,10 +37,22 @@ class Setting extends Model
     {
         $setting = self::where('key', $key)->first();
 
+        // Determine the type based on the value
+        $type = match(true) {
+            is_bool($value) => 'boolean',
+            is_numeric($value) => 'number',
+            is_array($value) => 'json',
+            default => 'string',
+        };
+
+        // Convert value to string for storage
+        $storedValue = is_bool($value) ? ($value ? '1' : '0') : 
+                       (is_array($value) ? json_encode($value) : $value);
+
         if ($setting) {
-            $setting->update(['value' => $value]);
+            $setting->update(['value' => $storedValue, 'type' => $type]);
         } else {
-            self::create(['key' => $key, 'value' => $value]);
+            self::create(['key' => $key, 'value' => $storedValue, 'type' => $type]);
         }
 
         Cache::forget("setting_{$key}");
