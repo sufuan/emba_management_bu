@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applicant;
+use App\Models\ApplicantUser;
 use App\Models\Session;
 use App\Models\Setting;
 use App\Services\ApplicantService;
@@ -40,6 +41,19 @@ class ApplicantController extends Controller
             'userEmail' => $authenticatedUser?->email,
             '_timestamp' => now()->timestamp, // Force cache bust
         ]);
+    }
+
+    /**
+     * Validate phone number uniqueness.
+     */
+    public function validatePhone(Request $request)
+    {
+        $request->validate(['phone' => 'required|string']);
+
+        $phone = $request->input('phone');
+        $exists = ApplicantUser::where('phone', $phone)->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 
     /**

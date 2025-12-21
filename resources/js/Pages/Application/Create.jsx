@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles, CreditCard } from 'lucide-react';
+import axios from 'axios';
+import { debounce } from 'lodash';
 
 const steps = [
     { id: 1, name: 'Personal Info', icon: User },
@@ -58,6 +60,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
             else if (data.nid.trim().length < 10 || data.nid.trim().length > 17) newErrors.nid = 'NID must be 10-17 digits';
             if (!data.phone.trim()) newErrors.phone = 'Phone number is required';
             else if (!/^(\+?880)?[0-9]{10,11}$/.test(data.phone.replace(/\s/g, ''))) newErrors.phone = 'Invalid phone number';
+            else if (stepErrors.phone) newErrors.phone = stepErrors.phone;
             if (!data.email.trim()) newErrors.email = 'Email is required';
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = 'Invalid email address';
             if (!data.present_address.trim()) newErrors.present_address = 'Present address is required';
@@ -208,10 +211,34 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
     };
     const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 1));
 
+    // Debounced phone validation
+    const validatePhoneUniqueness = useCallback(
+        debounce(async (phone) => {
+            if (!phone || !/^(\+?880)?[0-9]{10,11}$/.test(phone.replace(/\s/g, ''))) {
+                return;
+            }
+            try {
+                const response = await axios.post(route('applicant.application.validatePhone'), { phone });
+                if (response.data.exists) {
+                    setStepErrors(prev => ({ ...prev, phone: 'This phone number is already registered' }));
+                } else {
+                    setStepErrors(prev => ({ ...prev, phone: null }));
+                }
+            } catch (error) {
+                console.error('Phone validation error:', error);
+            }
+        }, 500),
+        []
+    );
+
     // Clear field error on input change
     const handleInputChange = (field, value) => {
         setData(field, value);
         setStepErrors(prev => ({ ...prev, [field]: null }));
+        
+        if (field === 'phone') {
+            validatePhoneUniqueness(value);
+        }
     };
 
     return (
@@ -278,7 +305,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             {stepErrors.dob && <p className="text-sm text-red-500 mt-1">{stepErrors.dob}</p>}
                                         </div>
                                         <div>
-                                            <Label>NID Number</Label>
+                                            <Label>NID Number *</Label>
                                             <Input
                                                 value={data.nid}
                                                 onChange={e => {
@@ -308,8 +335,8 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </div>
                                         <div>
                                             <Label>(c) Mobile No. *</Label>
-                                            <Input value={data.phone} onChange={e => handleInputChange('phone', e.target.value)} placeholder="+880" className={stepErrors.phone ? 'border-red-500' : ''} />
-                                            {stepErrors.phone && <p className="text-sm text-red-500 mt-1">{stepErrors.phone}</p>}
+                                            <Input value={data.phone} onChange={e => handleInputChange('phone', e.target.value)} placeholder="+880" className={(stepErrors.phone || errors.phone) ? 'border-red-500' : ''} />
+                                            {(stepErrors.phone || errors.phone) && <p className="text-sm text-red-500 mt-1">{stepErrors.phone || errors.phone}</p>}
                                         </div>
                                         <div>
                                             <Label>(d) Email *</Label>

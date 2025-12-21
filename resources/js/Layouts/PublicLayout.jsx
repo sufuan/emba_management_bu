@@ -156,11 +156,11 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             )}
                             <div className="pt-4 space-y-3">
-                                <Link href={route('download.offline-form')} className="block">
+                                <a href="/pdf/offline-form.pdf" download className="block">
                                     <Button variant="outline" className="w-full border-primary text-primary hover:text-white">
                                         Offline Apply
                                     </Button>
-                                </Link>
+                                </a>
                                 {applyNowEnabled ? (
                                     requireApplicantAuth ? (
                                         <Link href={route('applicant.register')} className="block">
