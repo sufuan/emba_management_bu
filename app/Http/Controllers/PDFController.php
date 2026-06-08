@@ -44,7 +44,7 @@ class PDFController extends Controller
      */
     public function downloadOfflineForm()
     {
-        $path = base_path('pdf/offline-form.pdf');
+        $path = public_path('pdf/offline-form.pdf');
 
         if (!file_exists($path)) {
             abort(404, 'Offline application form not found.');
