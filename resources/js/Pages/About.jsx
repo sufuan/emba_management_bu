@@ -5,6 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import DynamicIcon from '@/components/DynamicIcon';
 
 export default function About({ aboutSettings = {} }) {
+    // Helper to guarantee arrays from DB
+    const safeArray = (val, fallback) => {
+        if (!val) return fallback;
+        try {
+            let p = typeof val === 'string' ? JSON.parse(val) : val;
+            if (typeof p === 'string') p = JSON.parse(p);
+            if (Array.isArray(p)) return p;
+            if (typeof p === 'object') return Object.values(p);
+            return fallback;
+        } catch(e) {
+            return fallback;
+        }
+    };
+
     // Apply fallbacks for settings
     const heroTitle = aboutSettings.hero_title || 'Shaping Future Leaders';
     const heroDesc = aboutSettings.hero_desc || 'Learn about our mission, vision, and commitment to excellence in executive education.';
@@ -16,20 +30,20 @@ export default function About({ aboutSettings = {} }) {
     const visionDesc = aboutSettings.vision_desc || 'To be recognized as a premier institution for executive management education, known for producing ethical leaders who create sustainable value for businesses and communities worldwide. We envision a future where our graduates lead transformative change across industries and borders.';
     
     const valuesTitle = aboutSettings.values_title || 'Core Values';
-    const values = aboutSettings.values || [
+    const values = safeArray(aboutSettings.values, [
         { icon: 'Target', title: 'Excellence', desc: 'We strive for excellence in education and research.' },
         { icon: 'Eye', title: 'Innovation', desc: 'Embracing new ideas and methodologies in business education.' },
         { icon: 'Users', title: 'Collaboration', desc: 'Building strong partnerships with industry and academia.' },
         { icon: 'Award', title: 'Integrity', desc: 'Maintaining highest ethical standards in all endeavors.' },
-    ];
+    ]);
 
     const historyTitle = aboutSettings.history_title || '15+ Years of Excellence';
     const historyDesc = aboutSettings.history_desc || 'Since our establishment, we have been at the forefront of executive education, continuously evolving our programs to meet the changing demands of the global business landscape. Our alumni network spans across 50+ countries, holding leadership positions in Fortune 500 companies and successful startups alike.';
-    const historyStats = aboutSettings.history_stats || [
+    const historyStats = safeArray(aboutSettings.history_stats, [
         { value: '500+', label: 'Graduates' },
         { value: '50+', label: 'Countries' },
         { value: '95%', label: 'Career Growth' },
-    ];
+    ]);
 
     return (
         <PublicLayout>

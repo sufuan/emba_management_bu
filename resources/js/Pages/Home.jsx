@@ -7,6 +7,20 @@ import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import DynamicIcon from '@/components/DynamicIcon';
 
 export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication, requireApplicantAuth, homeSettings = {} }) {
+    // Helper to guarantee arrays from DB
+    const safeArray = (val, fallback) => {
+        if (!val) return fallback;
+        try {
+            let p = typeof val === 'string' ? JSON.parse(val) : val;
+            if (typeof p === 'string') p = JSON.parse(p);
+            if (Array.isArray(p)) return p;
+            if (typeof p === 'object') return Object.values(p);
+            return fallback;
+        } catch(e) {
+            return fallback;
+        }
+    };
+
     // Apply fallbacks for settings
     const heroUniversity = homeSettings.hero_university || 'University of Barishal';
     const heroTitle1 = homeSettings.hero_title_1 || 'Transform Your';
@@ -16,24 +30,24 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
     const heroDesc = homeSettings.hero_desc || 'Join our prestigious Executive MBA program and unlock your leadership potential. Learn from industry experts and build a powerful professional network.';
     
     const featuresTitle = homeSettings.features_title || 'Program Highlights';
-    const featuresDesc = homeSettings.features_desc || 'Our EMBA program is designed to fit your lifestyle while delivering world-class education';
-    const features = homeSettings.features || [
+    const featuresDesc = homeSettings.features_desc || 'Our EMBA program is designed to fit your lifestyle while delivering world-class education.';
+    const features = safeArray(homeSettings.features, [
         { icon: 'Briefcase', title: 'Executive Focus', desc: 'Designed for working professionals with 2+ years experience' },
         { icon: 'Clock', title: 'Flexible Schedule', desc: 'Weekend classes that fit your busy professional life' },
         { icon: 'Globe', title: 'Global Network', desc: 'Connect with industry leaders and alumni worldwide' },
         { icon: 'Award', title: 'Accredited Program', desc: 'Internationally recognized EMBA degree' },
-    ];
+    ]);
 
     const curriculumTitle = homeSettings.curriculum_title || "What You'll Learn";
     const curriculumDesc = homeSettings.curriculum_desc || 'Our comprehensive curriculum covers all aspects of modern business management, preparing you for leadership roles in any industry.';
-    const curriculumBenefits = homeSettings.curriculum_benefits || [
+    const curriculumBenefits = safeArray(homeSettings.curriculum_benefits, [
         'Leadership & Strategic Management',
         'Financial Analysis & Decision Making',
         'Marketing Strategy & Innovation',
         'Human Resource Management',
         'Business Analytics & Technology',
         'Entrepreneurship & Venture Creation',
-    ];
+    ]);
 
     const ctaTitle = homeSettings.cta_title || 'Ready to Take the Next Step?';
     const ctaDesc = homeSettings.cta_desc || 'Start your application today and join a community of ambitious professionals.';
