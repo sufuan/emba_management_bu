@@ -83,7 +83,7 @@ export default function PublicLayout({ children }) {
                         </div>
                         {/* CTA Buttons */}
                         <div className="hidden md:flex items-center gap-3">
-                            <a href="/offline-form" download="offline-form.pdf">
+                            <a href="/pdf/offline-Form.pdf" download="offline-form.pdf">
                                 <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white">
                                     Offline Apply
                                 </Button>
@@ -156,7 +156,7 @@ export default function PublicLayout({ children }) {
                                 </Link>
                             )}
                             <div className="pt-4 space-y-3">
-                                <a href="/offline-form" download="offline-form.pdf" className="block">
+                                <a href="/pdf/offline-Form.pdf" download="offline-form.pdf" className="block">
                                     <Button variant="outline" className="w-full border-primary text-primary hover:text-white">
                                         Offline Apply
                                     </Button>
