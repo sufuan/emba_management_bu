@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Session;
+use App\Models\Setting;
 use Inertia\Inertia;
 
 class HomeController extends Controller
@@ -34,6 +35,7 @@ class HomeController extends Controller
             'activeSession' => $activeSession,
             'applicantAuth' => $applicantUser,
             'hasSubmittedApplication' => $hasSubmittedApplication,
+            'homeSettings' => Setting::getByGroup('home_page'),
         ]);
     }
 
@@ -42,7 +44,9 @@ class HomeController extends Controller
      */
     public function about()
     {
-        return Inertia::render('About');
+        return Inertia::render('About', [
+            'aboutSettings' => Setting::getByGroup('about_page'),
+        ]);
     }
 
     /**

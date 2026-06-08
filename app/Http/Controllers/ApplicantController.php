@@ -76,7 +76,7 @@ class ApplicantController extends Controller
             'payment_transaction_id' => 'required|string|max:100',
             'payment_method' => 'required|string|max:50',
             'payment_amount' => 'required|numeric|min:0',
-            'passport_photo' => 'required|image|mimes:jpg,jpeg,png|max:200|dimensions:width=300,height=300',
+            'passport_photo' => 'required|image|mimes:jpg,jpeg,png|max:1024',
         ]);
 
         // Parse JSON strings to arrays

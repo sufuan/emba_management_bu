@@ -45,7 +45,7 @@ return [
     */
     'uploads' => [
         'passport_photo' => [
-            'max_size_kb' => 200,
+            'max_size_kb' => 1024,
             'width' => 300,
             'height' => 300,
             'allowed_types' => ['jpg', 'jpeg', 'png'],

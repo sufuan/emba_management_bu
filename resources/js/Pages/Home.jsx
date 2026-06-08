@@ -3,35 +3,41 @@ import { Link, Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-    GraduationCap, Users, Award, BookOpen, ArrowRight, CheckCircle2,
-    Briefcase, Clock, Globe, Star, ChevronRight,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 
-const features = [
-    { icon: Briefcase, title: 'Executive Focus', desc: 'Designed for working professionals with 2+ years experience' },
-    { icon: Clock, title: 'Flexible Schedule', desc: 'Weekend classes that fit your busy professional life' },
-    { icon: Globe, title: 'Global Network', desc: 'Connect with industry leaders and alumni worldwide' },
-    { icon: Award, title: 'Accredited Program', desc: 'Internationally recognized EMBA degree' },
-];
+export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication, requireApplicantAuth, homeSettings = {} }) {
+    // Apply fallbacks for settings
+    const heroUniversity = homeSettings.hero_university || 'University of Barishal';
+    const heroTitle1 = homeSettings.hero_title_1 || 'Transform Your';
+    const heroTitle2 = homeSettings.hero_title_2 || 'Career';
+    const heroTitle3 = homeSettings.hero_title_3 || 'with an Executive MBA in';
+    const heroSubtitle = homeSettings.hero_subtitle || 'Management Studies';
+    const heroDesc = homeSettings.hero_desc || 'Join our prestigious Executive MBA program and unlock your leadership potential. Learn from industry experts and build a powerful professional network.';
+    
+    const featuresTitle = homeSettings.features_title || 'Program Highlights';
+    const featuresDesc = homeSettings.features_desc || 'Our EMBA program is designed to fit your lifestyle while delivering world-class education';
+    const features = homeSettings.features || [
+        { icon: 'Briefcase', title: 'Executive Focus', desc: 'Designed for working professionals with 2+ years experience' },
+        { icon: 'Clock', title: 'Flexible Schedule', desc: 'Weekend classes that fit your busy professional life' },
+        { icon: 'Globe', title: 'Global Network', desc: 'Connect with industry leaders and alumni worldwide' },
+        { icon: 'Award', title: 'Accredited Program', desc: 'Internationally recognized EMBA degree' },
+    ];
 
-const stats = [
-    { value: '500+', label: 'Alumni Network' },
-    { value: '15+', label: 'Years of Excellence' },
-    { value: '95%', label: 'Employment Rate' },
-    { value: '50+', label: 'Industry Partners' },
-];
+    const curriculumTitle = homeSettings.curriculum_title || "What You'll Learn";
+    const curriculumDesc = homeSettings.curriculum_desc || 'Our comprehensive curriculum covers all aspects of modern business management, preparing you for leadership roles in any industry.';
+    const curriculumBenefits = homeSettings.curriculum_benefits || [
+        'Leadership & Strategic Management',
+        'Financial Analysis & Decision Making',
+        'Marketing Strategy & Innovation',
+        'Human Resource Management',
+        'Business Analytics & Technology',
+        'Entrepreneurship & Venture Creation',
+    ];
 
-const benefits = [
-    'Leadership & Strategic Management',
-    'Financial Analysis & Decision Making',
-    'Marketing Strategy & Innovation',
-    'Human Resource Management',
-    'Business Analytics & Technology',
-    'Entrepreneurship & Venture Creation',
-];
+    const ctaTitle = homeSettings.cta_title || 'Ready to Take the Next Step?';
+    const ctaDesc = homeSettings.cta_desc || 'Start your application today and join a community of ambitious professionals.';
 
-export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication, requireApplicantAuth }) {
     return (
         <PublicLayout>
             <Head title="Home - EMBA Admission" />
@@ -43,28 +49,27 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                     <div className="text-white space-y-6 text-center max-w-5xl mx-auto">
                         <div className="flex items-center justify-center gap-2">
                             <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400"></div>
-                            <span className="text-blue-300 font-semibold tracking-wider text-xl uppercase">University of Barishal</span>
+                            <span className="text-blue-300 font-semibold tracking-wider text-xl uppercase">{heroUniversity}</span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-blue-400"></div>
                         </div>
                         <div className="space-y-6">
                             <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                                Transform Your{' '}
+                                {heroTitle1}{' '}
                                 <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
-                                    Career
+                                    {heroTitle2}
                                 </span>
                                 <br />
-                                <span className="text-4xl lg:text-6xl">with an Executive MBA in</span>
+                                <span className="text-4xl lg:text-6xl">{heroTitle3}</span>
                             </h1>
                             <div className="relative inline-block">
                                 <div className="absolute -inset-2 bg-gradient-to-r from-blue-600/30 to-cyan-600/30 rounded-lg blur-xl"></div>
                                 <h2 className="relative text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-200 via-cyan-200 to-blue-100 bg-clip-text text-transparent">
-                                    Management Studies
+                                    {heroSubtitle}
                                 </h2>
                             </div>
                         </div>
                         <p className="text-lg lg:text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-                            Join our prestigious Executive MBA program and unlock your leadership potential.
-                            Learn from industry experts and build a powerful professional network.
+                            {heroDesc}
                         </p>
                         
                         {applyNowEnabled && activeSession && (
@@ -108,15 +113,15 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                 <div className="container mx-auto px-4">
                     <div className="text-center max-w-2xl mx-auto mb-16">
                         <Badge variant="outline" className="mb-4">Why Choose Us</Badge>
-                        <h2 className="text-3xl lg:text-4xl font-bold mb-4">Program Highlights</h2>
-                        <p className="text-muted-foreground">Our EMBA program is designed to fit your lifestyle while delivering world-class education</p>
+                        <h2 className="text-3xl lg:text-4xl font-bold mb-4">{featuresTitle}</h2>
+                        <p className="text-muted-foreground">{featuresDesc}</p>
                     </div>
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {features.map((feature, i) => (
                             <Card key={i} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
                                 <CardContent className="p-6 text-center">
                                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-                                        <feature.icon className="h-7 w-7" />
+                                        <DynamicIcon name={feature.icon} className="h-7 w-7" />
                                     </div>
                                     <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
                                     <p className="text-sm text-muted-foreground">{feature.desc}</p>
@@ -132,13 +137,12 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                 <div className="container mx-auto px-4">
                     <div className="max-w-4xl mx-auto text-center">
                         <Badge variant="outline" className="mb-4">Curriculum</Badge>
-                        <h2 className="text-3xl lg:text-4xl font-bold mb-6">What You'll Learn</h2>
+                        <h2 className="text-3xl lg:text-4xl font-bold mb-6">{curriculumTitle}</h2>
                         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-                            Our comprehensive curriculum covers all aspects of modern business management,
-                            preparing you for leadership roles in any industry.
+                            {curriculumDesc}
                         </p>
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {benefits.map((benefit, i) => (
+                            {curriculumBenefits.map((benefit, i) => (
                                 <div key={i} className="flex items-center gap-3 text-left">
                                     <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
                                     <span className="text-sm">{benefit}</span>
@@ -152,8 +156,8 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
             {/* CTA Section */}
             <section className="py-20 bg-gradient-to-r from-primary to-blue-600">
                 <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">Ready to Take the Next Step?</h2>
-                    <p className="text-blue-100 mb-8 max-w-2xl mx-auto">Start your application today and join a community of ambitious professionals.</p>
+                    <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">{ctaTitle}</h2>
+                    <p className="text-blue-100 mb-8 max-w-2xl mx-auto">{ctaDesc}</p>
                     <div className="flex flex-wrap justify-center gap-4">
                         {applicantAuth ? (
                             hasSubmittedApplication ? (

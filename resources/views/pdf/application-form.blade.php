@@ -310,7 +310,7 @@
     </table>
 
     <div style="margin-top:15px; padding:8px; border:1px solid #ccc; background:#f9f9f9;">
-        <p style="font-size:10px; margin:0;"><strong>Instructions:</strong> Attach photocopies of NID and all certificates/transcripts. Attach proof of job experience (if any). Submit to Dean's office by deadline. Collect admit card for Admission Test. Test date will be communicated via email/mobile.</p>
+        <p style="font-size:10px; margin:0;"><strong>Instructions:</strong> Attach photocopies of NID and all certificates/transcripts. Attach proof of job experience (if any). Please submit to the Department of Management Studies office by the deadline. Collect admit card for Admission Test. Test date will be communicated via email/mobile.</p>
     </div>
 
 </body>

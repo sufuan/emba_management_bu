@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useState, useCallback } from 'react';
-import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles, CreditCard } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
+import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles, CreditCard, Image as ImageIcon } from 'lucide-react';
 import axios from 'axios';
 import { debounce } from 'lodash';
+import ImageCropper from '@/Components/ImageCropper';
 
 const steps = [
     { id: 1, name: 'Personal Info', icon: User },
@@ -45,6 +46,22 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
     });
 
     const [photoPreview, setPhotoPreview] = useState(null);
+    const [cropperOpen, setCropperOpen] = useState(false);
+    const [tempImageSrc, setTempImageSrc] = useState(null);
+
+    // Helper to check if payment method is enabled (handles boolean, string, number)
+    const isPaymentMethodEnabled = (enabled) => {
+        return enabled === true || enabled === 1 || enabled === '1' || enabled === 'true';
+    };
+
+    // Debug: Log payment settings on mount
+    useEffect(() => {
+        console.log('Payment Settings:', paymentSettings);
+        console.log('bKash enabled:', paymentSettings?.payment_bkash_enabled, 'Type:', typeof paymentSettings?.payment_bkash_enabled);
+        console.log('Nagad enabled:', paymentSettings?.payment_nagad_enabled, 'Type:', typeof paymentSettings?.payment_nagad_enabled);
+        console.log('Rocket enabled:', paymentSettings?.payment_rocket_enabled, 'Type:', typeof paymentSettings?.payment_rocket_enabled);
+        console.log('Bank enabled:', paymentSettings?.payment_bank_enabled, 'Type:', typeof paymentSettings?.payment_bank_enabled);
+    }, [paymentSettings]);
 
     // Validation for each step
     const validateStep = (step) => {
@@ -100,14 +117,11 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         const file = e.target.files[0];
         if (!file) return;
 
-        // Constraints for passport photo
-        const constraints = { width: 300, height: 300, maxSize: 1024 * 1024, label: 'Passport Photo (300×300px)' };
-
-        // Validate file size first
-        if (file.size > constraints.maxSize) {
+        // Validate file size first (10MB max for initial upload, will be compressed later)
+        if (file.size > 10 * 1024 * 1024) {
             setStepErrors(prev => ({
                 ...prev,
-                [field]: `File size must be less than 1MB. Current: ${Math.round(file.size / 1024)}KB`
+                [field]: `File size too large. Please select an image under 10MB.`
             }));
             e.target.value = '';
             return;
@@ -123,30 +137,23 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
             return;
         }
 
-        // Validate image dimensions
-        const img = new Image();
+        // Read file and open cropper
         const reader = new FileReader();
-
         reader.onload = (ev) => {
-            img.onload = () => {
-                if (img.width !== constraints.width || img.height !== constraints.height) {
-                    setStepErrors(prev => ({
-                        ...prev,
-                        [field]: `Image must be exactly ${constraints.width}×${constraints.height}px. Your image: ${img.width}×${img.height}px`
-                    }));
-                    e.target.value = '';
-                    setData(field, null);
-                    setPhotoPreview(null);
-                } else {
-                    // Valid image - set data and preview
-                    setData(field, file);
-                    setPhotoPreview(ev.target.result);
-                    setStepErrors(prev => ({ ...prev, [field]: null }));
-                }
-            };
-            img.src = ev.target.result;
+            setTempImageSrc(ev.target.result);
+            setCropperOpen(true);
         };
         reader.readAsDataURL(file);
+        
+        // Reset file input
+        e.target.value = '';
+    };
+
+    // Handle cropped image from ImageCropper
+    const handleCropComplete = (croppedFile, previewUrl) => {
+        setData('passport_photo', croppedFile);
+        setPhotoPreview(previewUrl);
+        setStepErrors(prev => ({ ...prev, passport_photo: null }));
     };
 
     const addExperience = () => setData('experience_json', [...data.experience_json, { position: '', company: '', duration: '' }]);
@@ -280,6 +287,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                     <Card className="max-w-3xl mx-auto border-0 shadow-xl">
                         <CardHeader><CardTitle>{steps[currentStep - 1].name}</CardTitle><CardDescription>Step {currentStep} of 5</CardDescription></CardHeader>
                         <CardContent>
+                            {/* Mandatory Field Note */}
+                            <div className="mb-6 flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <AlertCircle className="h-4 w-4 text-blue-600 shrink-0" />
+                                <p className="text-sm text-blue-700">
+                                    Fields marked with <span className="font-semibold">*</span> are mandatory
+                                </p>
+                            </div>
+                            
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Step 1: Personal Info */}
                                 {currentStep === 1 && (
@@ -527,17 +542,108 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
 
                                 {/* Step 4: Documents */}
                                 {currentStep === 4 && (
-                                    <div className="max-w-md mx-auto">
-                                        <div className="space-y-3">
-                                            <Label>Passport Photo * (300×300px, max 1MB)</Label>
-                                            <div className={`border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors ${stepErrors.passport_photo ? 'border-red-500' : ''}`}>
-                                                {photoPreview ? <img src={photoPreview} alt="Preview" className="w-32 h-32 mx-auto object-cover rounded" /> : <Upload className="h-12 w-12 mx-auto text-muted-foreground mb-2" />}
-                                                <Input type="file" accept="image/*" onChange={e => handleFileChange(e, 'passport_photo')} className="mt-2" />
+                                    <Card className="border-0 shadow-xl">
+                                        <CardHeader>
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                                    <Upload className="h-6 w-6 text-white" />
+                                                </div>
+                                                <div>
+                                                    <CardTitle className="text-xl">Upload Your Photo</CardTitle>
+                                                    <CardDescription>Professional passport-size photograph required</CardDescription>
+                                                </div>
                                             </div>
-                                            {(stepErrors.passport_photo || errors.passport_photo) && <p className="text-sm text-red-500">{stepErrors.passport_photo || errors.passport_photo}</p>}
-                                            <p className="text-xs text-muted-foreground text-center mt-2">Note: Signature will be collected manually during the admission process.</p>
-                                        </div>
-                                    </div>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            {/* Upload Instructions */}
+                                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
+                                                <div className="flex gap-3">
+                                                   
+                                                    <div className="space-y-2">
+                                                        <p className="text-sm font-semibold text-blue-900">Photo Requirements</p>
+                                                        <ul className="text-xs text-blue-700 space-y-1">
+                                                            <li>✓ Upload any size image - you can crop it in the next step</li>
+                                                            <li>✓ Final photo will be 300×300 pixels</li>
+                                                            <li>✓ Clear front-facing photo with neutral background</li>
+                                                            <li>✓ Auto-compressed to under 1MB</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Upload Area */}
+                                            <div className="space-y-4">
+                                                <Label htmlFor="passport_photo" className="flex items-center gap-2 text-base">
+                                                    <ImageIcon className="h-4 w-4" />
+                                                    Passport Photo <span className="text-red-500">*</span>
+                                                </Label>
+                                                
+                                                {photoPreview ? (
+                                                    <div className="space-y-4">
+                                                        <div className="relative group">
+                                                            <div className="relative w-48 h-48 mx-auto">
+                                                                <img 
+                                                                    src={photoPreview} 
+                                                                    alt="Preview" 
+                                                                    className="w-full h-full object-cover rounded-xl border-4 border-purple-200 shadow-xl" 
+                                                                />
+                                                                <div className="absolute -top-2 -right-2">
+                                                                    <Badge className="bg-green-500 text-white shadow-lg">
+                                                                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                                                                        Ready
+                                                                    </Badge>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={() => document.getElementById('passport_photo').click()}
+                                                            className="w-full"
+                                                        >
+                                                            <Upload className="h-4 w-4 mr-2" />
+                                                            Change Photo
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <div 
+                                                        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer hover:border-purple-400 hover:bg-purple-50/50 ${
+                                                            stepErrors.passport_photo || errors.passport_photo 
+                                                                ? 'border-red-400 bg-red-50' 
+                                                                : 'border-gray-300 bg-gray-50'
+                                                        }`}
+                                                        onClick={() => document.getElementById('passport_photo').click()}
+                                                    >
+                                                        <div className="space-y-4">
+                                                            <div className="h-16 w-16 mx-auto rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                                                                <ImageIcon className="h-8 w-8 text-purple-600" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-base font-medium text-gray-900">Click to upload your photo</p>
+                                                                <p className="text-sm text-gray-500 mt-1">or drag and drop</p>
+                                                            </div>
+                                                            <p className="text-xs text-gray-400">PNG, JPG or JPEG (Max 10MB)</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                <Input
+                                                    id="passport_photo"
+                                                    type="file"
+                                                    accept="image/jpeg,image/jpg,image/png"
+                                                    onChange={(e) => handleFileChange(e, 'passport_photo')}
+                                                    className="hidden"
+                                                />
+                                                
+                                                {(stepErrors.passport_photo || errors.passport_photo) && (
+                                                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                                        <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+                                                        <p className="text-sm text-red-600">{stepErrors.passport_photo || errors.passport_photo}</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
                                 )}
 
                                 {/* Step 5: Payment */}
@@ -564,19 +670,19 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                 </h4>
                                                 <ul className="text-sm text-amber-700 space-y-1 list-disc list-inside">
                                                     <li>Application fee: <strong>{paymentSettings?.payment_fee || 500} BDT</strong></li>
-                                                    {paymentSettings?.payment_bkash_enabled && paymentSettings?.payment_bkash_number && (
+                                                    {isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) && paymentSettings?.payment_bkash_number && (
                                                         <li>bKash: <strong>{paymentSettings.payment_bkash_number}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_nagad_enabled && paymentSettings?.payment_nagad_number && (
+                                                    {isPaymentMethodEnabled(paymentSettings?.payment_nagad_enabled) && paymentSettings?.payment_nagad_number && (
                                                         <li>Nagad: <strong>{paymentSettings.payment_nagad_number}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_rocket_enabled && paymentSettings?.payment_rocket_number && (
+                                                    {isPaymentMethodEnabled(paymentSettings?.payment_rocket_enabled) && paymentSettings?.payment_rocket_number && (
                                                         <li>Rocket: <strong>{paymentSettings.payment_rocket_number}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_bank_enabled && paymentSettings?.payment_bank_name && (
+                                                    {isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled) && paymentSettings?.payment_bank_name && (
                                                         <li>Bank: <strong>{paymentSettings.payment_bank_name}</strong></li>
                                                     )}
-                                                    {paymentSettings?.payment_bank_enabled && paymentSettings?.payment_bank_account && (
+                                                    {isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled) && paymentSettings?.payment_bank_account && (
                                                         <li>Account: <strong>{paymentSettings.payment_bank_account}</strong></li>
                                                     )}
                                                     <li>Keep your transaction ID/receipt for verification</li>
@@ -585,7 +691,10 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </Card>
 
                                         {/* Payment Form */}
-                                        {(!paymentSettings?.payment_bkash_enabled && !paymentSettings?.payment_nagad_enabled && !paymentSettings?.payment_rocket_enabled && !paymentSettings?.payment_bank_enabled) ? (
+                                        {(!isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) && 
+                                          !isPaymentMethodEnabled(paymentSettings?.payment_nagad_enabled) && 
+                                          !isPaymentMethodEnabled(paymentSettings?.payment_rocket_enabled) && 
+                                          !isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled)) ? (
                                             <div className="md:col-span-2 p-6 bg-red-50 border border-red-200 rounded-xl text-center">
                                                 <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-3" />
                                                 <h4 className="text-lg font-semibold text-red-800 mb-2">No Payment Methods Available</h4>
@@ -600,17 +709,17 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                             <SelectValue placeholder="Select payment method" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {paymentSettings?.payment_bkash_enabled && (
-                                                                <SelectItem value="bKash">bKash</SelectItem>
+                                                            {isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) && (
+                                                                <SelectItem value="bKash">bKash {paymentSettings?.payment_bkash_number && `- ${paymentSettings.payment_bkash_number}`}</SelectItem>
                                                             )}
-                                                            {paymentSettings?.payment_nagad_enabled && (
-                                                                <SelectItem value="Nagad">Nagad</SelectItem>
+                                                            {isPaymentMethodEnabled(paymentSettings?.payment_nagad_enabled) && (
+                                                                <SelectItem value="Nagad">Nagad {paymentSettings?.payment_nagad_number && `- ${paymentSettings.payment_nagad_number}`}</SelectItem>
                                                             )}
-                                                            {paymentSettings?.payment_rocket_enabled && (
-                                                                <SelectItem value="Rocket">Rocket</SelectItem>
+                                                            {isPaymentMethodEnabled(paymentSettings?.payment_rocket_enabled) && (
+                                                                <SelectItem value="Rocket">Rocket {paymentSettings?.payment_rocket_number && `- ${paymentSettings.payment_rocket_number}`}</SelectItem>
                                                             )}
-                                                            {paymentSettings?.payment_bank_enabled && (
-                                                                <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                                                            {isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled) && (
+                                                                <SelectItem value="Bank Transfer">Bank Transfer {paymentSettings?.payment_bank_name && `- ${paymentSettings.payment_bank_name}`}</SelectItem>
                                                             )}
                                                         </SelectContent>
                                                     </Select>
@@ -674,6 +783,19 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                             </form>
                         </CardContent>
                     </Card>
+
+                    {/* Image Cropper Modal */}
+                    {tempImageSrc && (
+                        <ImageCropper
+                            open={cropperOpen}
+                            onClose={() => {
+                                setCropperOpen(false);
+                                setTempImageSrc(null);
+                            }}
+                            imageSrc={tempImageSrc}
+                            onCropComplete={handleCropComplete}
+                        />
+                    )}
         </>
     );
 }

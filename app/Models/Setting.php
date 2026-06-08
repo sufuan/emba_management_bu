@@ -63,7 +63,15 @@ class Setting extends Model
      */
     public static function getByGroup(string $group): array
     {
-        return self::where('group', $group)->get()->pluck('value', 'key')->toArray();
+        return self::where('group', $group)->get()->mapWithKeys(function ($setting) {
+            $value = match ($setting->type) {
+                'number' => (float) $setting->value,
+                'boolean' => filter_var($setting->value, FILTER_VALIDATE_BOOLEAN),
+                'json' => json_decode($setting->value, true),
+                default => $setting->value,
+            };
+            return [$setting->key => $value];
+        })->toArray();
     }
 
     /**

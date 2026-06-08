@@ -101,6 +101,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Sessions - add PATCH route for activate
     Route::patch('/sessions/{session}/activate', [AdminSessionController::class, 'setActive'])->name('sessions.activate-patch');
 
+    // Frontend Settings
+    Route::get('/frontend-settings', [\App\Http\Controllers\Admin\FrontendSettingController::class, 'index'])->name('frontend-settings.index');
+    Route::post('/frontend-settings', [\App\Http\Controllers\Admin\FrontendSettingController::class, 'update'])->name('frontend-settings.update');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

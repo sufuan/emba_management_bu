@@ -10,6 +10,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ApplicantService
 {
@@ -118,7 +120,7 @@ class ApplicantService
     public function handleUpload(Applicant $applicant, UploadedFile $file, string $type): Upload
     {
         $session = $applicant->session;
-        $extension = $file->getClientOriginalExtension();
+        $extension = 'jpg'; // Always save as JPG for consistency and better compression
         $filename = $type === 'passport_photo' ? 'photo' : 'signature';
         
         // Storage path: sessions/{session_id}/applicants/{applicant_id}/
@@ -130,13 +132,21 @@ class ApplicantService
             $extension
         );
 
-        // Store the file
-        Storage::disk('public')->put($path, file_get_contents($file->getRealPath()));
+        // Process image using Intervention Image v3
+        $manager = new ImageManager(new Driver());
+        $image = $manager->read($file->getRealPath());
+        
+        // Resize to 300x300 maintaining aspect ratio and crop from center
+        $image->cover(300, 300);
+        
+        // Encode as JPEG with 85% quality to balance size and quality
+        $encodedImage = $image->toJpeg(85);
+        
+        // Store the processed image
+        Storage::disk('public')->put($path, (string) $encodedImage);
 
-        // Get image dimensions
-        $imageInfo = getimagesize($file->getRealPath());
-        $width = $imageInfo[0] ?? null;
-        $height = $imageInfo[1] ?? null;
+        // Get file size after processing
+        $fileSize = Storage::disk('public')->size($path);
 
         // Update applicant path
         $pathField = $type === 'passport_photo' ? 'photo_path' : 'signature_path';
@@ -147,9 +157,9 @@ class ApplicantService
             'applicant_id' => $applicant->id,
             'type' => $type,
             'file_path' => $path,
-            'size_bytes' => $file->getSize(),
-            'width' => $width,
-            'height' => $height,
+            'size_bytes' => $fileSize,
+            'width' => 300,
+            'height' => 300,
         ]);
     }
 

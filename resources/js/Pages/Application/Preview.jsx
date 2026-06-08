@@ -103,14 +103,13 @@ export default function Preview({ applicant, embedded = false }) {
                                     <h4 className="font-semibold text-amber-800 mb-2">Important Information</h4>
                                     <ul className="text-sm text-amber-700 space-y-1">
                                         <li>• Save your Form No: <strong>{applicant.form_no}</strong> for future reference</li>
-                                        <li>• Your admit card will be available after verification</li>
-                                        <li>• You can track your application status using your form number</li>
+                                        
                                     </ul>
                                 </div>
 
                                 <div className="flex justify-center gap-4 mt-6">
                                     <Link href={route('applicant.dashboard')}><Button>Go to Dashboard</Button></Link>
-                                    <Link href="/track"><Button variant="outline">Track Application</Button></Link>
+                                   
                                 </div>
                             </CardContent>
                         </Card>

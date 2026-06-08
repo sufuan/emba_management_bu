@@ -8,7 +8,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
     GraduationCap, LayoutDashboard, Users, Calendar, Settings, LogOut,
-    Menu, ChevronRight, Bell, User,
+    Menu, ChevronRight, Bell, User, Monitor
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -16,6 +16,7 @@ const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Applicants', href: '/admin/applicants', icon: Users },
     { name: 'Sessions', href: '/admin/sessions', icon: Calendar },
+    { name: 'Frontend Settings', href: '/admin/frontend-settings', icon: Monitor },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
