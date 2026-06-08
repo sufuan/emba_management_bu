@@ -59,6 +59,9 @@ Route::get('/application/{applicant}/pdf/download', [PDFController::class, 'down
 Route::get('/application/{applicant}/pdf/preview', [PDFController::class, 'previewApplication'])->name('pdf.application.preview');
 Route::get('/application/{applicant}/admit-card/download', [PDFController::class, 'downloadAdmitCard'])->name('pdf.admit-card.download');
 
+// Offline Application Form PDF
+Route::get('/offline-form', [PDFController::class, 'downloadOfflineForm'])->name('pdf.offline-form');
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes (Protected by Auth Middleware)

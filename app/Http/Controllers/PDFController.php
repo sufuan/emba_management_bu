@@ -38,4 +38,21 @@ class PDFController extends Controller
     {
         return $this->pdfService->streamApplicationPDF($applicant);
     }
+
+    /**
+     * Download the static offline application form PDF.
+     */
+    public function downloadOfflineForm()
+    {
+        $path = base_path('pdf/offline-form.pdf');
+
+        if (!file_exists($path)) {
+            abort(404, 'Offline application form not found.');
+        }
+
+        return response()->file($path, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="offline-form.pdf"',
+        ]);
+    }
 }

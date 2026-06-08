@@ -1,0 +1,1 @@
+import{j as r}from"./app-xd_ZG-1v.js";import{I as s}from"./lucide-react-C2AK-gTq.js";import{C as c}from"./check-mLVNzCxu.js";function p({name:o,...n}){const t=o?.trim(),m=s[t]||c;return r.jsx(m,{...n})}export{p as D};
