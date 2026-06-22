@@ -562,10 +562,10 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             <div className="space-y-2">
                                                 <p className="text-sm font-semibold text-blue-900">Photo Requirements</p>
                                                 <ul className="text-xs text-blue-700 space-y-1">
-                                                    <li>✓ Upload any size image - you can crop it in the next step</li>
-                                                    <li>✓ Final photo will be 300×300 pixels</li>
-                                                    <li>✓ Clear front-facing photo with neutral background</li>
-                                                    <li>✓ Auto-compressed to under 1MB</li>
+                                                    <li>âœ“ Upload any size image - you can crop it in the next step</li>
+                                                    <li>âœ“ Final photo will be 300Ã—300 pixels</li>
+                                                    <li>âœ“ Clear front-facing photo with neutral background</li>
+                                                    <li>âœ“ Auto-compressed to under 1MB</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -688,7 +688,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
 
                                     {/* Payment Channels */}
                                     <div className="bg-white border-b border-slate-100">
-                                        <p className="px-5 pt-3 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Send Payment To</p>
+                                        <p className="px-5 pt-3 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Send payment using the <strong className="font-bold text-slate-700">Send Money</strong> Method To</p>
                                         <div className="divide-y divide-slate-50">
                                             {isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) && paymentSettings?.payment_bkash_number && (
                                                 <div className="flex items-center gap-4 px-5 py-3">
@@ -729,7 +729,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                         <span className="text-blue-600 font-bold text-xs">BK</span>
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="text-xs text-slate-400">Bank — {paymentSettings.payment_bank_name}</p>
+                                                        <p className="text-xs text-slate-400">Bank â€” {paymentSettings.payment_bank_name}</p>
                                                         {paymentSettings?.payment_bank_account && (
                                                             <p className="text-slate-800 font-semibold">Account: {paymentSettings.payment_bank_account}</p>
                                                         )}
@@ -746,8 +746,8 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mb-0.5">Payee</p>
-                                            <p className="text-slate-800 font-semibold">Safiul Islam Khan</p>
-                                            <p className="text-slate-500 text-xs leading-relaxed">Administrative Officer, Department of Management Studies,<br />University of Barishal</p>
+                                            <p className="text-slate-800 font-semibold">Md. Safiul Islam Khan</p>
+                                            <p className="text-slate-500 text-xs leading-relaxed">Section Officer, Department of Management Studies,<br />University of Barishal</p>
                                         </div>
                                     </div>
 
@@ -863,4 +863,5 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         </>
     );
 }
+
 
