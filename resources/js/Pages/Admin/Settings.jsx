@@ -8,14 +8,17 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
-import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2, Shield, UserCheck, Users } from 'lucide-react';
+import { Power, Calendar, FileText, Image, AlertTriangle, CheckCircle2, Loader2, CreditCard, Banknote, Phone, Building2, Shield, UserCheck, Users, Upload, RefreshCw } from 'lucide-react';
 
-export default function Settings({ applyNowEnabled, sessions, uploadConfig, paymentSettings, requireApplicantAuth }) {
+export default function Settings({ applyNowEnabled, sessions, uploadConfig, paymentSettings, requireApplicantAuth, offlineFormInfo }) {
     const [isApplyEnabled, setIsApplyEnabled] = useState(applyNowEnabled);
     const [requireAuth, setRequireAuth] = useState(requireApplicantAuth);
     const [isToggling, setIsToggling] = useState(false);
     const [isTogglingAuth, setIsTogglingAuth] = useState(false);
     const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+    const [offlinePdfFile, setOfflinePdfFile] = useState(null);
+    const [isUploadingPdf, setIsUploadingPdf] = useState(false);
+    const [pdfError, setPdfError] = useState(null);
     const [payment, setPayment] = useState({
         payment_fee: paymentSettings?.payment_fee || 500,
         payment_bkash_number: paymentSettings?.payment_bkash_number || '',
@@ -79,6 +82,48 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
             preserveScroll: true,
             onSuccess: () => setIsUpdatingPayment(false),
             onError: () => setIsUpdatingPayment(false),
+        });
+    };
+
+    const handlePdfFileChange = (e) => {
+        const file = e.target.files[0];
+        setPdfError(null);
+        if (!file) { setOfflinePdfFile(null); return; }
+        if (file.type !== 'application/pdf') {
+            setPdfError('Only PDF files are allowed.');
+            setOfflinePdfFile(null);
+            e.target.value = '';
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            setPdfError('File must be under 10 MB.');
+            setOfflinePdfFile(null);
+            e.target.value = '';
+            return;
+        }
+        setOfflinePdfFile(file);
+    };
+
+    const uploadOfflineForm = () => {
+        if (!offlinePdfFile) { setPdfError('Please select a PDF file first.'); return; }
+        setIsUploadingPdf(true);
+        setPdfError(null);
+        const formData = new FormData();
+        formData.append('offline_form_pdf', offlinePdfFile);
+        router.post('/admin/offline-form-upload', formData, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setIsUploadingPdf(false);
+                setOfflinePdfFile(null);
+                // Reset file input
+                const input = document.getElementById('offline_pdf_input');
+                if (input) input.value = '';
+            },
+            onError: (errors) => {
+                setIsUploadingPdf(false);
+                setPdfError(errors?.offline_form_pdf || 'Upload failed. Please try again.');
+            },
         });
     };
 
@@ -299,6 +344,130 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                             <Button onClick={updatePaymentSettings} disabled={isUpdatingPayment}>
                                 {isUpdatingPayment ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</> : 'Save Payment Settings'}
                             </Button>
+                        </CardContent>
+                    </Card>
+
+                    {/* Offline Application Form Upload */}
+                    <Card className="border-0 shadow-lg lg:col-span-2">
+                        <CardHeader>
+                            <div className="flex items-center gap-3">
+                                <div className="p-3 rounded-xl bg-indigo-100 text-indigo-600">
+                                    <FileText className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <CardTitle>Offline Application Form</CardTitle>
+                                    <CardDescription>Upload a new PDF to replace the downloadable offline form for applicants</CardDescription>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-5">
+                            {/* Current file status */}
+                            <div className={`flex items-start gap-4 p-4 rounded-xl border ${
+                                offlineFormInfo?.exists
+                                    ? 'bg-emerald-50 border-emerald-200'
+                                    : 'bg-amber-50 border-amber-200'
+                            }`}>
+                                <div className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                                    offlineFormInfo?.exists ? 'bg-emerald-100' : 'bg-amber-100'
+                                }`}>
+                                    {offlineFormInfo?.exists
+                                        ? <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                                        : <AlertTriangle className="h-5 w-5 text-amber-600" />
+                                    }
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    {offlineFormInfo?.exists ? (
+                                        <>
+                                            <p className="font-semibold text-emerald-800 text-sm">Dynamic PDF Active</p>
+                                            <p className="text-emerald-700 text-xs mt-0.5">
+                                                Last uploaded: <strong>{offlineFormInfo.uploaded_at}</strong>
+                                                {offlineFormInfo.size_kb && <span className="ml-2 text-emerald-600">({offlineFormInfo.size_kb} KB)</span>}
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="font-semibold text-amber-800 text-sm">Using Backup / Original PDF</p>
+                                            <p className="text-amber-700 text-xs mt-0.5">No custom PDF uploaded yet. Applicants will download the original form.</p>
+                                        </>
+                                    )}
+                                </div>
+                                <a
+                                    href="/offline-form"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:underline flex-shrink-0"
+                                >
+                                    Preview ↗
+                                </a>
+                            </div>
+
+                            {/* Upload area */}
+                            <div className="space-y-3">
+                                <Label htmlFor="offline_pdf_input" className="flex items-center gap-2 font-medium">
+                                    <Upload className="h-4 w-4" /> Upload New PDF
+                                </Label>
+
+                                <div
+                                    className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                                        offlinePdfFile
+                                            ? 'border-indigo-400 bg-indigo-50'
+                                            : pdfError
+                                            ? 'border-red-400 bg-red-50'
+                                            : 'border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/50'
+                                    }`}
+                                    onClick={() => document.getElementById('offline_pdf_input').click()}
+                                >
+                                    <input
+                                        id="offline_pdf_input"
+                                        type="file"
+                                        accept="application/pdf,.pdf"
+                                        onChange={handlePdfFileChange}
+                                        className="hidden"
+                                    />
+                                    {offlinePdfFile ? (
+                                        <div className="flex items-center justify-center gap-3">
+                                            <div className="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                                <FileText className="h-5 w-5 text-indigo-600" />
+                                            </div>
+                                            <div className="text-left">
+                                                <p className="font-medium text-indigo-800 text-sm">{offlinePdfFile.name}</p>
+                                                <p className="text-indigo-600 text-xs">{(offlinePdfFile.size / 1024).toFixed(1)} KB — click to change</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <div className="h-12 w-12 mx-auto rounded-full bg-slate-200 flex items-center justify-center">
+                                                <Upload className="h-6 w-6 text-slate-500" />
+                                            </div>
+                                            <p className="text-sm font-medium text-slate-700">Click to select a PDF</p>
+                                            <p className="text-xs text-slate-500">PDF only · Max 10 MB</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {pdfError && (
+                                    <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                        <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
+                                        <p className="text-sm text-red-600">{pdfError}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <Button
+                                onClick={uploadOfflineForm}
+                                disabled={isUploadingPdf || !offlinePdfFile}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                            >
+                                {isUploadingPdf ? (
+                                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading...</>
+                                ) : (
+                                    <><RefreshCw className="h-4 w-4 mr-2" /> Upload & Replace PDF</>
+                                )}
+                            </Button>
+
+                            <p className="text-xs text-muted-foreground">
+                                ⓘ The original backup PDF is preserved separately and will be served automatically if the upload is ever unavailable.
+                            </p>
                         </CardContent>
                     </Card>
 

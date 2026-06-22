@@ -108,6 +108,9 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/frontend-settings', [\App\Http\Controllers\Admin\FrontendSettingController::class, 'index'])->name('frontend-settings.index');
     Route::post('/frontend-settings', [\App\Http\Controllers\Admin\FrontendSettingController::class, 'update'])->name('frontend-settings.update');
 
+    // Offline Form PDF Upload
+    Route::post('/offline-form-upload', [PDFController::class, 'uploadOfflineForm'])->name('offline-form.upload');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -21,6 +21,8 @@ class SettingController extends Controller
         // Get active session from database
         $activeSession = Session::where('is_active', true)->first();
 
+        $dynamicPdfPath = public_path('pdf/offline-form.pdf');
+
         return Inertia::render('Admin/Settings', [
             'applyNowEnabled' => config('admission.apply_now_enabled'),
             'activeSessionId' => $activeSession?->id,
@@ -28,6 +30,15 @@ class SettingController extends Controller
             'uploadConfig' => config('admission.uploads'),
             'paymentSettings' => Setting::getPaymentSettings(),
             'requireApplicantAuth' => Setting::getValue('require_applicant_auth', true),
+            'offlineFormInfo' => [
+                'exists'      => file_exists($dynamicPdfPath),
+                'uploaded_at' => file_exists($dynamicPdfPath)
+                    ? date('d M Y, h:i A', filemtime($dynamicPdfPath))
+                    : null,
+                'size_kb'     => file_exists($dynamicPdfPath)
+                    ? round(filesize($dynamicPdfPath) / 1024, 1)
+                    : null,
+            ],
         ]);
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Services\PDFService;
+use Illuminate\Http\Request;
 
 class PDFController extends Controller
 {
@@ -40,13 +41,20 @@ class PDFController extends Controller
     }
 
     /**
-     * Download the static offline application form PDF.
+     * Download the offline application form PDF.
+     * Primary: public/pdf/offline-form.pdf (dynamic, admin-uploaded)
+     * Fallback: pdf/offline-form.pdf (original static backup)
      */
     public function downloadOfflineForm()
     {
-        $path = public_path('pdf/offline-form.pdf');
+        $dynamicPath = public_path('pdf/offline-form.pdf');
+        $backupPath  = base_path('pdf/offline-form.pdf');
 
-        if (!file_exists($path)) {
+        if (file_exists($dynamicPath)) {
+            $path = $dynamicPath;
+        } elseif (file_exists($backupPath)) {
+            $path = $backupPath;
+        } else {
             abort(404, 'Offline application form not found.');
         }
 
@@ -55,4 +63,37 @@ class PDFController extends Controller
             'Content-Disposition' => 'attachment; filename="offline-form.pdf"',
         ]);
     }
+
+    /**
+     * Upload a new offline application form PDF (admin only).
+     * Replaces public/pdf/offline-form.pdf in place.
+     */
+    public function uploadOfflineForm(Request $request)
+    {
+        $request->validate([
+            'offline_form_pdf' => [
+                'required',
+                'file',
+                'mimes:pdf',
+                'max:10240', // 10 MB
+            ],
+        ], [
+            'offline_form_pdf.required' => 'Please select a PDF file to upload.',
+            'offline_form_pdf.mimes'    => 'The file must be a PDF.',
+            'offline_form_pdf.max'      => 'The PDF must not be larger than 10 MB.',
+        ]);
+
+        $destination = public_path('pdf');
+
+        // Ensure the directory exists
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // Move uploaded file, overwriting the existing one
+        $request->file('offline_form_pdf')->move($destination, 'offline-form.pdf');
+
+        return back()->with('success', 'Offline application form updated successfully.');
+    }
 }
+
