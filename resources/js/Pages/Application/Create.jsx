@@ -752,6 +752,17 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                     </div>
                                 )}
 
+                                {/* add a note After completing the payment and submitting the online form, you will be able to download the PDF version of the form. */}
+
+                                <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                                    <div className="flex items-center gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                                        <span className="font-semibold text-blue-700">Note</span>
+                                    </div>
+                                    <p className="text-blue-600 text-sm">After completing the payment and submitting the online form, you will be able to download the PDF version of the form.</p>
+                                </div>
+
+
                                 {/* Summary */}
                                 {data.payment_transaction_id && data.payment_method && data.payment_amount && (
                                     <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
