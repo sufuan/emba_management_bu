@@ -562,10 +562,10 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             <div className="space-y-2">
                                                 <p className="text-sm font-semibold text-blue-900">Photo Requirements</p>
                                                 <ul className="text-xs text-blue-700 space-y-1">
-                                                    <li>âœ“ Upload any size image - you can crop it in the next step</li>
-                                                    <li>âœ“ Final photo will be 300Ã—300 pixels</li>
-                                                    <li>âœ“ Clear front-facing photo with neutral background</li>
-                                                    <li>âœ“ Auto-compressed to under 1MB</li>
+                                                    <li> Upload any size image - you can crop it in the next step</li>
+                                                    <li> Final photo will be 300Ã—300 pixels</li>
+                                                    <li> Clear front-facing photo with neutral background</li>
+                                                    <li> Auto-compressed to under 1MB</li>
                                                 </ul>
                                             </div>
                                         </div>
