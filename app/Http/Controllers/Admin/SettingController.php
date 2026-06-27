@@ -86,16 +86,21 @@ class SettingController extends Controller
         try {
             $validated = $request->validate([
                 'payment_fee'           => 'required|numeric|min:0',
-                'payment_bkash_number'  => 'nullable|string|max:20',
+                'payment_bkash_number'  => 'nullable|max:20',
                 'payment_bkash_enabled' => 'nullable',
-                'payment_nagad_number'  => 'nullable|string|max:20',
+                'payment_nagad_number'  => 'nullable|max:20',
                 'payment_nagad_enabled' => 'nullable',
-                'payment_rocket_number' => 'nullable|string|max:20',
+                'payment_rocket_number' => 'nullable|max:20',
                 'payment_rocket_enabled'=> 'nullable',
-                'payment_bank_name'     => 'nullable|string|max:255',
-                'payment_bank_account'  => 'nullable|string|max:50',
+                'payment_bank_name'     => 'nullable|max:255',
+                'payment_bank_account'  => 'nullable|max:50',
                 'payment_bank_enabled'  => 'nullable',
             ]);
+
+            // Normalize: convert null string fields to empty string so Setting::setValue stores type='string'
+            foreach (['payment_bkash_number', 'payment_nagad_number', 'payment_rocket_number', 'payment_bank_name', 'payment_bank_account'] as $key) {
+                $validated[$key] = $validated[$key] ?? '';
+            }
 
             // Explicitly cast boolean fields — Inertia may send true/false/1/0/"true"/"false"
             $booleanKeys = [
