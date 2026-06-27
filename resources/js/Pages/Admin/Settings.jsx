@@ -16,6 +16,8 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
     const [isToggling, setIsToggling] = useState(false);
     const [isTogglingAuth, setIsTogglingAuth] = useState(false);
     const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
+    const [paymentSaveError, setPaymentSaveError] = useState(null);
+    const [paymentSaveSuccess, setPaymentSaveSuccess] = useState(false);
     const [offlinePdfFile, setOfflinePdfFile] = useState(null);
     const [isUploadingPdf, setIsUploadingPdf] = useState(false);
     const [pdfError, setPdfError] = useState(null);
@@ -78,10 +80,19 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
 
     const updatePaymentSettings = () => {
         setIsUpdatingPayment(true);
+        setPaymentSaveError(null);
+        setPaymentSaveSuccess(false);
         router.post('/admin/settings/payment', payment, {
             preserveScroll: true,
-            onSuccess: () => setIsUpdatingPayment(false),
-            onError: () => setIsUpdatingPayment(false),
+            onSuccess: () => {
+                setIsUpdatingPayment(false);
+                setPaymentSaveSuccess(true);
+                setTimeout(() => setPaymentSaveSuccess(false), 4000);
+            },
+            onError: (errors) => {
+                setIsUpdatingPayment(false);
+                setPaymentSaveError(errors?.payment || 'An unexpected error occurred. Check server logs.');
+            },
         });
     };
 
@@ -338,6 +349,23 @@ export default function Settings({ applyNowEnabled, sessions, uploadConfig, paym
                                         <p className="font-medium">No Payment Methods Enabled!</p>
                                         <p className="text-xs mt-1">At least one payment method must be enabled for applicants to submit applications.</p>
                                     </div>
+                                </div>
+                            )}
+
+                            {paymentSaveError && (
+                                <div className="flex items-start gap-2 p-3 bg-red-50 text-red-800 rounded-lg text-sm border border-red-200">
+                                    <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <p className="font-medium">Save Failed</p>
+                                        <p className="text-xs mt-1">{paymentSaveError}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {paymentSaveSuccess && (
+                                <div className="flex items-center gap-2 p-3 bg-green-50 text-green-800 rounded-lg text-sm border border-green-200">
+                                    <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                                    <p className="font-medium">Payment settings saved successfully!</p>
                                 </div>
                             )}
 

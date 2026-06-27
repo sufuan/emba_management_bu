@@ -83,45 +83,58 @@ class SettingController extends Controller
      */
     public function updatePaymentSettings(Request $request)
     {
-        $validated = $request->validate([
-            'payment_fee' => 'required|numeric|min:0',
-            'payment_bkash_number' => 'nullable|string|max:20',
-            'payment_bkash_enabled' => 'nullable|boolean',
-            'payment_nagad_number' => 'nullable|string|max:20',
-            'payment_nagad_enabled' => 'nullable|boolean',
-            'payment_rocket_number' => 'nullable|string|max:20',
-            'payment_rocket_enabled' => 'nullable|boolean',
-            'payment_bank_name' => 'nullable|string|max:255',
-            'payment_bank_account' => 'nullable|string|max:50',
-            'payment_bank_enabled' => 'nullable|boolean',
-        ]);
+        try {
+            $validated = $request->validate([
+                'payment_fee'           => 'required|numeric|min:0',
+                'payment_bkash_number'  => 'nullable|string|max:20',
+                'payment_bkash_enabled' => 'nullable',
+                'payment_nagad_number'  => 'nullable|string|max:20',
+                'payment_nagad_enabled' => 'nullable',
+                'payment_rocket_number' => 'nullable|string|max:20',
+                'payment_rocket_enabled'=> 'nullable',
+                'payment_bank_name'     => 'nullable|string|max:255',
+                'payment_bank_account'  => 'nullable|string|max:50',
+                'payment_bank_enabled'  => 'nullable',
+            ]);
 
-        // Ensure boolean values are properly set (false if not present)
-        $validated['payment_bkash_enabled'] = $validated['payment_bkash_enabled'] ?? false;
-        $validated['payment_nagad_enabled'] = $validated['payment_nagad_enabled'] ?? false;
-        $validated['payment_rocket_enabled'] = $validated['payment_rocket_enabled'] ?? false;
-        $validated['payment_bank_enabled'] = $validated['payment_bank_enabled'] ?? false;
+            // Explicitly cast boolean fields — Inertia may send true/false/1/0/"true"/"false"
+            $booleanKeys = [
+                'payment_bkash_enabled',
+                'payment_nagad_enabled',
+                'payment_rocket_enabled',
+                'payment_bank_enabled',
+            ];
 
-        // Ensure at least one payment method is enabled
-        $enabledMethods = array_filter([
-            $validated['payment_bkash_enabled'],
-            $validated['payment_nagad_enabled'],
-            $validated['payment_rocket_enabled'],
-            $validated['payment_bank_enabled'],
-        ]);
+            foreach ($booleanKeys as $key) {
+                $val = $validated[$key] ?? false;
+                $validated[$key] = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+            }
 
-        if (empty($enabledMethods)) {
-            return back()->withErrors(['payment' => 'At least one payment method must be enabled.']);
+            // Save every validated setting
+            foreach ($validated as $key => $value) {
+                Setting::setValue($key, $value);
+            }
+
+            // Clear per-key caches (the pattern used by Setting::getValue)
+            $cacheKeys = [
+                'payment_fee', 'payment_bkash_number', 'payment_bkash_enabled',
+                'payment_nagad_number', 'payment_nagad_enabled',
+                'payment_rocket_number', 'payment_rocket_enabled',
+                'payment_bank_name', 'payment_bank_account', 'payment_bank_enabled',
+            ];
+            foreach ($cacheKeys as $key) {
+                \Illuminate\Support\Facades\Cache::forget("setting_{$key}");
+            }
+
+            return back()->with('success', 'Payment settings updated successfully.');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Payment settings save failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all(),
+            ]);
+            return back()->withErrors(['payment' => 'Failed to save settings: ' . $e->getMessage()]);
         }
-
-        foreach ($validated as $key => $value) {
-            Setting::setValue($key, $value);
-        }
-
-        // Clear all payment-related cache
-        \Illuminate\Support\Facades\Cache::forget('payment_settings');
-        
-        return back()->with('success', 'Payment settings updated successfully.');
     }
 
     /**
