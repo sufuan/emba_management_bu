@@ -42,7 +42,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         },
         experience_json: [{ position: '', company: '', duration: '' }],
         passport_photo: null,
-        payment_transaction_id: '', payment_method: '', payment_amount: paymentSettings?.payment_fee || 500,
+        payment_transaction_id: '', payment_method: 'bKash', payment_amount: paymentSettings?.payment_fee || 500,
     });
 
     const [photoPreview, setPhotoPreview] = useState(null);
@@ -701,41 +701,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                     </div>
                                                 </div>
                                             )}
-                                            {isPaymentMethodEnabled(paymentSettings?.payment_nagad_enabled) && paymentSettings?.payment_nagad_number && (
-                                                <div className="flex items-center gap-4 px-5 py-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-                                                        <span className="text-orange-600 font-bold text-xs">Ng</span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="text-xs text-slate-400">Nagad</p>
-                                                        <p className="text-slate-800 font-semibold">{paymentSettings.payment_nagad_number}</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {isPaymentMethodEnabled(paymentSettings?.payment_rocket_enabled) && paymentSettings?.payment_rocket_number && (
-                                                <div className="flex items-center gap-4 px-5 py-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                                        <span className="text-purple-600 font-bold text-xs">Rk</span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="text-xs text-slate-400">Rocket</p>
-                                                        <p className="text-slate-800 font-semibold">{paymentSettings.payment_rocket_number}</p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            {isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled) && paymentSettings?.payment_bank_name && (
-                                                <div className="flex items-center gap-4 px-5 py-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                        <span className="text-blue-600 font-bold text-xs">BK</span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="text-xs text-slate-400">Bank â€” {paymentSettings.payment_bank_name}</p>
-                                                        {paymentSettings?.payment_bank_account && (
-                                                            <p className="text-slate-800 font-semibold">Account: {paymentSettings.payment_bank_account}</p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            )}
+
                                         </div>
                                     </div>
 
@@ -755,63 +721,33 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                 </div>
 
                                 {/* Payment Form */}
-                                {(!isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) &&
-                                    !isPaymentMethodEnabled(paymentSettings?.payment_nagad_enabled) &&
-                                    !isPaymentMethodEnabled(paymentSettings?.payment_rocket_enabled) &&
-                                    !isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled)) ? (
+                                {!isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) ? (
                                     <div className="md:col-span-2 p-6 bg-red-50 border border-red-200 rounded-xl text-center">
                                         <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-3" />
                                         <h4 className="text-lg font-semibold text-red-800 mb-2">No Payment Methods Available</h4>
-                                        <p className="text-red-600 text-sm">Payment methods have not been configured yet. Please contact the admission office for assistance.</p>
+                                        <p className="text-red-600 text-sm">bKash payment has not been configured yet. Please contact the admission office for assistance.</p>
                                     </div>
                                 ) : (
                                     <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <Label>Payment Method *</Label>
-                                            <Select value={data.payment_method} onValueChange={(v) => handleInputChange('payment_method', v)}>
-                                                <SelectTrigger className={stepErrors.payment_method ? 'border-red-500' : ''}>
-                                                    <SelectValue placeholder="Select payment method" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) && (
-                                                        <SelectItem value="bKash">bKash {paymentSettings?.payment_bkash_number && `- ${paymentSettings.payment_bkash_number}`}</SelectItem>
-                                                    )}
-                                                    {isPaymentMethodEnabled(paymentSettings?.payment_nagad_enabled) && (
-                                                        <SelectItem value="Nagad">Nagad {paymentSettings?.payment_nagad_number && `- ${paymentSettings.payment_nagad_number}`}</SelectItem>
-                                                    )}
-                                                    {isPaymentMethodEnabled(paymentSettings?.payment_rocket_enabled) && (
-                                                        <SelectItem value="Rocket">Rocket {paymentSettings?.payment_rocket_number && `- ${paymentSettings.payment_rocket_number}`}</SelectItem>
-                                                    )}
-                                                    {isPaymentMethodEnabled(paymentSettings?.payment_bank_enabled) && (
-                                                        <SelectItem value="Bank Transfer">Bank Transfer {paymentSettings?.payment_bank_name && `- ${paymentSettings.payment_bank_name}`}</SelectItem>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                            {stepErrors.payment_method && <p className="text-sm text-red-500">{stepErrors.payment_method}</p>}
-                                        </div>
+                                        <div className="md:col-span-2 space-y-2">
+                                            <Label>Payment Method</Label>
+                                            <div className="h-10 px-3 py-2 rounded-md border bg-slate-50 flex items-center gap-3">
+                                                <div className="h-6 w-6 rounded bg-pink-100 flex items-center justify-center flex-shrink-0">
+                                                    <span className="text-pink-600 font-bold text-[10px]">bK</span>
+                                                </div>
+                                                <span className="font-medium text-slate-700">bKash</span>
 
-                                        <div className="space-y-2">
-                                            <Label>Amount Paid (BDT) *</Label>
-                                            <Input
-                                                type="number"
-                                                value={data.payment_amount}
-                                                readOnly
-                                                className="bg-slate-50 cursor-not-allowed"
-                                            />
-                                            <p className="text-xs text-muted-foreground">Fixed application fee: {paymentSettings?.payment_fee || 500} BDT</p>
-                                            {stepErrors.payment_amount && <p className="text-sm text-red-500">{stepErrors.payment_amount}</p>}
+
+                                            </div>
                                         </div>
 
                                         <div className="md:col-span-2 space-y-2">
-                                            <Label>Transaction ID / Reference Number *</Label>
+                                            <Label>Payment Mobile Number </Label>
                                             <Input
                                                 value={data.payment_transaction_id}
                                                 onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
-                                                placeholder="e.g. TRX123456789 or Receipt No."
-                                                className={stepErrors.payment_transaction_id ? 'border-red-500' : ''}
+                                                placeholder="Mobile Number Used for Payment"
                                             />
-                                            {stepErrors.payment_transaction_id && <p className="text-sm text-red-500">{stepErrors.payment_transaction_id}</p>}
-                                            <p className="text-xs text-muted-foreground">Enter the transaction ID from your bKash/Nagad/Bank receipt</p>
                                         </div>
                                     </div>
                                 )}
