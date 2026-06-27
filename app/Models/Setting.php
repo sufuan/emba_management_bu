@@ -37,11 +37,13 @@ class Setting extends Model
     {
         $setting = self::where('key', $key)->first();
 
-        // Determine the type based on the value
+        // Determine the type based on the value.
+        // Note: strings that look numeric but start with '0' (e.g. phone numbers like 013158989898)
+        // must be stored as 'string' to preserve the leading zero.
         $type = match(true) {
             is_bool($value) => 'boolean',
-            is_numeric($value) => 'number',
             is_array($value) => 'json',
+            is_numeric($value) && !(is_string($value) && str_starts_with($value, '0')) => 'number',
             default => 'string',
         };
 

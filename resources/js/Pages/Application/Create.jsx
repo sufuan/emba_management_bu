@@ -742,7 +742,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </div>
 
                                         <div className="md:col-span-2 space-y-2">
-                                            <Label>Payment Mobile Number </Label>
+                                            <Label>Payment Mobile Number</Label>
                                             <Input
                                                 value={data.payment_transaction_id}
                                                 onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
