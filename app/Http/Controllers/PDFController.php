@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Applicant;
 use App\Services\PDFService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PDFController extends Controller
 {
@@ -42,31 +43,42 @@ class PDFController extends Controller
 
     /**
      * Download the offline application form PDF.
-     * Primary: public/pdf/offline-form.pdf (dynamic, admin-uploaded)
-     * Fallback: pdf/offline-form.pdf (original static backup)
+     * Primary: storage/app/public/pdf/offline-form.pdf (admin-uploaded via Storage disk)
+     * Fallback 1: public/pdf/offline-form.pdf (legacy location)
+     * Fallback 2: pdf/offline-form.pdf at base path
      */
     public function downloadOfflineForm()
     {
-        $dynamicPath = public_path('pdf/offline-form.pdf');
-        $backupPath  = base_path('pdf/offline-form.pdf');
-
-        if (file_exists($dynamicPath)) {
-            $path = $dynamicPath;
-        } elseif (file_exists($backupPath)) {
-            $path = $backupPath;
-        } else {
-            abort(404, 'Offline application form not found.');
+        // Primary: Storage public disk (storage/app/public/pdf/offline-form.pdf)
+        if (Storage::disk('public')->exists('pdf/offline-form.pdf')) {
+            $path = Storage::disk('public')->path('pdf/offline-form.pdf');
+            return response()->download($path, 'offline-form.pdf', [
+                'Content-Type' => 'application/pdf',
+            ]);
         }
 
-        return response()->file($path, [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="offline-form.pdf"',
-        ]);
+        // Fallback 1: legacy public/pdf/ directory
+        $legacyPath = public_path('pdf/offline-form.pdf');
+        if (file_exists($legacyPath)) {
+            return response()->download($legacyPath, 'offline-form.pdf', [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
+
+        // Fallback 2: base_path pdf directory
+        $backupPath = base_path('pdf/offline-form.pdf');
+        if (file_exists($backupPath)) {
+            return response()->download($backupPath, 'offline-form.pdf', [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
+
+        abort(404, 'Offline application form not found.');
     }
 
     /**
      * Upload a new offline application form PDF (admin only).
-     * Replaces public/pdf/offline-form.pdf in place.
+     * Stores into storage/app/public/pdf/offline-form.pdf via Storage disk.
      */
     public function uploadOfflineForm(Request $request)
     {
@@ -83,15 +95,17 @@ class PDFController extends Controller
             'offline_form_pdf.max'      => 'The PDF must not be larger than 10 MB.',
         ]);
 
-        $destination = public_path('pdf');
+        $file = $request->file('offline_form_pdf');
 
-        // Ensure the directory exists
-        if (!is_dir($destination)) {
-            mkdir($destination, 0755, true);
+        // Store using Laravel Storage public disk — works reliably on all hosting
+        Storage::disk('public')->putFileAs('pdf', $file, 'offline-form.pdf');
+
+        // Also write to public/pdf/ for direct URL access / legacy fallback
+        $publicDest = public_path('pdf');
+        if (!is_dir($publicDest)) {
+            mkdir($publicDest, 0755, true);
         }
-
-        // Move uploaded file, overwriting the existing one
-        $request->file('offline_form_pdf')->move($destination, 'offline-form.pdf');
+        $file->move($publicDest, 'offline-form.pdf');
 
         return back()->with('success', 'Offline application form updated successfully.');
     }
