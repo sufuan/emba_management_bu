@@ -73,7 +73,7 @@ class ApplicantController extends Controller
             'permanent_address' => 'required|string|max:500',
             'experience_json' => 'nullable|string',
             'education_json' => 'nullable|string',
-            'payment_transaction_id' => 'required|string|max:100',
+            'payment_transaction_id' => 'nullable|string|max:100',
             'payment_method' => 'required|string|max:50',
             'payment_amount' => 'required|numeric|min:0',
             'passport_photo' => 'required|image|mimes:jpg,jpeg,png|max:1024',

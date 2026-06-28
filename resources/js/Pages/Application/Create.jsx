@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { User, GraduationCap, Briefcase, Upload, CheckCircle2, ArrowRight, ArrowLeft, Loader2, AlertCircle, Sparkles, CreditCard, Image as ImageIcon } from 'lucide-react';
 import axios from 'axios';
 import { debounce } from 'lodash';
@@ -42,26 +42,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         },
         experience_json: [{ position: '', company: '', duration: '' }],
         passport_photo: null,
-        payment_transaction_id: '', payment_method: 'bKash', payment_amount: paymentSettings?.payment_fee || 500,
+        payment_transaction_id: '', payment_method: 'bKash', payment_amount: 1000,
     });
 
     const [photoPreview, setPhotoPreview] = useState(null);
     const [cropperOpen, setCropperOpen] = useState(false);
     const [tempImageSrc, setTempImageSrc] = useState(null);
 
-    // Helper to check if payment method is enabled (handles boolean, string, number)
-    const isPaymentMethodEnabled = (enabled) => {
-        return enabled === true || enabled === 1 || enabled === '1' || enabled === 'true';
-    };
-
-    // Debug: Log payment settings on mount
-    useEffect(() => {
-        console.log('Payment Settings:', paymentSettings);
-        console.log('bKash enabled:', paymentSettings?.payment_bkash_enabled, 'Type:', typeof paymentSettings?.payment_bkash_enabled);
-        console.log('Nagad enabled:', paymentSettings?.payment_nagad_enabled, 'Type:', typeof paymentSettings?.payment_nagad_enabled);
-        console.log('Rocket enabled:', paymentSettings?.payment_rocket_enabled, 'Type:', typeof paymentSettings?.payment_rocket_enabled);
-        console.log('Bank enabled:', paymentSettings?.payment_bank_enabled, 'Type:', typeof paymentSettings?.payment_bank_enabled);
-    }, [paymentSettings]);
+    // Payment is hardcoded: bKash only, 1000 BDT
 
     // Validation for each step
     const validateStep = (step) => {
@@ -104,7 +92,6 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         }
 
         if (step === 5) {
-            if (!data.payment_transaction_id.trim()) newErrors.payment_transaction_id = 'Transaction ID is required';
             if (!data.payment_method) newErrors.payment_method = 'Payment method is required';
             if (!data.payment_amount || parseFloat(data.payment_amount) <= 0) newErrors.payment_amount = 'Valid payment amount is required';
         }
@@ -213,10 +200,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
 
     const nextStep = () => {
         if (validateStep(currentStep)) {
+            setStepErrors({});
             setCurrentStep(Math.min(currentStep + 1, 5));
         }
     };
-    const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 1));
+    const prevStep = () => {
+        setStepErrors({});
+        setCurrentStep(Math.max(currentStep - 1, 1));
+    };
 
     // Debounced phone validation
     const validatePhoneUniqueness = useCallback(
@@ -657,7 +648,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             <CreditCard className="h-5 w-5" />
                                             <span className="text-sm font-medium uppercase tracking-wider">Payment Information</span>
                                         </div>
-                                        <p className="text-emerald-100 text-sm">Complete your payment via bKash/Nagad and enter the transaction details below.</p>
+                                        <p className="text-emerald-100 text-sm">Complete your payment via bKash and enter the mobile number used for payment below.</p>
                                     </div>
                                 </div>
 
@@ -681,27 +672,23 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Application Fee</p>
-                                            <p className="text-slate-800 font-bold text-lg">{paymentSettings?.payment_fee || 500} <span className="text-sm font-medium text-slate-500">BDT</span></p>
+                                            <p className="text-slate-800 font-bold text-lg">1000 <span className="text-sm font-medium text-slate-500">BDT</span></p>
                                         </div>
-
                                     </div>
 
-                                    {/* Payment Channels */}
+                                    {/* Payment Channel — bKash hardcoded */}
                                     <div className="bg-white border-b border-slate-100">
                                         <p className="px-5 pt-3 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Send payment using the <strong className="font-bold text-slate-700">Send Money</strong> Method To</p>
                                         <div className="divide-y divide-slate-50">
-                                            {isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) && paymentSettings?.payment_bkash_number && (
-                                                <div className="flex items-center gap-4 px-5 py-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-pink-100 flex items-center justify-center flex-shrink-0">
-                                                        <span className="text-pink-600 font-bold text-xs">bK</span>
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="text-xs text-slate-400">bKash</p>
-                                                        <p className="text-slate-800 font-semibold">{paymentSettings.payment_bkash_number}</p>
-                                                    </div>
+                                            <div className="flex items-center gap-4 px-5 py-3">
+                                                <div className="h-8 w-8 rounded-lg bg-pink-100 flex items-center justify-center flex-shrink-0">
+                                                    <span className="text-pink-600 font-bold text-xs">bK</span>
                                                 </div>
-                                            )}
-
+                                                <div className="flex-1">
+                                                    <p className="text-xs text-slate-400">bKash</p>
+                                                    <p className="text-slate-800 font-semibold">{paymentSettings?.payment_bkash_number || '01XXXXXXXXX'}</p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -716,44 +703,35 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             <p className="text-slate-500 text-xs leading-relaxed">Section Officer, Department of Management Studies,<br />University of Barishal</p>
                                         </div>
                                     </div>
-
-
                                 </div>
 
-                                {/* Payment Form */}
-                                {!isPaymentMethodEnabled(paymentSettings?.payment_bkash_enabled) ? (
-                                    <div className="md:col-span-2 p-6 bg-red-50 border border-red-200 rounded-xl text-center">
-                                        <AlertCircle className="h-12 w-12 text-red-600 mx-auto mb-3" />
-                                        <h4 className="text-lg font-semibold text-red-800 mb-2">No Payment Methods Available</h4>
-                                        <p className="text-red-600 text-sm">bKash payment has not been configured yet. Please contact the admission office for assistance.</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="md:col-span-2 space-y-2">
-                                            <Label>Payment Method</Label>
-                                            <div className="h-10 px-3 py-2 rounded-md border bg-slate-50 flex items-center gap-3">
-                                                <div className="h-6 w-6 rounded bg-pink-100 flex items-center justify-center flex-shrink-0">
-                                                    <span className="text-pink-600 font-bold text-[10px]">bK</span>
-                                                </div>
-                                                <span className="font-medium text-slate-700">bKash</span>
-
-
+                                {/* Payment Form — always visible, hardcoded bKash + 1000 BDT */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-2 space-y-2">
+                                        <Label>Payment Method</Label>
+                                        <div className="h-10 px-3 py-2 rounded-md border bg-slate-50 flex items-center gap-3">
+                                            <div className="h-6 w-6 rounded bg-pink-100 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-pink-600 font-bold text-[10px]">bK</span>
                                             </div>
-                                        </div>
-
-                                        <div className="md:col-span-2 space-y-2">
-                                            <Label>Payment Mobile Number</Label>
-                                            <Input
-                                                value={data.payment_transaction_id}
-                                                onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
-                                                placeholder="Mobile Number Used for Payment"
-                                            />
+                                            <span className="font-medium text-slate-700">bKash</span>
                                         </div>
                                     </div>
-                                )}
 
-                                {/* add a note After completing the payment and submitting the online form, you will be able to download the PDF version of the form. */}
+                                    <div className="md:col-span-2 space-y-2">
+                                        <Label>Payment Mobile Number </Label>
+                                        <Input
+                                            value={data.payment_transaction_id}
+                                            onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
+                                            placeholder="Mobile Number Used for Payment"
+                                            className={stepErrors.payment_transaction_id ? 'border-red-500' : ''}
+                                        />
+                                        {stepErrors.payment_transaction_id && (
+                                            <p className="text-sm text-red-500 mt-1">{stepErrors.payment_transaction_id}</p>
+                                        )}
+                                    </div>
+                                </div>
 
+                                {/* Note */}
                                 <div className="md:col-span-2 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                                     <div className="flex items-center gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-blue-600" />
@@ -762,18 +740,18 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                     <p className="text-blue-600 text-sm">After completing the payment and submitting the online form, you will be able to download the PDF version of the form.</p>
                                 </div>
 
-
                                 {/* Summary */}
-                                {data.payment_transaction_id && data.payment_method && data.payment_amount && (
+                                {data.payment_transaction_id && (
                                     <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                                         <div className="flex items-center gap-2 mb-2">
                                             <CheckCircle2 className="h-5 w-5 text-green-600" />
                                             <span className="font-semibold text-green-700">Payment Details Ready</span>
                                         </div>
                                         <div className="grid grid-cols-3 gap-4 text-sm">
-                                            <div><span className="text-green-600">Method:</span> <strong>{data.payment_method}</strong></div>
-                                            <div><span className="text-green-600">Amount:</span> <strong>{data.payment_amount} BDT</strong></div>
-                                            <div><span className="text-green-600">TRX ID:</span> <strong>{data.payment_transaction_id}</strong></div>
+                                            <div><span className="text-green-600">Method:</span> <strong>bKash</strong></div>
+                                            <div><span className="text-green-600">Amount:</span> <strong>1000 BDT</strong></div>
+                                            <div><span className="text-green-600">Mobile:</span> <strong>{data.payment_transaction_id}</strong></div>
+
                                         </div>
                                     </div>
                                 )}
@@ -784,9 +762,9 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                         <div className="flex justify-between pt-6 border-t">
                             <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1}><ArrowLeft className="h-4 w-4 mr-2" /> Previous</Button>
                             {currentStep < 5 ? (
-                                <Button type="button" onClick={nextStep}>Next <ArrowRight className="h-4 w-4 ml-2" /></Button>
+                                <Button key="next-btn" type="button" onClick={nextStep}>Next <ArrowRight className="h-4 w-4 ml-2" /></Button>
                             ) : (
-                                <Button type="submit" disabled={processing} className="bg-gradient-to-r from-primary to-blue-600">
+                                <Button key="submit-btn" type="submit" disabled={processing} className="bg-gradient-to-r from-primary to-blue-600">
                                     {processing ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</> : <>Submit Application <CheckCircle2 className="h-4 w-4 ml-2" /></>}
                                 </Button>
                             )}
