@@ -1,0 +1,8 @@
+<IfModule mod_headers.c>
+    <Files "offline-form.pdf">
+        Header set Content-Disposition "attachment; filename=\"offline-form.pdf\""
+        Header set Content-Type "application/pdf"
+        Header set Cache-Control "no-store, no-cache, must-revalidate"
+        Header set Pragma "no-cache"
+    </Files>
+</IfModule>

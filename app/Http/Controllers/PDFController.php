@@ -42,26 +42,42 @@ class PDFController extends Controller
 
     /**
      * Download the offline application form PDF.
-     * Primary: public/pdf/offline-form.pdf (admin-uploaded)
-     * Fallback: pdf/offline-form.pdf at base path
+     *
+     * On shared hosting, streaming files through PHP is unreliable (output buffering,
+     * memory limits, connection resets). Instead, we redirect the browser directly to
+     * the public file URL so Apache/Nginx serves it — far more stable.
+     *
+     * Fallback: If the file is not in the public/ directory (e.g. base_path),
+     * we stream it via PHP with output buffer cleared.
      */
     public function downloadOfflineForm()
     {
-        $dynamicPath = public_path('pdf/offline-form.pdf');
-        $backupPath  = base_path('pdf/offline-form.pdf');
+        $publicRelative = 'pdf/offline-form.pdf';
+        $publicAbsolute = public_path($publicRelative);
 
-        if (file_exists($dynamicPath)) {
-            $path = $dynamicPath;
-        } elseif (file_exists($backupPath)) {
-            $path = $backupPath;
-        } else {
-            abort(404, 'Offline application form not found.');
+        // Primary: file is in public/ — redirect so the web server serves it directly.
+        // The public/pdf/.htaccess forces Content-Disposition: attachment.
+        if (file_exists($publicAbsolute)) {
+            // Bust cache so browser always fetches fresh copy
+            $bust = '?v=' . filemtime($publicAbsolute);
+            return redirect(asset($publicRelative) . $bust);
         }
 
-        return response()->download($path, 'offline-form.pdf', [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'attachment; filename="offline-form.pdf"',
-        ]);
+        // Fallback: file is outside public/ — stream via PHP with buffer cleared
+        $backupPath = base_path('pdf/offline-form.pdf');
+        if (file_exists($backupPath)) {
+            // Clear any output buffers to prevent partial-transfer errors
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            return response()->download($backupPath, 'offline-form.pdf', [
+                'Content-Type'   => 'application/pdf',
+                'Cache-Control'  => 'no-store, no-cache',
+                'Pragma'         => 'no-cache',
+            ]);
+        }
+
+        abort(404, 'Offline application form not found.');
     }
 
     /**
