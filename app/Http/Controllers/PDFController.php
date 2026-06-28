@@ -28,7 +28,6 @@ class PDFController extends Controller
      */
     public function downloadAdmitCard(Applicant $applicant)
     {
-        // Admit card is now part of the application PDF
         return $this->pdfService->downloadApplicationPDF($applicant);
     }
 
@@ -41,48 +40,92 @@ class PDFController extends Controller
     }
 
     /**
+     * DEBUG: Show path info — visit /offline-form-debug to diagnose.
+     * REMOVE this method after fixing the issue.
+     */
+    public function debugOfflineForm()
+    {
+        $publicPath   = public_path('pdf/offline-form.pdf');
+        $basePath     = base_path('pdf/offline-form.pdf');
+        $assetUrl     = asset('pdf/offline-form.pdf');
+
+        echo '<pre>';
+        echo "public_path('pdf/offline-form.pdf') = " . $publicPath . "\n";
+        echo "file_exists(public_path)            = " . (file_exists($publicPath) ? 'YES' : 'NO') . "\n";
+        echo "is_readable(public_path)             = " . (is_readable($publicPath)  ? 'YES' : 'NO') . "\n";
+        echo "filesize(public_path)                = " . (file_exists($publicPath) ? filesize($publicPath) . ' bytes' : 'N/A') . "\n";
+        echo "\n";
+        echo "base_path('pdf/offline-form.pdf')   = " . $basePath . "\n";
+        echo "file_exists(base_path)               = " . (file_exists($basePath) ? 'YES' : 'NO') . "\n";
+        echo "\n";
+        echo "asset('pdf/offline-form.pdf')        = " . $assetUrl . "\n";
+        echo "\n";
+        echo "__DIR__                              = " . __DIR__ . "\n";
+        echo "PHP version                          = " . PHP_VERSION . "\n";
+        echo "memory_limit                         = " . ini_get('memory_limit') . "\n";
+        echo "max_execution_time                   = " . ini_get('max_execution_time') . "\n";
+        echo '</pre>';
+        exit;
+    }
+
+    /**
      * Download the offline application form PDF.
      *
-     * On shared hosting, streaming files through PHP is unreliable (output buffering,
-     * memory limits, connection resets). Instead, we redirect the browser directly to
-     * the public file URL so Apache/Nginx serves it — far more stable.
-     *
-     * Fallback: If the file is not in the public/ directory (e.g. base_path),
-     * we stream it via PHP with output buffer cleared.
+     * Uses raw chunked output to avoid Laravel response/buffering issues
+     * that cause intermittent "file not available" errors on shared hosting.
      */
     public function downloadOfflineForm()
     {
-        $publicRelative = 'pdf/offline-form.pdf';
-        $publicAbsolute = public_path($publicRelative);
+        // Resolve the file path
+        $path = public_path('pdf/offline-form.pdf');
 
-        // Primary: file is in public/ — redirect so the web server serves it directly.
-        // The public/pdf/.htaccess forces Content-Disposition: attachment.
-        if (file_exists($publicAbsolute)) {
-            // Bust cache so browser always fetches fresh copy
-            $bust = '?v=' . filemtime($publicAbsolute);
-            return redirect(asset($publicRelative) . $bust);
+        if (!file_exists($path) || !is_readable($path)) {
+            $path = base_path('pdf/offline-form.pdf');
         }
 
-        // Fallback: file is outside public/ — stream via PHP with buffer cleared
-        $backupPath = base_path('pdf/offline-form.pdf');
-        if (file_exists($backupPath)) {
-            // Clear any output buffers to prevent partial-transfer errors
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
-            return response()->download($backupPath, 'offline-form.pdf', [
-                'Content-Type'   => 'application/pdf',
-                'Cache-Control'  => 'no-store, no-cache',
-                'Pragma'         => 'no-cache',
-            ]);
+        if (!file_exists($path) || !is_readable($path)) {
+            abort(404, 'Offline application form not found.');
         }
 
-        abort(404, 'Offline application form not found.');
+        $filesize = filesize($path);
+
+        // Kill ALL output buffers — critical on shared hosting
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        // Send headers directly — bypasses Laravel response pipeline entirely
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: attachment; filename="offline-form.pdf"');
+        header('Content-Length: ' . $filesize);
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+        header('X-Content-Type-Options: nosniff');
+
+        // Flush headers to the browser immediately
+        if (function_exists('fastcgi_finish_request')) {
+            // not applicable here — skip
+        }
+        flush();
+
+        // Stream file in 8KB chunks — prevents memory_limit issues
+        $handle = fopen($path, 'rb');
+        if ($handle === false) {
+            abort(500, 'Could not open file for reading.');
+        }
+
+        while (!feof($handle)) {
+            echo fread($handle, 8192);
+            flush();
+        }
+
+        fclose($handle);
+        exit;
     }
 
     /**
      * Upload a new offline application form PDF (admin only).
-     * Saves to public/pdf/offline-form.pdf (web-accessible directory).
      */
     public function uploadOfflineForm(Request $request)
     {
@@ -91,7 +134,7 @@ class PDFController extends Controller
                 'required',
                 'file',
                 'mimes:pdf',
-                'max:10240', // 10 MB
+                'max:10240',
             ],
         ], [
             'offline_form_pdf.required' => 'Please select a PDF file to upload.',
@@ -101,15 +144,12 @@ class PDFController extends Controller
 
         $destination = public_path('pdf');
 
-        // Ensure the directory exists with proper permissions
         if (!is_dir($destination)) {
             mkdir($destination, 0755, true);
         }
 
-        // Move uploaded file, overwriting any existing one
         $request->file('offline_form_pdf')->move($destination, 'offline-form.pdf');
 
         return back()->with('success', 'Offline application form updated successfully.');
     }
 }
-

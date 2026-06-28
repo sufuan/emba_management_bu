@@ -61,6 +61,7 @@ Route::get('/application/{applicant}/admit-card/download', [PDFController::class
 
 // Offline Application Form PDF
 Route::get('/offline-form', [PDFController::class, 'downloadOfflineForm'])->name('pdf.offline-form');
+Route::get('/offline-form-debug', [PDFController::class, 'debugOfflineForm']); // TEMP: remove after fix
 
 /*
 |--------------------------------------------------------------------------
