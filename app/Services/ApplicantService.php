@@ -46,6 +46,7 @@ class ApplicantService
                 'experience_json' => $data['experience_json'] ?? null,
                 'education_json' => $data['education_json'] ?? null,
                 'payment_transaction_id' => $data['payment_transaction_id'] ?? null,
+                'payment_mobile_number' => $data['payment_mobile_number'] ?? null,
                 'payment_method' => $data['payment_method'] ?? null,
                 'payment_amount' => $data['payment_amount'] ?? null,
                 'payment_date' => $data['payment_date'] ?? now(),
@@ -197,4 +198,3 @@ class ApplicantService
         return $query->orderBy('created_at', 'desc')->paginate(15);
     }
 }
-

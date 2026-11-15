@@ -42,7 +42,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         },
         experience_json: [{ position: '', company: '', duration: '' }],
         passport_photo: null,
-        payment_transaction_id: '', payment_method: 'bKash', payment_amount: 1000,
+        payment_transaction_id: '', payment_mobile_number: '', payment_method: 'bKash', payment_amount: 1000,
     });
 
     const [photoPreview, setPhotoPreview] = useState(null);
@@ -94,6 +94,8 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         if (step === 5) {
             if (!data.payment_method) newErrors.payment_method = 'Payment method is required';
             if (!data.payment_amount || parseFloat(data.payment_amount) <= 0) newErrors.payment_amount = 'Valid payment amount is required';
+            if (!data.payment_mobile_number.trim()) newErrors.payment_mobile_number = 'Payment mobile number is required';
+            if (!data.payment_transaction_id.trim()) newErrors.payment_transaction_id = 'Payment transaction ID is required';
         }
 
         setStepErrors(newErrors);
@@ -185,6 +187,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
             formData.append('education_json', JSON.stringify(data.education_json));
             formData.append('experience_json', JSON.stringify(data.experience_json));
             formData.append('payment_transaction_id', data.payment_transaction_id);
+            formData.append('payment_mobile_number', data.payment_mobile_number);
             formData.append('payment_method', data.payment_method);
             formData.append('payment_amount', data.payment_amount);
             if (data.passport_photo) formData.append('passport_photo', data.passport_photo);
@@ -648,7 +651,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                             <CreditCard className="h-5 w-5" />
                                             <span className="text-sm font-medium uppercase tracking-wider">Payment Information</span>
                                         </div>
-                                        <p className="text-emerald-100 text-sm">Complete your payment via bKash and enter the mobile number used for payment below.</p>
+                                        <p className="text-emerald-100 text-sm">Complete your payment via bKash, then enter the payment mobile number and transaction ID below.</p>
                                     </div>
                                 </div>
 
@@ -718,15 +721,36 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                     </div>
 
                                     <div className="md:col-span-2 space-y-2">
-                                        <Label>Payment Mobile Number </Label>
+                                        <Label htmlFor="payment_mobile_number">Payment Mobile Number *</Label>
                                         <Input
+                                            id="payment_mobile_number"
+                                            type="tel"
+                                            value={data.payment_mobile_number}
+                                            onChange={e => handleInputChange('payment_mobile_number', e.target.value)}
+                                            placeholder="Mobile Number Used for Payment"
+                                            maxLength={20}
+                                            autoComplete="tel"
+                                            required
+                                            className={stepErrors.payment_mobile_number || errors.payment_mobile_number ? 'border-red-500' : ''}
+                                        />
+                                        {(stepErrors.payment_mobile_number || errors.payment_mobile_number) && (
+                                            <p className="text-sm text-red-500 mt-1">{stepErrors.payment_mobile_number || errors.payment_mobile_number}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="md:col-span-2 space-y-2">
+                                        <Label htmlFor="payment_transaction_id">Payment Transaction ID *</Label>
+                                        <Input
+                                            id="payment_transaction_id"
                                             value={data.payment_transaction_id}
                                             onChange={e => handleInputChange('payment_transaction_id', e.target.value)}
-                                            placeholder="Mobile Number Used for Payment"
-                                            className={stepErrors.payment_transaction_id ? 'border-red-500' : ''}
+                                            placeholder="Transaction ID from your payment confirmation"
+                                            maxLength={100}
+                                            required
+                                            className={stepErrors.payment_transaction_id || errors.payment_transaction_id ? 'border-red-500' : ''}
                                         />
-                                        {stepErrors.payment_transaction_id && (
-                                            <p className="text-sm text-red-500 mt-1">{stepErrors.payment_transaction_id}</p>
+                                        {(stepErrors.payment_transaction_id || errors.payment_transaction_id) && (
+                                            <p className="text-sm text-red-500 mt-1">{stepErrors.payment_transaction_id || errors.payment_transaction_id}</p>
                                         )}
                                     </div>
                                 </div>
@@ -741,17 +765,17 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                 </div>
 
                                 {/* Summary */}
-                                {data.payment_transaction_id && (
+                                {(data.payment_mobile_number || data.payment_transaction_id) && (
                                     <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
                                         <div className="flex items-center gap-2 mb-2">
                                             <CheckCircle2 className="h-5 w-5 text-green-600" />
                                             <span className="font-semibold text-green-700">Payment Details Ready</span>
                                         </div>
-                                        <div className="grid grid-cols-3 gap-4 text-sm">
+                                        <div className="grid grid-cols-2 gap-4 text-sm">
                                             <div><span className="text-green-600">Method:</span> <strong>bKash</strong></div>
                                             <div><span className="text-green-600">Amount:</span> <strong>1000 BDT</strong></div>
-                                            <div><span className="text-green-600">Mobile:</span> <strong>{data.payment_transaction_id}</strong></div>
-
+                                            <div><span className="text-green-600">Mobile:</span> <strong>{data.payment_mobile_number}</strong></div>
+                                            <div><span className="text-green-600">Transaction ID:</span> <strong>{data.payment_transaction_id}</strong></div>
                                         </div>
                                     </div>
                                 )}
@@ -788,5 +812,3 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         </>
     );
 }
-
-

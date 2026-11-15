@@ -34,6 +34,7 @@ class Applicant extends Model
         'experience_json',
         'education_json',
         'payment_transaction_id',
+        'payment_mobile_number',
         'payment_method',
         'payment_amount',
         'payment_date',

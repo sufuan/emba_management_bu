@@ -124,10 +124,11 @@ export default function Show({ applicant }) {
                         <Card className="border-0 shadow-lg">
                             <CardHeader><CardTitle>Payment Information</CardTitle></CardHeader>
                             <CardContent>
-                                {applicant.payment_transaction_id ? (
+                                {applicant.payment_transaction_id || applicant.payment_mobile_number ? (
                                     <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                                         <div className="grid md:grid-cols-2 gap-4">
-                                            <div><p className="text-xs text-muted-foreground">Transaction ID</p><p className="font-medium text-green-700">{applicant.payment_transaction_id}</p></div>
+                                            <div><p className="text-xs text-muted-foreground">Transaction ID</p><p className="font-medium text-green-700">{applicant.payment_transaction_id || '-'}</p></div>
+                                            <div><p className="text-xs text-muted-foreground">Payment Mobile Number</p><p className="font-medium">{applicant.payment_mobile_number || '-'}</p></div>
                                             <div><p className="text-xs text-muted-foreground">Payment Method</p><p className="font-medium">{applicant.payment_method || '-'}</p></div>
                                             <div><p className="text-xs text-muted-foreground">Amount</p><p className="font-medium">{applicant.payment_amount ? `${applicant.payment_amount} BDT` : '-'}</p></div>
                                             <div><p className="text-xs text-muted-foreground">Payment Date</p><p className="font-medium">{applicant.payment_date ? new Date(applicant.payment_date).toLocaleDateString() : '-'}</p></div>
@@ -182,4 +183,3 @@ export default function Show({ applicant }) {
         </AdminLayout>
     );
 }
-
