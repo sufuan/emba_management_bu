@@ -23,9 +23,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
 
     // Apply fallbacks for settings
     const heroUniversity = homeSettings.hero_university || 'University of Barishal';
-    const heroTitle1 = homeSettings.hero_title_1 || 'Transform Your';
-    const heroTitle2 = homeSettings.hero_title_2 || 'Career';
-    const heroTitle3 = homeSettings.hero_title_3 || 'with an Executive MBA in';
+    const heroTitle3 = homeSettings.hero_title_3 || 'Executive MBA in';
     const heroSubtitle = homeSettings.hero_subtitle || 'Management Studies';
     const heroDesc = homeSettings.hero_desc || 'Join our prestigious Executive MBA program and unlock your leadership potential. Learn from industry experts and build a powerful professional network.';
     
@@ -73,11 +71,6 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                         </div>
                         <div className="space-y-6">
                             <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                                {heroTitle1}{' '}
-                                <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
-                                    {heroTitle2}
-                                </span>
-                                <br />
                                 <span className="text-4xl lg:text-6xl">{heroTitle3}</span>
                             </h1>
                             <div className="relative inline-block">
@@ -122,10 +115,10 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                                 )
                             )}
 
-                            {/* Offline Apply button — always second (right) */}
-                            <a href="/offline-form">
+                            {/* View Circular button — always second (right) */}
+                            <a href="/circular/admission-circular.jpg" download>
                                 <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-slate-900 gap-2 px-6 py-3">
-                                    <Download className="h-5 w-5" /> Offline Apply
+                                    <Download className="h-5 w-5" /> View Circular
                                 </Button>
                             </a>
                         </div>

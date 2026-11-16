@@ -49,9 +49,9 @@ export default function FrontendSettings({ homeSettings = {}, aboutSettings = {}
     // Initial state matching existing Home.jsx strings
     const defaultHome = {
         hero_university: homeSettings.hero_university || 'University of Barishal',
-        hero_title_1: homeSettings.hero_title_1 || 'Transform Your',
-        hero_title_2: homeSettings.hero_title_2 || 'Career',
-        hero_title_3: homeSettings.hero_title_3 || 'with an Executive MBA in',
+        hero_title_1: homeSettings.hero_title_1 || '',
+        hero_title_2: homeSettings.hero_title_2 || '',
+        hero_title_3: homeSettings.hero_title_3 || 'Executive MBA in',
         hero_subtitle: homeSettings.hero_subtitle || 'Management Studies',
         hero_desc: homeSettings.hero_desc || 'Join our prestigious Executive MBA program and unlock your leadership potential. Learn from industry experts and build a powerful professional network.',
         
