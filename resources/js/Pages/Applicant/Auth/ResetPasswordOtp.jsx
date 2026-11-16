@@ -1,9 +1,10 @@
+import { useRef } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, GraduationCap, KeyRound, RefreshCw } from 'lucide-react';
+import { Lock, GraduationCap, RefreshCw } from 'lucide-react';
 
 export default function ResetPasswordOtp({ email, status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -13,6 +14,73 @@ export default function ResetPasswordOtp({ email, status }) {
     });
 
     const resendForm = useForm({});
+
+    // ---- Six-box PIN entry: type to auto-advance, Backspace goes back ----
+    const boxRefs = useRef([]);
+    const slots = Array.from({ length: 6 }, (_, i) => data.otp[i] || '');
+
+    const focusBox = (i) => {
+        const el = boxRefs.current[i];
+        if (el) {
+            el.focus();
+            el.select();
+        }
+    };
+
+    const writeSlots = (next) => setData('otp', next.join(''));
+
+    const handleBoxFocus = (i) => {
+        // Never leave a gap: send focus to the first empty box instead.
+        const firstEmpty = slots.indexOf('');
+        if (firstEmpty !== -1 && firstEmpty < i) {
+            focusBox(firstEmpty);
+        }
+    };
+
+    const handleBoxChange = (i, value) => {
+        const digit = value.replace(/\D/g, '').slice(-1);
+        const next = slots.slice();
+        next[i] = digit;
+        writeSlots(next);
+        if (digit && i < 5) {
+            focusBox(i + 1);
+        }
+    };
+
+    const handleBoxKeyDown = (i, e) => {
+        if (e.key === 'Backspace') {
+            e.preventDefault();
+            const next = slots.slice();
+            if (next[i]) {
+                next[i] = '';
+                writeSlots(next);
+            } else if (i > 0) {
+                next[i - 1] = '';
+                writeSlots(next);
+                focusBox(i - 1);
+            }
+        } else if (e.key === 'ArrowLeft' && i > 0) {
+            e.preventDefault();
+            focusBox(i - 1);
+        } else if (e.key === 'ArrowRight' && i < 5) {
+            e.preventDefault();
+            focusBox(i + 1);
+        } else if (e.key === 'Delete') {
+            e.preventDefault();
+            const next = slots.slice();
+            next[i] = '';
+            writeSlots(next);
+        }
+    };
+
+    const handleBoxPaste = (e) => {
+        e.preventDefault();
+        const text = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+        if (!text) return;
+        const next = Array.from({ length: 6 }, (_, i) => text[i] || '');
+        writeSlots(next);
+        focusBox(Math.min(text.length, 5));
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -60,26 +128,30 @@ export default function ResetPasswordOtp({ email, status }) {
                             )}
 
                             <form onSubmit={submit} className="space-y-5">
-                                {/* OTP Field */}
+                                {/* OTP Field — six boxes, auto-advance */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="otp" className="text-sm font-semibold">
+                                    <Label className="text-sm font-semibold">
                                         6-Digit Code
                                     </Label>
-                                    <div className="relative">
-                                        <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                        <Input
-                                            id="otp"
-                                            type="text"
-                                            inputMode="numeric"
-                                            maxLength={6}
-                                            value={data.otp}
-                                            onChange={(e) => setData('otp', e.target.value.replace(/\D/g, ''))}
-                                            className="pl-10 h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500 tracking-[0.4em] font-semibold"
-                                            placeholder="------"
-                                            autoComplete="one-time-code"
-                                            autoFocus
-                                            required
-                                        />
+                                    <div className="flex items-center justify-between gap-2" onPaste={handleBoxPaste}>
+                                        {slots.map((digit, i) => (
+                                            <Input
+                                                key={i}
+                                                ref={(el) => (boxRefs.current[i] = el)}
+                                                type="text"
+                                                inputMode="numeric"
+                                                maxLength={1}
+                                                value={digit}
+                                                onChange={(e) => handleBoxChange(i, e.target.value)}
+                                                onKeyDown={(e) => handleBoxKeyDown(i, e)}
+                                                onFocus={() => handleBoxFocus(i)}
+                                                className="h-12 w-11 text-center text-lg font-bold border-slate-300 focus:border-blue-500 focus:ring-blue-500 px-0"
+                                                autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                                                autoFocus={i === 0}
+                                                aria-label={`Code digit ${i + 1}`}
+                                                required
+                                            />
+                                        ))}
                                     </div>
                                     {errors.otp && (
                                         <p className="text-sm text-red-600 font-medium flex items-center gap-1">
