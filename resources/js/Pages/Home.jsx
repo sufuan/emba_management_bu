@@ -66,6 +66,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                     <div className="text-white space-y-6 text-center max-w-5xl mx-auto">
                         <div className="flex items-center justify-center gap-2">
                             <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400"></div>
+                            <img src="/logo/university_logo.png" alt="University of Barishal logo" className="h-9 w-9 object-contain" />
                             <span className="text-blue-300 font-semibold tracking-wider text-xl uppercase">{heroUniversity}</span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-blue-400"></div>
                         </div>
