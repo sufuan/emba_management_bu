@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin/
+Disallow: /applicant/dashboard
+Disallow: /applicant/application/
+
+Sitemap: https://www.bu-embamgt.com/sitemap.xml
