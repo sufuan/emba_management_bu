@@ -31,6 +31,8 @@ class RegisteredApplicantController extends Controller
         $request->validate([
             'email' => 'required|string|lowercase|email|max:255|unique:' . ApplicantUser::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'email.unique' => 'This email is already registered. Please sign in to your account, or use "Forgot Password" if you cannot remember your password.',
         ]);
 
         // Generate unique temporary phone using timestamp and random string
