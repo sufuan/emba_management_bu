@@ -18,7 +18,7 @@ export default function PublicLayout({ children }) {
             <div className="bg-primary text-primary-foreground py-2">
                 <div className="container mx-auto px-4 flex justify-between items-center text-sm">
                     <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> +8801711352874</span>
+                        <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> Chairman: +8801711352874</span>
                         <span className="hidden sm:flex items-center gap-1"><Mail className="h-3 w-3" />chair_mgt@bu.ac.bd</span>
                     </div>
                     <div className="flex items-center gap-2">
