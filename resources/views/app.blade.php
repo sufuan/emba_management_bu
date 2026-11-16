@@ -33,7 +33,7 @@
         @php $logoUrl = asset('logo/university_logo.png'); @endphp
         <script type="application/ld+json">
         {
-            "@context": "https://schema.org",
+            "@@context": "https://schema.org",
             "@type": "EducationalOrganization",
             "name": "Department of Management Studies, University of Barishal",
             "alternateName": "BU EMBA MGT",
