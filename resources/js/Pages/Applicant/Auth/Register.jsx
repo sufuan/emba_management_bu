@@ -147,13 +147,22 @@ export default function Register() {
                             </div>
 
                             {/* Login Link */}
-                            <div className="text-center">
+                            <div className="text-center space-y-2">
                                 <Link
                                     href={route('applicant.login')}
                                     className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors inline-flex items-center gap-1"
                                 >
                                     Sign in to your account →
                                 </Link>
+                                <p className="text-sm text-slate-600">
+                                    Already registered but forgot your password?{' '}
+                                    <Link
+                                        href={route('applicant.password.request')}
+                                        className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                                    >
+                                        Reset it here →
+                                    </Link>
+                                </p>
                             </div>
                         </CardContent>
                     </Card>
