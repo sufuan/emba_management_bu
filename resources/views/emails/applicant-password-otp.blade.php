@@ -6,7 +6,7 @@
 </head>
 <body style="font-family: Arial, Helvetica, sans-serif; background:#f1f5f9; margin:0; padding:24px;">
     <div style="max-width:520px; margin:0 auto; background:#ffffff; border-radius:12px; padding:32px; border:1px solid #e2e8f0;">
-        <h1 style="font-size:20px; color:#0f172a; margin:0 0 8px;">EMBA Admission — Password Reset</h1>
+        <h1 style="font-size:20px; color:#0f172a; margin:0 0 8px;">EMBA Management Studies admission password reset</h1>
         <p style="color:#475569; font-size:14px; line-height:1.6; margin:0 0 20px;">
             Hello,<br>
             You requested to reset the password of your EMBA applicant account at the
