@@ -30,6 +30,7 @@
         <meta name="twitter:image" content="{{ asset('logo/university_logo.png') }}">
 
         <!-- JSON-LD Structured Data -->
+        @php $logoUrl = asset('logo/university_logo.png'); @endphp
         <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -37,7 +38,7 @@
             "name": "Department of Management Studies, University of Barishal",
             "alternateName": "BU EMBA MGT",
             "url": "https://www.bu-embamgt.com",
-            "logo": "{{ asset('logo/university_logo.png') }}",
+            "logo": "{{ $logoUrl }}",
             "description": "Official EMBA program admission portal for the Department of Management Studies, University of Barishal.",
             "address": {
                 "@type": "PostalAddress",
