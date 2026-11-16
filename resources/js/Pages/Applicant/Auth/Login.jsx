@@ -137,7 +137,7 @@ export default function Login({ status }) {
                                             href={route('applicant.password.request')}
                                             className="text-sm font-semibold text-blue-900 hover:text-blue-700 transition-colors"
                                         >
-                                            Forgot password?
+                                            Reset your password
                                         </Link>
                                     </div>
 
@@ -157,7 +157,7 @@ export default function Login({ status }) {
                                     </Button>
                                 </form>
 
-                                <div className="mt-6 space-y-3 text-center">
+                                <div className="mt-6 text-center">
                                     <p className="text-sm text-slate-600">
                                         Don't have an account?{' '}
                                         <Link
@@ -165,23 +165,6 @@ export default function Login({ status }) {
                                             className="font-semibold text-slate-900 hover:text-slate-700 transition-colors"
                                         >
                                             Register Now →
-                                        </Link>
-                                    </p>
-                                    <div className="relative">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <span className="w-full border-t border-slate-200" />
-                                        </div>
-                                        <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-white px-2 text-slate-500">or</span>
-                                        </div>
-                                    </div>
-                                    <p className="text-sm text-slate-600">
-                                        Administrator?{' '}
-                                        <Link
-                                            href={route('login')}
-                                            className="font-semibold text-blue-900 hover:text-blue-700 transition-colors"
-                                        >
-                                            Admin Login →
                                         </Link>
                                     </p>
                                 </div>
