@@ -28,11 +28,11 @@ class RegisteredApplicantController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // NOTE (owner decision 2026-11-16): duplicate emails are ALLOWED.
+        // One email may create as many applicant accounts as it wants.
         $request->validate([
-            'email' => 'required|string|lowercase|email|max:255|unique:' . ApplicantUser::class,
+            'email' => 'required|string|lowercase|email|max:255',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'email.unique' => 'This email is already registered. Please sign in to your account, or use "Forgot Password" if you cannot remember your password.',
         ]);
 
         // Generate unique temporary phone using timestamp and random string
