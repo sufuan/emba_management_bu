@@ -122,15 +122,23 @@ export default function Login({ status }) {
                                         )}
                                     </div>
 
-                                    <div className="flex items-center space-x-2">
-                                        <Checkbox
-                                            id="remember"
-                                            checked={data.remember}
-                                            onCheckedChange={(checked) => setData('remember', checked)}
-                                        />
-                                        <Label htmlFor="remember" className="text-sm font-medium cursor-pointer">
-                                            Remember me
-                                        </Label>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id="remember"
+                                                checked={data.remember}
+                                                onCheckedChange={(checked) => setData('remember', checked)}
+                                            />
+                                            <Label htmlFor="remember" className="text-sm font-medium cursor-pointer">
+                                                Remember me
+                                            </Label>
+                                        </div>
+                                        <Link
+                                            href={route('applicant.password.request')}
+                                            className="text-sm font-semibold text-blue-900 hover:text-blue-700 transition-colors"
+                                        >
+                                            Forgot password?
+                                        </Link>
                                     </div>
 
                                     <Button
