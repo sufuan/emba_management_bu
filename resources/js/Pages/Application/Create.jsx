@@ -41,10 +41,10 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         permanent_house: '', permanent_road: '', permanent_village: '', permanent_post_office: '', permanent_upazila: '', permanent_district: '',
         emergency_contact_name: '', emergency_contact_phone: '', emergency_contact_address: '',
         education_json: {
-            ssc: { year: '', board: '', subject: '', result: '' },
-            hsc: { year: '', board: '', subject: '', result: '' },
-            bachelor: { year: '', university: '', department: '', result: '' },
-            master: { year: '', university: '', department: '', result: '' },
+            ssc: { year: '', board: '', subject: '', institution: '', result: '' },
+            hsc: { year: '', board: '', subject: '', institution: '', result: '' },
+            bachelor: { year: '', university: '', department: '', institution: '', result: '' },
+            master: { year: '', university: '', department: '', institution: '', result: '' },
         },
         experience_json: [{ position: '', company: '', duration: '' }],
         passport_photo: null,
@@ -86,6 +86,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                 const label = key === 'ssc' ? 'SSC' : key === 'hsc' ? 'HSC' : 'Bachelor';
                 if (!edu.year.trim()) newErrors[`${key}_year`] = `${label} year is required`;
                 if (!edu.board?.trim() && !edu.university?.trim()) newErrors[`${key}_board`] = `${label} board/university is required`;
+                if (!edu.institution?.trim()) newErrors[`${key}_institution`] = `${label} institution name is required`;
                 if (!edu.subject?.trim() && !edu.department?.trim()) newErrors[`${key}_subject`] = `${label} subject/department is required`;
                 if (!edu.result.trim()) newErrors[`${key}_result`] = `${label} result is required`;
             });
@@ -172,8 +173,9 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
         const edu = data.education_json[key];
         if (key === 'master') return true; // Optional
         const hasBoard = edu.board?.trim() || edu.university?.trim();
+        const hasInstitution = edu.institution?.trim();
         const hasSubject = edu.subject?.trim() || edu.department?.trim();
-        return edu.year?.trim() && hasBoard && hasSubject && edu.result?.trim();
+        return edu.year?.trim() && hasBoard && hasInstitution && hasSubject && edu.result?.trim();
     };
 
     const handleSubmit = (e) => {
@@ -563,6 +565,7 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                     <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider w-[160px]">Examination</th>
                                                     <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Year of Passing</th>
                                                     <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Board / University</th>
+                                                    <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Institution Name</th>
                                                     <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Subject / Dept.</th>
                                                     <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wider">Division / CGPA</th>
                                                     <th className="px-2 py-4 w-[50px]"></th>
@@ -603,6 +606,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                                                                     onChange={e => updateEducation(row.key, boardField, e.target.value)}
                                                                     placeholder={isMaster || row.key === 'bachelor' ? "University name" : "e.g. Dhaka"}
                                                                     className={`h-9 text-sm ${stepErrors[`${row.key}_board`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
+                                                                />
+                                                            </td>
+                                                            <td className="px-2 py-2">
+                                                                <Input
+                                                                    value={edu.institution || ''}
+                                                                    onChange={e => updateEducation(row.key, 'institution', e.target.value)}
+                                                                    placeholder={isMaster || row.key === 'bachelor' ? "University / Institute" : row.key === 'ssc' ? "School name" : "College name"}
+                                                                    className={`h-9 text-sm ${stepErrors[`${row.key}_institution`] ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:ring-2 focus:ring-blue-500 transition-all`}
                                                                 />
                                                             </td>
                                                             <td className="px-2 py-2">

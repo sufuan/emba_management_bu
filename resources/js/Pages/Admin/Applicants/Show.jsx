@@ -69,6 +69,7 @@ export default function Show({ applicant }) {
                                                     <th className="px-4 py-2 text-left font-semibold">Examination</th>
                                                     <th className="px-4 py-2 text-left font-semibold">Year</th>
                                                     <th className="px-4 py-2 text-left font-semibold">Board/University</th>
+                                                    <th className="px-4 py-2 text-left font-semibold">Institution</th>
                                                     <th className="px-4 py-2 text-left font-semibold">Subject/Dept.</th>
                                                     <th className="px-4 py-2 text-left font-semibold">Result/CGPA</th>
                                                 </tr>
@@ -90,6 +91,7 @@ export default function Show({ applicant }) {
                                                             <td className="px-4 py-3 font-medium">{row.label}</td>
                                                             <td className="px-4 py-3">{edu.year || '-'}</td>
                                                             <td className="px-4 py-3">{board || '-'}</td>
+                                                            <td className="px-4 py-3">{edu.institution || '-'}</td>
                                                             <td className="px-4 py-3">{subject || '-'}</td>
                                                             <td className="px-4 py-3">{edu.result || '-'}</td>
                                                         </tr>
