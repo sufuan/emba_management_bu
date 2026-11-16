@@ -60,14 +60,14 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
             </Head>
 
             {/* Hero Section */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+            <section className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-blue-800 to-slate-800">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
                 <div className="container mx-auto px-4 py-20 lg:py-32 relative">
                     <div className="text-white space-y-6 text-center max-w-5xl mx-auto">
                         <div className="flex items-center justify-center gap-2">
                             <div className="h-px w-12 bg-gradient-to-r from-transparent to-blue-400"></div>
-                            <img src="/logo/university_logo.png" alt="University of Barishal logo" className="h-12 w-12 object-contain" />
-                            <span className="text-blue-300 font-semibold tracking-wider text-2xl uppercase">{heroUniversity}</span>
+                            <img src="/logo/university_logo.png" alt="University of Barishal logo" className="h-16 w-16 object-contain" />
+                            <span className="text-blue-300 font-semibold tracking-wider text-2xl">{heroUniversity}</span>
                             <div className="h-px w-12 bg-gradient-to-l from-transparent to-blue-400"></div>
                         </div>
                         <div className="space-y-6">
