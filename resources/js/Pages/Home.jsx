@@ -87,7 +87,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                         {applyNowEnabled && activeSession && (
                             <div className="flex justify-center">
                                 <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 text-sm py-1.5 px-4">
-                                    Admission Open: {activeSession.formatted_name}
+                                    Admission open EMBA 5th Batch: 2026-27
                                 </Badge>
                             </div>
                         )}
