@@ -32,8 +32,14 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
     const [currentStep, setCurrentStep] = useState(1);
     const [stepErrors, setStepErrors] = useState({});
     const { data, setData, post, processing, errors } = useForm({
-        full_name: '', fathers_name: '', mothers_name: '', dob: '', nid: '', phone: '', email: userEmail || '',
-        present_address: '', permanent_address: '',
+        full_name: '', name_bengali: '', fathers_name: '', mothers_name: '',
+        nationality: 'Bangladeshi', blood_group: '', marital_status: '',
+        dob: '', nid: '', phone: '', email: userEmail || '',
+        present_address: '',
+        present_house: '', present_road: '', present_village: '', present_post_office: '', present_upazila: '', present_district: '',
+        permanent_address: '',
+        permanent_house: '', permanent_road: '', permanent_village: '', permanent_post_office: '', permanent_upazila: '', permanent_district: '',
+        emergency_contact_name: '', emergency_contact_phone: '', emergency_contact_address: '',
         education_json: {
             ssc: { year: '', board: '', subject: '', result: '' },
             hsc: { year: '', board: '', subject: '', result: '' },
@@ -68,8 +74,8 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
             else if (stepErrors.phone) newErrors.phone = stepErrors.phone;
             if (!data.email.trim()) newErrors.email = 'Email is required';
             else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) newErrors.email = 'Invalid email address';
-            if (!data.present_address.trim()) newErrors.present_address = 'Present address is required';
-            if (!data.permanent_address.trim()) newErrors.permanent_address = 'Permanent address is required';
+            if (!data.present_district.trim() && !data.present_address.trim()) newErrors.present_district = 'Present district is required';
+            if (!data.permanent_district.trim() && !data.permanent_address.trim()) newErrors.permanent_district = 'Permanent district is required';
             // Subject is always Management - no validation needed
         }
 
@@ -176,14 +182,33 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
             // Use router.post with FormData for file uploads
             const formData = new FormData();
             formData.append('full_name', data.full_name);
+            formData.append('name_bengali', data.name_bengali || '');
             formData.append('fathers_name', data.fathers_name);
             formData.append('mothers_name', data.mothers_name);
+            formData.append('nationality', data.nationality || 'Bangladeshi');
+            formData.append('blood_group', data.blood_group || '');
+            formData.append('marital_status', data.marital_status || '');
             formData.append('dob', data.dob);
             formData.append('nid', data.nid);
             formData.append('phone', data.phone);
             formData.append('email', data.email);
             formData.append('present_address', data.present_address);
+            formData.append('present_house', data.present_house || '');
+            formData.append('present_road', data.present_road || '');
+            formData.append('present_village', data.present_village || '');
+            formData.append('present_post_office', data.present_post_office || '');
+            formData.append('present_upazila', data.present_upazila || '');
+            formData.append('present_district', data.present_district || '');
             formData.append('permanent_address', data.permanent_address);
+            formData.append('permanent_house', data.permanent_house || '');
+            formData.append('permanent_road', data.permanent_road || '');
+            formData.append('permanent_village', data.permanent_village || '');
+            formData.append('permanent_post_office', data.permanent_post_office || '');
+            formData.append('permanent_upazila', data.permanent_upazila || '');
+            formData.append('permanent_district', data.permanent_district || '');
+            formData.append('emergency_contact_name', data.emergency_contact_name || '');
+            formData.append('emergency_contact_phone', data.emergency_contact_phone || '');
+            formData.append('emergency_contact_address', data.emergency_contact_address || '');
             formData.append('education_json', JSON.stringify(data.education_json));
             formData.append('experience_json', JSON.stringify(data.experience_json));
             formData.append('payment_transaction_id', data.payment_transaction_id);
@@ -292,83 +317,218 @@ export default function Create({ session, subjectChoices, uploadConfig, paymentS
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Step 1: Personal Info */}
                         {currentStep === 1 && (
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div className="md:col-span-2">
-                                    <Label>Full Name *</Label>
-                                    <Input value={data.full_name} onChange={e => handleInputChange('full_name', e.target.value)} placeholder="Enter your full name" className={stepErrors.full_name ? 'border-red-500' : ''} />
-                                    {(stepErrors.full_name || errors.full_name) && <p className="text-sm text-red-500 mt-1">{stepErrors.full_name || errors.full_name}</p>}
-                                </div>
-                                <div>
-                                    <Label>Father's Name *</Label>
-                                    <Input value={data.fathers_name} onChange={e => handleInputChange('fathers_name', e.target.value)} className={stepErrors.fathers_name ? 'border-red-500' : ''} />
-                                    {stepErrors.fathers_name && <p className="text-sm text-red-500 mt-1">{stepErrors.fathers_name}</p>}
-                                </div>
-                                <div>
-                                    <Label>Mother's Name *</Label>
-                                    <Input value={data.mothers_name} onChange={e => handleInputChange('mothers_name', e.target.value)} className={stepErrors.mothers_name ? 'border-red-500' : ''} />
-                                    {stepErrors.mothers_name && <p className="text-sm text-red-500 mt-1">{stepErrors.mothers_name}</p>}
-                                </div>
-                                <div>
-                                    <Label>Date of Birth *</Label>
-                                    <Input type="date" value={data.dob} onChange={e => handleInputChange('dob', e.target.value)} className={stepErrors.dob ? 'border-red-500' : ''} />
-                                    {stepErrors.dob && <p className="text-sm text-red-500 mt-1">{stepErrors.dob}</p>}
-                                </div>
-                                <div>
-                                    <Label>NID Number *</Label>
-                                    <Input
-                                        value={data.nid}
-                                        onChange={e => {
-                                            const value = e.target.value.replace(/[^0-9]/g, '');
-                                            handleInputChange('nid', value);
-                                        }}
-                                        placeholder="National ID (10-17 digits)"
-                                        className={stepErrors.nid ? 'border-red-500' : ''}
-                                        maxLength={17}
-                                    />
-                                    {stepErrors.nid && <p className="text-sm text-red-500 mt-1">{stepErrors.nid}</p>}
+                            <div className="space-y-6">
+
+                                {/* 01 Student Name */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="md:col-span-2">
+                                        <h4 className="font-semibold text-primary mb-3 border-b pb-2">01. Student Name</h4>
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <Label>Name in Bengali</Label>
+                                        <Input value={data.name_bengali} onChange={e => handleInputChange('name_bengali', e.target.value)} placeholder="বাংলায় নাম লিখুন" />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <Label>Name in English (Block Letter) *</Label>
+                                        <Input
+                                            value={data.full_name}
+                                            onChange={e => handleInputChange('full_name', e.target.value.toUpperCase())}
+                                            placeholder="FULL NAME IN CAPITAL LETTERS"
+                                            className={stepErrors.full_name ? 'border-red-500' : ''}
+                                        />
+                                        {(stepErrors.full_name || errors.full_name) && <p className="text-sm text-red-500 mt-1">{stepErrors.full_name || errors.full_name}</p>}
+                                    </div>
                                 </div>
 
-                                {/* Contact Details Section */}
-                                <div className="md:col-span-2 mt-4">
-                                    <h4 className="font-semibold text-primary mb-3 border-b pb-2">4. Contact Details</h4>
+                                {/* 02 & 03 Mother's & Father's Name */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label>02. Mother's Name *</Label>
+                                        <Input value={data.mothers_name} onChange={e => handleInputChange('mothers_name', e.target.value)} placeholder="Mother's full name" className={stepErrors.mothers_name ? 'border-red-500' : ''} />
+                                        {stepErrors.mothers_name && <p className="text-sm text-red-500 mt-1">{stepErrors.mothers_name}</p>}
+                                    </div>
+                                    <div>
+                                        <Label>03. Father's Name *</Label>
+                                        <Input value={data.fathers_name} onChange={e => handleInputChange('fathers_name', e.target.value)} placeholder="Father's full name" className={stepErrors.fathers_name ? 'border-red-500' : ''} />
+                                        {stepErrors.fathers_name && <p className="text-sm text-red-500 mt-1">{stepErrors.fathers_name}</p>}
+                                    </div>
                                 </div>
-                                <div className="md:col-span-2">
-                                    <Label>(a) Present Address *</Label>
-                                    <Input value={data.present_address} onChange={e => handleInputChange('present_address', e.target.value)} placeholder="Enter your present address" className={stepErrors.present_address ? 'border-red-500' : ''} />
-                                    {stepErrors.present_address && <p className="text-sm text-red-500 mt-1">{stepErrors.present_address}</p>}
+
+                                {/* 04 Date of Birth */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label>04. Date of Birth *</Label>
+                                        <Input type="date" value={data.dob} onChange={e => handleInputChange('dob', e.target.value)} className={stepErrors.dob ? 'border-red-500' : ''} />
+                                        {stepErrors.dob && <p className="text-sm text-red-500 mt-1">{stepErrors.dob}</p>}
+                                    </div>
                                 </div>
-                                <div className="md:col-span-2">
-                                    <Label>(b) Permanent Address *</Label>
-                                    <Input value={data.permanent_address} onChange={e => handleInputChange('permanent_address', e.target.value)} placeholder="Enter your permanent address" className={stepErrors.permanent_address ? 'border-red-500' : ''} />
-                                    {stepErrors.permanent_address && <p className="text-sm text-red-500 mt-1">{stepErrors.permanent_address}</p>}
+
+                                {/* 06 & 07 Nationality & Blood Group */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label>06. Nationality</Label>
+                                        <Input value={data.nationality} onChange={e => handleInputChange('nationality', e.target.value)} placeholder="e.g. Bangladeshi" />
+                                    </div>
+                                    <div>
+                                        <Label>07. Blood Group</Label>
+                                        <Select value={data.blood_group} onValueChange={v => handleInputChange('blood_group', v)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select blood group" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(g => (
+                                                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
+
+                                {/* 08 NID */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label>08. National Identity Card Number *</Label>
+                                        <Input
+                                            value={data.nid}
+                                            onChange={e => {
+                                                const value = e.target.value.replace(/[^0-9]/g, '');
+                                                handleInputChange('nid', value);
+                                            }}
+                                            placeholder="National ID (10-17 digits)"
+                                            className={stepErrors.nid ? 'border-red-500' : ''}
+                                            maxLength={17}
+                                        />
+                                        {stepErrors.nid && <p className="text-sm text-red-500 mt-1">{stepErrors.nid}</p>}
+                                    </div>
+                                    <div>
+                                        <Label>09. Mobile Number *</Label>
+                                        <Input value={data.phone} onChange={e => handleInputChange('phone', e.target.value)} placeholder="+880XXXXXXXXXX" className={(stepErrors.phone || errors.phone) ? 'border-red-500' : ''} />
+                                        {(stepErrors.phone || errors.phone) && <p className="text-sm text-red-500 mt-1">{stepErrors.phone || errors.phone}</p>}
+                                    </div>
+                                </div>
+
+                                {/* 10 Email & 11 Marital Status */}
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Label>10. Email *</Label>
+                                        <Input
+                                            type="email"
+                                            value={data.email}
+                                            onChange={e => handleInputChange('email', e.target.value)}
+                                            readOnly={requireAuth && userEmail}
+                                            className={`${(requireAuth && userEmail) ? 'bg-slate-50 cursor-not-allowed' : ''} ${stepErrors.email ? 'border-red-500' : ''}`}
+                                            title={requireAuth && userEmail ? "Email cannot be changed (registered email)" : "Enter your email address"}
+                                            placeholder="your.email@example.com"
+                                        />
+                                        {requireAuth && userEmail ? (
+                                            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                                                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                                Registered email (cannot be changed)
+                                            </p>
+                                        ) : (
+                                            <p className="text-xs text-slate-500 mt-1">Enter a valid email address</p>
+                                        )}
+                                        {stepErrors.email && <p className="text-sm text-red-500 mt-1">{stepErrors.email}</p>}
+                                    </div>
+                                    <div>
+                                        <Label>11. Marital Status</Label>
+                                        <Select value={data.marital_status} onValueChange={v => handleInputChange('marital_status', v)}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select marital status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Married">Married</SelectItem>
+                                                <SelectItem value="Unmarried">Unmarried</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                {/* 12 Present Address */}
                                 <div>
-                                    <Label>(c) Mobile No. *</Label>
-                                    <Input value={data.phone} onChange={e => handleInputChange('phone', e.target.value)} placeholder="+880" className={(stepErrors.phone || errors.phone) ? 'border-red-500' : ''} />
-                                    {(stepErrors.phone || errors.phone) && <p className="text-sm text-red-500 mt-1">{stepErrors.phone || errors.phone}</p>}
+                                    <h4 className="font-semibold text-primary mb-3 border-b pb-2">12. Present Address</h4>
+                                    <div className="grid md:grid-cols-2 gap-3">
+                                        <div className="md:col-span-2">
+                                            <Label>House Name / No. *</Label>
+                                            <Input value={data.present_address} onChange={e => handleInputChange('present_address', e.target.value)} placeholder="House name or number" className={stepErrors.present_address ? 'border-red-500' : ''} />
+                                            {stepErrors.present_address && <p className="text-sm text-red-500 mt-1">{stepErrors.present_address}</p>}
+                                        </div>
+                                        <div>
+                                            <Label>Road</Label>
+                                            <Input value={data.present_road} onChange={e => handleInputChange('present_road', e.target.value)} placeholder="Road name or number" />
+                                        </div>
+                                        <div>
+                                            <Label>Village</Label>
+                                            <Input value={data.present_village} onChange={e => handleInputChange('present_village', e.target.value)} placeholder="Village name" />
+                                        </div>
+                                        <div>
+                                            <Label>Post Office</Label>
+                                            <Input value={data.present_post_office} onChange={e => handleInputChange('present_post_office', e.target.value)} placeholder="Post office" />
+                                        </div>
+                                        <div>
+                                            <Label>Upazila</Label>
+                                            <Input value={data.present_upazila} onChange={e => handleInputChange('present_upazila', e.target.value)} placeholder="Upazila" />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <Label>District</Label>
+                                            <Input value={data.present_district} onChange={e => handleInputChange('present_district', e.target.value)} placeholder="District" />
+                                        </div>
+                                    </div>
                                 </div>
+
+                                {/* 13 Permanent Address */}
                                 <div>
-                                    <Label>(d) Email *</Label>
-                                    <Input
-                                        type="email"
-                                        value={data.email}
-                                        onChange={e => handleInputChange('email', e.target.value)}
-                                        readOnly={requireAuth && userEmail}
-                                        className={`${(requireAuth && userEmail) ? 'bg-slate-50 cursor-not-allowed' : ''} ${stepErrors.email ? 'border-red-500' : ''}`}
-                                        title={requireAuth && userEmail ? "Email cannot be changed (registered email)" : "Enter your email address"}
-                                        placeholder="your.email@example.com"
-                                    />
-                                    {requireAuth && userEmail ? (
-                                        <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-                                            <CheckCircle2 className="h-3 w-3 text-green-600" />
-                                            Registered email (cannot be changed)
-                                        </p>
-                                    ) : (
-                                        <p className="text-xs text-slate-500 mt-1">Enter a valid email address</p>
-                                    )}
-                                    {stepErrors.email && <p className="text-sm text-red-500 mt-1">{stepErrors.email}</p>}
+                                    <h4 className="font-semibold text-primary mb-3 border-b pb-2">13. Permanent Address</h4>
+                                    <div className="grid md:grid-cols-2 gap-3">
+                                        <div className="md:col-span-2">
+                                            <Label>House Name / No. *</Label>
+                                            <Input value={data.permanent_address} onChange={e => handleInputChange('permanent_address', e.target.value)} placeholder="House name or number" className={stepErrors.permanent_address ? 'border-red-500' : ''} />
+                                            {stepErrors.permanent_address && <p className="text-sm text-red-500 mt-1">{stepErrors.permanent_address}</p>}
+                                        </div>
+                                        <div>
+                                            <Label>Road</Label>
+                                            <Input value={data.permanent_road} onChange={e => handleInputChange('permanent_road', e.target.value)} placeholder="Road name or number" />
+                                        </div>
+                                        <div>
+                                            <Label>Village</Label>
+                                            <Input value={data.permanent_village} onChange={e => handleInputChange('permanent_village', e.target.value)} placeholder="Village name" />
+                                        </div>
+                                        <div>
+                                            <Label>Post Office</Label>
+                                            <Input value={data.permanent_post_office} onChange={e => handleInputChange('permanent_post_office', e.target.value)} placeholder="Post office" />
+                                        </div>
+                                        <div>
+                                            <Label>Upazila</Label>
+                                            <Input value={data.permanent_upazila} onChange={e => handleInputChange('permanent_upazila', e.target.value)} placeholder="Upazila" />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <Label>District</Label>
+                                            <Input value={data.permanent_district} onChange={e => handleInputChange('permanent_district', e.target.value)} placeholder="District" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="md:col-span-2">
+
+                                {/* 18 Emergency Contact */}
+                                <div>
+                                    <h4 className="font-semibold text-primary mb-3 border-b pb-2">18. Emergency Contact</h4>
+                                    <div className="grid md:grid-cols-2 gap-3">
+                                        <div>
+                                            <Label>Name</Label>
+                                            <Input value={data.emergency_contact_name} onChange={e => handleInputChange('emergency_contact_name', e.target.value)} placeholder="Emergency contact name" />
+                                        </div>
+                                        <div>
+                                            <Label>Mobile No.</Label>
+                                            <Input value={data.emergency_contact_phone} onChange={e => handleInputChange('emergency_contact_phone', e.target.value)} placeholder="Emergency contact mobile" />
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <Label>Address</Label>
+                                            <Input value={data.emergency_contact_address} onChange={e => handleInputChange('emergency_contact_address', e.target.value)} placeholder="Emergency contact address" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Subject */}
+                                <div>
                                     <Label>Subject</Label>
                                     <div className="h-10 px-3 py-2 rounded-md border bg-muted flex items-center">
                                         <span className="font-medium">Management</span>

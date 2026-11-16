@@ -3,7 +3,7 @@ import { Link, Head } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Download } from 'lucide-react';
 import DynamicIcon from '@/components/DynamicIcon';
 
 export default function Home({ applyNowEnabled, activeSession, applicantAuth, hasSubmittedApplication, requireApplicantAuth, homeSettings = {} }) {
@@ -94,12 +94,13 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                             </div>
                         )}
                         <div className="flex flex-wrap justify-center gap-4 pt-4">
+                            {/* Online Apply Now button — always first (left) */}
                             {applicantAuth ? (
                                 hasSubmittedApplication ? null : (
                                     applyNowEnabled ? (
                                         <Link href={route('applicant.application.create')}>
-                                            <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-xl shadow-blue-500/25 gap-2">
-                                                Complete Application <ArrowRight className="h-5 w-5" />
+                                            <Button size="lg" style={{background:'linear-gradient(to right,#3b82f6,#06b6d4)'}} className="text-white hover:opacity-90 shadow-lg gap-2 px-6 py-3">
+                                                Apply Now <ArrowRight className="h-5 w-5" />
                                             </Button>
                                         </Link>
                                     ) : null
@@ -107,7 +108,7 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                             ) : (
                                 applyNowEnabled ? (
                                     <Link href={requireApplicantAuth ? route('applicant.register') : route('applicant.application.create')}>
-                                        <Button size="lg" className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-xl shadow-blue-500/25 gap-2">
+                                        <Button size="lg" style={{background:'linear-gradient(to right,#3b82f6,#06b6d4)'}} className="text-white hover:opacity-90 shadow-lg gap-2 px-6 py-3">
                                             Apply Now <ArrowRight className="h-5 w-5" />
                                         </Button>
                                     </Link>
@@ -116,6 +117,12 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                                 )
                             )}
 
+                            {/* Offline Apply button — always second (right) */}
+                            <a href="/offline-form">
+                                <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-slate-900 gap-2 px-6 py-3">
+                                    <Download className="h-5 w-5" /> Offline Apply
+                                </Button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -173,33 +180,41 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
                     <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">{ctaTitle}</h2>
                     <p className="text-blue-100 mb-8 max-w-2xl mx-auto">{ctaDesc}</p>
                     <div className="flex flex-wrap justify-center gap-4">
+                        {/* Online Apply Now — always first (left) */}
                         {applicantAuth ? (
                             hasSubmittedApplication ? (
                                 <Link href={route('applicant.dashboard')}>
-                                    <Button size="lg" variant="secondary" className="gap-2">
+                                    <Button size="lg" variant="secondary" className="gap-2 px-6 py-3">
                                         View Application <ArrowRight className="h-5 w-5" />
                                     </Button>
                                 </Link>
                             ) : (
                                 applyNowEnabled ? (
                                     <Link href={route('applicant.application.create')}>
-                                        <Button size="lg" variant="secondary" className="gap-2">
-                                            Complete Application <ArrowRight className="h-5 w-5" />
+                                        <Button size="lg" variant="secondary" className="gap-2 px-6 py-3">
+                                            Apply Now <ArrowRight className="h-5 w-5" />
                                         </Button>
                                     </Link>
                                 ) : null
                             )
                         ) : (
                             applyNowEnabled ? (
-                                <Link href={route('applicant.register')}>
-                                    <Button size="lg" variant="secondary" className="gap-2">
-                                        Start Application <ArrowRight className="h-5 w-5" />
+                                <Link href={requireApplicantAuth ? route('applicant.register') : route('applicant.application.create')}>
+                                    <Button size="lg" variant="secondary" className="gap-2 px-6 py-3">
+                                        Apply Now <ArrowRight className="h-5 w-5" />
                                     </Button>
                                 </Link>
                             ) : (
                                 <Button size="lg" variant="secondary" disabled>Applications Closed</Button>
                             )
                         )}
+
+                        {/* Offline Apply — always second (right) */}
+                        <a href="/offline-form">
+                            <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white hover:text-primary gap-2 px-6 py-3">
+                                <Download className="h-5 w-5" /> Offline Apply
+                            </Button>
+                        </a>
                     </div>
                 </div>
             </section>
