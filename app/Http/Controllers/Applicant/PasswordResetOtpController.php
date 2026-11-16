@@ -7,7 +7,6 @@ use App\Mail\ApplicantPasswordOtpMail;
 use App\Models\ApplicantUser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -24,15 +23,14 @@ use Inertia\Response;
  * emailed (stored hashed in password_reset_tokens, 10-minute validity)
  * -> applicant submits the code together with a new password.
  *
- * Guard rails: 60-second resend cooldown, max 5 sends per hour,
- * max 5 wrong-code attempts (code is then invalidated), single use.
+ * Owner decision 2026-11-16: NO barriers of any kind — no resend
+ * cooldown, no send cap, no wrong-attempt limit. Codes are single-use
+ * and expire after 10 minutes. Duplicate emails are allowed, so a
+ * successful reset updates EVERY account registered with that email.
  */
 class PasswordResetOtpController extends Controller
 {
     private const OTP_TTL_MINUTES = 10;
-    private const RESEND_COOLDOWN_SECONDS = 60;
-    private const MAX_SENDS_PER_HOUR = 5;
-    private const MAX_ATTEMPTS = 5;
     private const SESSION_KEY = 'applicant_password_reset_email';
 
     /**
@@ -135,26 +133,16 @@ class PasswordResetOtpController extends Controller
         }
 
         if (! Hash::check($request->input('otp'), $record->token)) {
-            $attempts = (int) Cache::get($this->attemptsKey($email), 0) + 1;
-            Cache::put($this->attemptsKey($email), $attempts, now()->addHour());
-
-            if ($attempts >= self::MAX_ATTEMPTS) {
-                DB::table('password_reset_tokens')->where('email', $email)->delete();
-                Cache::forget($this->attemptsKey($email));
-
-                throw ValidationException::withMessages([
-                    'otp' => 'Too many incorrect attempts. This code has been cancelled — please request a new code.',
-                ]);
-            }
-
             throw ValidationException::withMessages([
                 'otp' => 'The code you entered is incorrect. Please check your email and try again.',
             ]);
         }
 
-        $user = ApplicantUser::where('email', $email)->first();
+        // Duplicate emails are allowed: reset EVERY account with this email
+        // so the new password works no matter which account signs in.
+        $users = ApplicantUser::where('email', $email)->get();
 
-        if (! $user) {
+        if ($users->isEmpty()) {
             DB::table('password_reset_tokens')->where('email', $email)->delete();
 
             throw ValidationException::withMessages([
@@ -162,14 +150,16 @@ class PasswordResetOtpController extends Controller
             ]);
         }
 
-        $user->forceFill([
-            'password' => Hash::make($request->input('password')),
-            'remember_token' => null,
-        ])->save();
+        $passwordHash = Hash::make($request->input('password'));
+
+        foreach ($users as $user) {
+            $user->forceFill([
+                'password' => $passwordHash,
+                'remember_token' => null,
+            ])->save();
+        }
 
         DB::table('password_reset_tokens')->where('email', $email)->delete();
-        Cache::forget($this->attemptsKey($email));
-        Cache::forget($this->sendsKey($email));
         $request->session()->forget(self::SESSION_KEY);
 
         return redirect()->route('applicant.login')
@@ -178,29 +168,11 @@ class PasswordResetOtpController extends Controller
 
     /**
      * Shared send logic for the first send and for resends.
+     * No cooldown and no send cap — a new code can be requested
+     * at any time, as often as the applicant wants.
      */
     private function sendOtp(string $email, string $statusMessage): RedirectResponse
     {
-        // Resend cooldown: one code per minute at most.
-        $existing = DB::table('password_reset_tokens')->where('email', $email)->first();
-
-        if ($existing && now()->diffInSeconds($existing->created_at) < self::RESEND_COOLDOWN_SECONDS) {
-            $wait = self::RESEND_COOLDOWN_SECONDS - now()->diffInSeconds($existing->created_at);
-
-            throw ValidationException::withMessages([
-                'email' => "A code was just sent. Please wait {$wait} seconds before requesting another one.",
-            ]);
-        }
-
-        // Hourly send cap.
-        $sends = (int) Cache::get($this->sendsKey($email), 0);
-
-        if ($sends >= self::MAX_SENDS_PER_HOUR) {
-            throw ValidationException::withMessages([
-                'email' => 'Too many codes requested for this email. Please try again after some time.',
-            ]);
-        }
-
         $otp = (string) random_int(100000, 999999);
 
         DB::table('password_reset_tokens')->updateOrInsert(
@@ -219,22 +191,9 @@ class PasswordResetOtpController extends Controller
             ]);
         }
 
-        Cache::put($this->sendsKey($email), $sends + 1, now()->addHour());
-        Cache::forget($this->attemptsKey($email));
-
         session([self::SESSION_KEY => $email]);
 
         return redirect()->route('applicant.password.otp.form')
             ->with('status', $statusMessage);
-    }
-
-    private function attemptsKey(string $email): string
-    {
-        return 'applicant_otp_attempts:' . sha1(strtolower($email));
-    }
-
-    private function sendsKey(string $email): string
-    {
-        return 'applicant_otp_sends:' . sha1(strtolower($email));
     }
 }
