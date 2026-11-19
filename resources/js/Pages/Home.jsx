@@ -53,9 +53,9 @@ export default function Home({ applyNowEnabled, activeSession, applicantAuth, ha
     return (
         <PublicLayout>
             <Head>
-                <title>EMBA - Department of Management Studies, University of Barishal</title>
+                <title>EMBA Management Studies - Barishal University</title>
                 <meta name="description" content="Apply online for the Executive MBA (EMBA) program at the Department of Management Studies, University of Barishal. Official admission portal at bu-embamgt.com." />
-                <meta property="og:title" content="Executive MBA (EMBA) in Management Studies | University of Barishal" />
+                <meta property="og:title" content="EMBA Management Studies - Barishal University" />
                 <meta property="og:description" content="Apply online for the Executive MBA (EMBA) program at the Department of Management Studies, University of Barishal." />
             </Head>
 
